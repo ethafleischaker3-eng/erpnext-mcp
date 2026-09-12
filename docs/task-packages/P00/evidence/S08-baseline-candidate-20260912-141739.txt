@@ -1,0 +1,39 @@
+证据编号：EV-P00-011
+对应工作项/自检：W11-W12、D08-D09、S08 候选检查
+执行者：Codex（P00 实施上下文）
+执行时间：2026-09-12 14:17:40 +0800
+时区：China Standard Time (UTC+08:00)
+操作系统：Microsoft Windows 11 家庭中文版 (build 10.0.26200)
+PowerShell 版本：5.1.26100.9444
+Git 版本：git version 2.55.0.windows.5
+P00 冻结版本：v1.1（docs/task-records/freeze-manifests/P00-v1.1.md）
+完整命令：git rev-parse 标签/HEAD；git merge-base --is-ancestor；git diff --name-only 标签..候选；git status --short；sha256sum 回滚说明
+预期值：基线标签为候选祖先；候选差异仅含允许收尾文件；回滚说明存在
+实际值与判定：见下方原始输出
+
+===== 原始输出开始 =====
+--- 基线标签解析值 ---
+governance-p00-v1.1（注解对象） = 6d0f44d314f8870c41ad5036bcbddb7d93d74be7
+governance-p00-v1.1^{}（解引用提交） = a8bc0444adbfaab125a9570a970ac51f1005db6c
+HEAD = a8bc0444adbfaab125a9570a970ac51f1005db6c
+--- 祖先关系检查（0=标签为 HEAD 祖先）---
+is-ancestor 退出码：0
+--- 已提交差异 标签..HEAD（应空，HEAD==标签）---
+[diff 输出结束]
+--- 待提交候选（工作树相对标签的差异路径）---
+docs/task-packages/P00/task.md
+"docs/\344\273\273\345\212\241\345\214\205\347\231\273\350\256\260\350\241\250.md"
+[diff 输出结束]
+--- 工作树/暂存状态 ---
+ M docs/task-packages/P00/task.md
+ M "docs/\344\273\273\345\212\241\345\214\205\347\231\273\350\256\260\350\241\250.md"
+?? docs/task-packages/P00/evidence/S08-baseline-candidate-20260912-141739.txt
+?? docs/task-packages/P00/git-baseline.md
+[status 输出结束]
+--- 回滚说明（D09 git-baseline.md）存在性与哈希 ---
+-rw-r--r-- 1 乐 197121 2559 Sep 12 14:16 docs/task-packages/P00/git-baseline.md
+bdb1575e838a8a9eb188233c4ab74f67f74128b5b8fd74a0601addd34ed1a72b *docs/task-packages/P00/git-baseline.md
+--- 允许收尾范围核对 ---
+标签后允许：证据、状态记录、Freeze Manifest、登记表动态状态、回滚说明
+===== 原始输出结束 =====
+退出码：0
