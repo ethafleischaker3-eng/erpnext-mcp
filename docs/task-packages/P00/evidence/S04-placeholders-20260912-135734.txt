@@ -1,0 +1,37 @@
+证据编号：EV-P00-006
+对应工作项/自检：S04、完成定义
+执行者：Codex（P00 实施上下文）
+执行时间：2026-09-12 13:57:36 +0800
+时区：China Standard Time (UTC+08:00)
+操作系统：Microsoft Windows 11 家庭中文版 (build 10.0.26200)
+PowerShell 版本：5.1.26100.9444
+Git 版本：git version 2.55.0.windows.5
+P00 冻结版本：v1.1（docs/task-records/freeze-manifests/P00-v1.1.md）
+完整命令：grep 占位标记于 P00 task.md 与 evidence-manifest.md
+预期值：除阶段允许字段（完成日期/证据状态/时间戳）外无未处理占位项
+实际值与判定：见下方原始输出
+
+===== 原始输出开始 =====
+--- 占位标记扫描（task.md + evidence-manifest.md）---
+docs/task-packages/P00/task.md:19:| 完成日期 | 待验收通过后填写 |
+docs/task-packages/P00/task.md:169:| S01 | 检查 D01-D05 文件是否存在 | 全部存在；D01/D02 的正式输出保存到 `evidence/S01-files-<时间戳>.txt`，D04/D05 的正式输出保存到 `evidence/S01-governance-dirs-<时间戳>.txt`，D03 由 S02 单独验证 |
+docs/task-packages/P00/task.md:170:| S02 | 检查登记表 Markdown 各行列数 | 所有表格行列数一致；正式输出保存到 `evidence/S02-registry-columns-<时间戳>.txt` |
+docs/task-packages/P00/task.md:171:| S03 | 重新计算不可变治理文件 SHA-256，并检查登记表字段结构与列数 | 不可变文件与 Freeze Manifest 一致；登记表动态行更新后仍保持冻结字段结构且各行列数一致；正式输出保存到 `evidence/S03-freeze-hashes-<时间戳>.txt` |
+docs/task-packages/P00/task.md:172:| S04 | 搜索 P00 文件中的未处理占位项 | 除冻结日期、完成日期和正式证据状态等阶段性字段外无未处理占位项；正式输出保存到 `evidence/S04-placeholders-<时间戳>.txt` |
+docs/task-packages/P00/task.md:173:| S05 | 检查本任务的数据库、外部网络和依赖安装操作记录 | 均未发生；由实施者声明及命令/工具调用记录共同证明，正式记录保存到 `evidence/S05-boundary-<时间戳>.md` |
+docs/task-packages/P00/task.md:174:| S06 | 检查 Git 跟踪与忽略结果 | 无敏感/运行文件被跟踪；代表样例命中预期忽略规则；正式输出保存到 `evidence/S06-git-ignore-<时间戳>.txt` |
+docs/task-packages/P00/task.md:175:| S07 | 检查 submodule | `.gitmodules`、gitlink、已配置远程 URL及提交均符合 W10，内部工作树干净且 `.git` 未被迁移；不进行 GitHub 可达性探测；正式输出保存到 `evidence/S07-submodule-<时间戳>.txt` |
+docs/task-packages/P00/evidence-manifest.md:18:| EV-P00-001 | W01、全部前置条件重新验证 | 输出所有权威输入的路径、版本、页头状态及适用 Freeze Manifest；计算相关文件哈希 | 版本与冻结记录一致，无缺失基线 | `evidence/W01-baselines-<时间戳>.txt` | 待冻结后执行 |
+docs/task-packages/P00/evidence-manifest.md:19:| EV-P00-002 | W02、D01、D02、S01 | 逐一执行文件存在性检查并输出绝对路径、类型和实际值 | D01、D02 均存在且为文件 | `evidence/S01-files-<时间戳>.txt` | 待冻结后执行 |
+docs/task-packages/P00/evidence-manifest.md:20:| EV-P00-003 | W03、D04、D05、S01 | 检查 changes/returns 目录及 README，并输出实际路径和文件属性 | 两个目录及说明文件均存在 | `evidence/S01-governance-dirs-<时间戳>.txt` | 待冻结后执行 |
+docs/task-packages/P00/evidence-manifest.md:21:| EV-P00-004 | W04、D03、S02 | 输出登记表表头、P00 行、总行数和每行管道符/列数统计 | P00 内容与冻结 P00 一致；全部表格行均为 14 列 | `evidence/S02-registry-columns-<时间戳>.txt` | 待冻结后执行 |
+docs/task-packages/P00/evidence-manifest.md:22:| EV-P00-005 | S03、冻结基线不变量 | 对五份不可变治理文件逐一执行 SHA-256；检查登记表冻结字段结构 | 五份哈希逐项匹配；登记表字段结构未变 | `evidence/S03-freeze-hashes-<时间戳>.txt` | 待冻结后执行 |
+docs/task-packages/P00/evidence-manifest.md:23:| EV-P00-006 | S04、完成定义 | 搜索 P00 任务包和 Evidence Manifest 中的占位标记并输出匹配行 | 除阶段允许字段外无未处理占位项 | `evidence/S04-placeholders-<时间戳>.txt` | 待冻结后执行 |
+docs/task-packages/P00/evidence-manifest.md:24:| EV-P00-007 | S05、授权边界和禁止事项 | 实施者记录本任务实际使用的工具/命令类别，并声明数据库、外网、依赖安装及隐藏材料访问情况 | 四类禁止操作均未发生 | `evidence/S05-boundary-<时间戳>.md` | 待冻结后执行 |
+docs/task-packages/P00/evidence-manifest.md:25:| EV-P00-008 | W05-W07、剩余限制和风险 | 输出并核对 B00/A01 顺序、存量证据接管条款及验收材料任务阻断条款 | 三类门槛均明确且互不冲突 | `evidence/W05-W07-gates-<时间戳>.txt` | 待冻结后执行 |
+docs/task-packages/P00/evidence-manifest.md:26:| EV-P00-009 | W08-W09、D06、S06 | 记录 Git 初始化命令、版本、默认分支和本地身份来源；列出跟踪文件并对代表样例执行 `git check-ignore -v` | 主仓库建立；禁止文件未被跟踪；样例命中预期规则 | `evidence/S06-git-ignore-<时间戳>.txt` | 待 v1.1 冻结后执行 |
+docs/task-packages/P00/evidence-manifest.md:27:| EV-P00-010 | W10、D07、S07 | 输出 `.gitmodules`、index mode、submodule 已配置 URL/HEAD/status、内部 porcelain 状态及 `.git` 形态；不执行网络访问或 `absorbgitdirs` | 路径及配置 URL 正确；mode 为 gitlink；HEAD 为指定提交；内部工作树干净；`.git` 未被迁移 | `evidence/S07-submodule-<时间戳>.txt` | 待 v1.1 冻结后执行 |
+docs/task-packages/P00/evidence-manifest.md:28:| EV-P00-011 | W11-W12、D08-D09、S08 候选检查 | 在提交 S08 证据前输出证据收尾提交的父提交或待提交候选、基线标签解析值、祖先关系、`标签..候选` 变更路径及回滚说明哈希 | 基线标签为候选祖先；候选差异仅含允许的收尾文件；回滚说明存在 | `evidence/S08-baseline-candidate-<时间戳>.txt` | 待 v1.1 冻结后执行 |
+docs/task-packages/P00/evidence-manifest.md:29:| EV-P00-012 | S08 最终复核、全部完成定义、独立验收 | Acceptor 在证据/状态收尾提交完成后，对最终 HEAD 执行只读祖先关系、差异路径和工作树检查，并逐条复核 P00 v1.1 的全部完成定义及其证据；不向主工作树写入结果 | 基线标签为最终 HEAD 祖先；标签后差异全部合规；工作树干净；全部完成定义成立且证据可独立复核 | 指向最终 HEAD 的 annotated tag `governance-p00-v1.1-accepted`；tag message 保存完整复核信息及外部原始输出哈希 | 待 Acceptor 最终执行 |
+===== 原始输出结束 =====
+退出码：0

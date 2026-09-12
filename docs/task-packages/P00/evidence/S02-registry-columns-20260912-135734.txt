@@ -1,0 +1,47 @@
+证据编号：EV-P00-004
+对应工作项/自检：W04、D03、S02
+执行者：Codex（P00 实施上下文）
+执行时间：2026-09-12 13:57:35 +0800
+时区：China Standard Time (UTC+08:00)
+操作系统：Microsoft Windows 11 家庭中文版 (build 10.0.26200)
+PowerShell 版本：5.1.26100.9444
+Git 版本：git version 2.55.0.windows.5
+P00 冻结版本：v1.1（docs/task-records/freeze-manifests/P00-v1.1.md）
+完整命令：awk 统计登记表各表格行列数；grep 表头与 P00 行
+预期值：全部表格行均为 14 列；P00 行与冻结定义一致
+实际值与判定：见下方原始输出
+
+===== 原始输出开始 =====
+--- 各表格行列数统计（列数=竖线数-1）---
+行007: 14列
+行008: 14列
+行009: 14列
+行010: 14列
+行011: 14列
+行012: 14列
+行013: 14列
+行014: 14列
+行015: 14列
+行016: 14列
+行017: 14列
+行018: 14列
+行019: 14列
+行020: 14列
+行021: 14列
+行022: 14列
+行023: 14列
+行024: 14列
+行025: 14列
+行026: 14列
+行027: 14列
+行028: 14列
+行029: 14列
+行030: 14列
+行031: 14列
+行032: 14列
+--- 表头行 ---
+7:| 编号 | 名称 | 版本 | 状态 | Owner | Implementer | Implementation Reviewer | Acceptance Reviewer | Acceptor | 上游依赖 | 写入集/共享文件 | 任务包位置 | 证据位置 | 备注 |
+--- P00 行 ---
+9:| P00 | 项目总控与治理基线 | v1.1 | 实施中 | gjg | Codex（P00 实施上下文） | gjg | 不适用 | gjg | 冻结 PRD、总则及治理模板 | `docs/task-packages/P00/`、根 Git 元数据、`.gitignore`、`.gitmodules`、登记表 P00 行、治理记录目录；Owner=gjg | `docs/task-packages/P00/task.md` | `docs/task-packages/P00/evidence-manifest.md` | CHG-P00-20260912-001 已评审通过；v1.1 已冻结并进入实施中（依据 P00 v1.1 Freeze Manifest） |
+===== 原始输出结束 =====
+退出码：0

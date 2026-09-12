@@ -1,0 +1,63 @@
+证据编号：EV-P00-005
+对应工作项/自检：S03、冻结基线不变量
+执行者：Codex（P00 实施上下文）
+执行时间：2026-09-12 13:57:35 +0800
+时区：China Standard Time (UTC+08:00)
+操作系统：Microsoft Windows 11 家庭中文版 (build 10.0.26200)
+PowerShell 版本：5.1.26100.9444
+Git 版本：git version 2.55.0.windows.5
+P00 冻结版本：v1.1（docs/task-records/freeze-manifests/P00-v1.1.md）
+完整命令：sha256sum 五份不可变治理文件并与 Freeze Manifest 比对；检查登记表字段结构
+预期值：五份哈希逐项匹配冻结值；登记表字段结构未变
+实际值与判定：见下方原始输出
+
+===== 原始输出开始 =====
+--- 五份不可变治理文件 SHA-256 与冻结值比对 ---
+MATCH  docs/MCP改造任务包总则.md
+    冻结 4ad600504daa87641badcf4cebc9f7b1be990f6e50373524dd18f49c44ce5c28
+    实际 4ad600504daa87641badcf4cebc9f7b1be990f6e50373524dd18f49c44ce5c28
+MATCH  docs/任务包模板.md
+    冻结 b53a96f28dc4a67901dec8392461c3032e520d6c617187bfe31d6af7b92c7b34
+    实际 b53a96f28dc4a67901dec8392461c3032e520d6c617187bfe31d6af7b92c7b34
+MATCH  docs/实施区与验收区边界.md
+    冻结 f815420c5bb75272d88efd87f49058b4b2f45dc1759df2b956cc09ffdcb05801
+    实际 f815420c5bb75272d88efd87f49058b4b2f45dc1759df2b956cc09ffdcb05801
+MATCH  docs/任务包变更记录模板.md
+    冻结 0f4b172c09bffe1034631c4711a10994b9874faf3eba98a4512bfdb3bdb6c34b
+    实际 0f4b172c09bffe1034631c4711a10994b9874faf3eba98a4512bfdb3bdb6c34b
+MATCH  docs/任务包退回记录模板.md
+    冻结 5fac9e64ac81fffc3a924ef876521a1a7f0f411eafe3d5a7505e39f6ee52b50c
+    实际 5fac9e64ac81fffc3a924ef876521a1a7f0f411eafe3d5a7505e39f6ee52b50c
+--- 登记表字段结构检查（表头 + 列数）---
+7:| 编号 | 名称 | 版本 | 状态 | Owner | Implementer | Implementation Reviewer | Acceptance Reviewer | Acceptor | 上游依赖 | 写入集/共享文件 | 任务包位置 | 证据位置 | 备注 |
+行007: 14列
+行008: 14列
+行009: 14列
+行010: 14列
+行011: 14列
+行012: 14列
+行013: 14列
+行014: 14列
+行015: 14列
+行016: 14列
+行017: 14列
+行018: 14列
+行019: 14列
+行020: 14列
+行021: 14列
+行022: 14列
+行023: 14列
+行024: 14列
+行025: 14列
+行026: 14列
+行027: 14列
+行028: 14列
+行029: 14列
+行030: 14列
+行031: 14列
+行032: 14列
+--- 登记表内容哈希（动态行，与冻结哈希预期不同，仅作变更留痕）---
+冻结 41c47b7cf8ee10a3c7b9ef0b7745e6607d6d8d5a10607123505f7ffa81ac1994
+实际 295a21ab86dacc937a6794b9d0f6bb2b6b3c628acc4e1f3ea2a144b98d5f18a0
+===== 原始输出结束 =====
+退出码：0

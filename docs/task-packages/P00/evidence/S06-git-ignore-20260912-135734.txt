@@ -1,0 +1,83 @@
+证据编号：EV-P00-009
+对应工作项/自检：W08-W09、D06、S06
+执行者：Codex（P00 实施上下文）
+执行时间：2026-09-12 14:00:36 +0800
+时区：China Standard Time (UTC+08:00)
+操作系统：Microsoft Windows 11 家庭中文版 (build 10.0.26200)
+PowerShell 版本：5.1.26100.9444
+Git 版本：git version 2.55.0.windows.5
+P00 冻结版本：v1.1（docs/task-records/freeze-manifests/P00-v1.1.md）
+完整命令：git init -b main；git config local 身份；git status --short；cat .gitignore；git check-ignore -v/-q 代表样例
+预期值：主仓库建立(main)；本地身份 gjg/<email>；禁止文件未被跟踪；样例命中预期规则；example.env 未被忽略
+实际值与判定：见下方原始输出
+
+===== 原始输出开始 =====
+--- Git 版本 ---
+git version 2.55.0.windows.5
+--- 是否处于工作树 ---
+true
+--- 当前分支 ---
+main
+--- 本地身份（来源：--local，git init 后显式设置）---
+user.name  = gjg
+user.email = ethafleischaker3@gmail.com
+--- 暂存/跟踪状态（尚无提交，A=已暂存，??=未跟踪）---
+A  .gitmodules
+A  frappe_docker
+?? .gitignore
+?? docs/
+?? erp/
+--- .gitignore 内容 ---
+# 根级忽略规则（P00 W09）
+# 覆盖：环境文件、站点数据、依赖目录、Python 缓存、日志、备份、数据库转储/文件、虚拟环境
+
+# 环境变量（example.env 为模板，予以保留，不入忽略）
+**/.env
+**/.env.*
+!**/example.env
+
+# 站点/运行数据
+**/sites/
+
+# 依赖目录
+**/node_modules/
+**/venv/
+
+# Python 缓存
+**/__pycache__/
+**/*.pyc
+
+# 日志
+**/*.log
+
+# 备份
+**/*.bak
+**/*.backup
+
+# 数据库转储 / SQLite
+**/*.dump
+**/*.sql
+**/*.sqlite
+**/*.sqlite3
+--- git check-ignore -v 代表样例（应逐行命中忽略规则）---
+.gitignore:5:**/.env	.env
+.gitignore:6:**/.env.*	.env.local
+.gitignore:10:**/sites/	sites/
+.gitignore:13:**/node_modules/	node_modules/
+.gitignore:17:**/__pycache__/	__pycache__/
+.gitignore:18:**/*.pyc	app.pyc
+.gitignore:21:**/*.log	app.log
+.gitignore:24:**/*.bak	data.bak
+.gitignore:25:**/*.backup	data.backup
+.gitignore:28:**/*.dump	db.dump
+.gitignore:29:**/*.sql	db.sql
+.gitignore:30:**/*.sqlite	db.sqlite
+.gitignore:31:**/*.sqlite3	db.sqlite3
+.gitignore:14:**/venv/	venv/
+--- example.env（应不被忽略）---
+[check-ignore -v：显示命中规则，应为否定规则 !**/example.env，证明被显式重新纳入]
+.gitignore:7:!**/example.env	example.env
+[check-ignore -q：静默权威判定，退出码 1=未被忽略，0=被忽略]
+example.env 判定退出码：1（1=未被忽略，符合要求）
+===== 原始输出结束 =====
+退出码：0
