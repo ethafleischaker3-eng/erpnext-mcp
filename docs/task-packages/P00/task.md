@@ -7,7 +7,7 @@
 | 编号 | P00 |
 | 名称 | 项目总控与治理基线 |
 | 版本 | v1.1 |
-| 状态 | 已通过 |
+| 状态 | 已封存 |
 | 创建人 | Codex |
 | Owner | gjg |
 | Implementer | Codex（当前 P00 实施上下文） |
@@ -220,3 +220,43 @@
 | 2026-09-12 | 已冻结 | 实施中 | gjg | 依据 P00 v1.1 Freeze Manifest 进入实施中；仅动态状态更新，不改变冻结目标、范围与完成定义 |
 | 2026-09-12 | 实施中 | 待验收 | Codex | 完成 W01—W12 及 S01—S08 正式自检，生成 EV-P00-001 至 EV-P00-011 证据并提交全部交付物；待 Acceptor 独立验收（EV-P00-012） |
 | 2026-09-12 | 待验收 | 已通过 | gjg | 独立验收通过（EV-P00-012）：全部完成定义成立，证据可独立复核；annotated tag governance-p00-v1.1-accepted 指向最终 HEAD |
+| 2026-09-12 | 已通过 | 已封存 | gjg | 独立验收通过后归档；封存记录与对 B00 的输入/影响见第 18 节 |
+
+## 18. 封存记录与下游影响
+
+### 18.1 封存信息
+
+| 字段 | 内容 |
+|---|---|
+| 状态 | 已封存 |
+| 封存日期 | 2026-09-12 |
+| 操作人 | gjg |
+| 基线标签 | `governance-p00-v1.1`（`a8bc0444adbfaab125a9570a970ac51f1005db6c`） |
+| 验收标签 | `governance-p00-v1.1-accepted`（指向最终 HEAD `8a9775501af6f80744783a0dc37012e7c23b7bc8`） |
+
+### 18.2 封存材料
+
+- 冻结版任务包及证据计划快照：`docs/task-packages/P00/frozen/v1.1/task.md`、`evidence-manifest.md`；
+- 权威输入版本清单：本文件第 5 节；
+- 交付物：根 Git 主仓库基线提交 `a8bc0444adbfaab125a9570a970ac51f1005db6c`、`.gitignore`、`.gitmodules`、`frappe_docker` gitlink `a0c52135d4d41c4b8acf7adfdfc5bbcba46dd4d0`、`git-baseline.md`；
+- 自检记录：`docs/task-packages/P00/evidence/S01—S08-*.txt` 及 `S05-boundary-*.md`；
+- 独立验收记录：annotated tag `governance-p00-v1.1-accepted`；
+- 变更记录：`docs/task-records/changes/CHG-P00-20260912-001.md`；
+- 已知限制：本文件第 16 节。
+
+### 18.3 对 B00 的输入
+
+1. 冻结上游基线版本：《开源后端 Agent 化接入规范》2026-09-07 定稿版；《ERPNext-MCP 改造 PRD》2026-09-12-r1；《MCP 改造任务包总则》v1.0 及配套治理物料 v1.0；
+2. 可追溯 Git 基线：主仓库、基线提交与标签、`frappe_docker` 固定提交 `a0c52135d4d41c4b8acf7adfdfc5bbcba46dd4d0`；
+3. 治理记录固定目录：`docs/task-records/changes/`、`returns/`、`freeze-manifests/`；
+4. 角色隔离与状态流转规则（总则 §2.5、§7）；
+5. 存量证据接管规则（总则 §6.13）：B00 须重新验证或书面采纳治理生效前探索证据并生成新证据编号。
+
+### 18.4 对 B00 的影响与门槛
+
+1. B00 是 P00 的直接下游，B00 通过后方可创建并冻结 A01（总则 §16.5）；
+2. B00 必须取得并冻结的待验证事实：可信调用方身份来源、权限模型可行性、币种与默认 selling Price List 等（总则 §16.2、PRD 待验证项）；
+3. B00 不得将临时探针权限直接沿用为正式业务权限（总则 §13，E01 依据冻结契约另行审查）；
+4. 实施区/验收区实际路径、Owner 与访问控制尚未确定并验证——B00 须完成该交付物后，验收材料相关任务（C01a/C01b/G01）方可启动（总则 §16.2）；
+5. B00 继承 P00 的角色隔离、禁止事项与最小授权边界；
+6. P00 已知限制不变：本地 Git 不构成灾难恢复；未验证 GitHub 可达性。
