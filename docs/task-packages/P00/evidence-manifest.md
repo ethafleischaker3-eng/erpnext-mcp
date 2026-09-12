@@ -26,7 +26,7 @@
 | EV-P00-009 | W08-W09、D06、S06 | 记录 Git 初始化命令、版本、默认分支和本地身份来源；列出跟踪文件并对代表样例执行 `git check-ignore -v` | 主仓库建立；禁止文件未被跟踪；样例命中预期规则 | `evidence/S06-git-ignore-20260912-135734.txt` | 已完成（2026-09-12） |
 | EV-P00-010 | W10、D07、S07 | 输出 `.gitmodules`、index mode、submodule 已配置 URL/HEAD/status、内部 porcelain 状态及 `.git` 形态；不执行网络访问或 `absorbgitdirs` | 路径及配置 URL 正确；mode 为 gitlink；HEAD 为指定提交；内部工作树干净；`.git` 未被迁移 | `evidence/S07-submodule-20260912-135734.txt` | 已完成（2026-09-12） |
 | EV-P00-011 | W11-W12、D08-D09、S08 候选检查 | 在提交 S08 证据前输出证据收尾提交的父提交或待提交候选、基线标签解析值、祖先关系、`标签..候选` 变更路径及回滚说明哈希 | 基线标签为候选祖先；候选差异仅含允许的收尾文件；回滚说明存在 | `evidence/S08-baseline-candidate-20260912-141739.txt` | 已完成（2026-09-12） |
-| EV-P00-012 | S08 最终复核、全部完成定义、独立验收 | Acceptor 在证据/状态收尾提交完成后，对最终 HEAD 执行只读祖先关系、差异路径和工作树检查，并逐条复核 P00 v1.1 的全部完成定义及其证据；不向主工作树写入结果 | 基线标签为最终 HEAD 祖先；标签后差异全部合规；工作树干净；全部完成定义成立且证据可独立复核 | 指向最终 HEAD 的 annotated tag `governance-p00-v1.1-accepted`；tag message 保存完整复核信息及外部原始输出哈希 | 待 Acceptor 最终执行 |
+| EV-P00-012 | S08 最终复核、全部完成定义、独立验收 | Acceptor 在证据/状态收尾提交完成后，对最终 HEAD 执行只读祖先关系、差异路径和工作树检查，并逐条复核 P00 v1.1 的全部完成定义及其证据；不向主工作树写入结果 | 基线标签为最终 HEAD 祖先；标签后差异全部合规；工作树干净；全部完成定义成立且证据可独立复核 | 指向最终 HEAD 的 annotated tag `governance-p00-v1.1-accepted`；tag message 保存完整复核信息及外部原始输出哈希 | 待 Acceptor 最终执行 | 已完成（2026-09-12，Acceptor: gjg） |
 
 ## 3. 正式证据记录要求
 
