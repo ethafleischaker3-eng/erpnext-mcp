@@ -250,3 +250,41 @@ B01 不提供正式业务 tool，不定义 tool 语义或 schema。本节规定�
 | 2026-09-14 | 退回 | 实施中 | Claude（B01 实施上下文） | 冻结目标/范围/完成定义未变化，在原授权内修复 |
 | 2026-09-14 | 实施中 | 待验收 | Claude（B01 实施上下文） | 整改完成：补测 Supplier update 五项（陈旧 modified→417、creation/owner→417、name→404）、实测快照 dump→restore 往返成功、回填 §4 两行、Manifest 时间补至秒级（UTC+8）并重算哈希；重新提交待验收 |
 | 2026-09-14 | 待验收 | 验收通过 | gjg | 独立验收通过：§9 九项全覆盖、F1–F5 自洽且证据充分；完成定义九条全部满足；四类对象零残留；EV-B01-001..008 与冻结快照哈希 10/10 一致；R1/R2/R3 整改复核闭合 |
+| 2026-09-14 | 验收通过 | 已封存 | gjg | 独立验收通过后归档；封存记录与对 D01/D02 及下游任务包的输入/影响见第 18 节 |
+
+## 18. 封存记录与下游影响
+
+### 18.1 封存信息
+
+| 字段 | 内容 |
+|---|---|
+| 状态 | 已封存 |
+| 封存日期 | 2026-09-14 |
+| 操作人 | gjg |
+| 结论 | 主数据接口事实已冻结：乐观版本断言与生效区间不重叠均「须由 MCP server 层实现」；主数据 create/update/set 由后端单事务保证；失败不静默 |
+| Freeze Manifest | `docs/task-records/freeze-manifests/B01-v1.0.md` |
+
+### 18.2 封存材料
+
+- 冻结版任务包及证据计划快照：`docs/task-packages/B01/frozen/v1.0/task.md`、`evidence-manifest.md`；
+- 权威输入版本清单：本文件第 5 节；
+- 交付物：D01–D06（任务包、Evidence Manifest、登记表 B01 行、接口事实记录 `interface-facts.md`、合成数据与清理记录、各场景原始证据）；
+- 自检记录：`docs/task-packages/B01/evidence-manifest.md`（S01–S08 对应 EV-B01-001..008）；
+- 独立验收记录：本文件第 17 节状态记录；
+- 变更与退回记录：1 次退回（R1/R2/R3 整改，见第 17 节）。
+
+### 18.3 对下游任务包的输入
+
+1. **名称唯一性事实（→ D01/D02 #6/#8/#10）**：Customer 同名不拒绝（自动改名 `X - 1`），Supplier/Item 拒绝（`DuplicateEntryError` 409）；server 须统一实现「同名对象不存在」前置断言，不得依赖后端（F1）；
+2. **乐观版本断言事实（→ D02 #7/#9/#11/#12）**：`modified` 为可选并发令牌，提供则校验（陈旧→417 `TimestampMismatchError`）、省略则不校验；server 写 tool 必须始终携带当前 `modified`（F2）；
+3. **Item Price 生效区间事实（→ D02 #12）**：`valid_from`/`valid_upto` 区间重叠不被后端拒绝、不自动调整；`item_price_set` 的区间不重叠校验须由 server 实现（F3）；
+4. **删除/回滚事实（→ D01/D02、E04）**：未引用删除 202；Item 被 Item Price 引用时删除级联删除 Item Price，后端不主动拒绝引用删除；server 删除/回滚须自行前置引用检查（F4）；
+5. **不可修改字段与 docstatus 事实（→ D02、B02–B04）**：`name`/`creation`/`owner` 常量不可改（417/404）；`docstatus` 可被普通 update 改写；主数据恒 docstatus=0 无业务风险，交易单据须注意（F5）；
+6. **原子性事实（→ D02）**：主数据 create/update/Item Price set 单请求单事务；`check_if_latest` 在 `_save()` 内与写入同事务，版本不匹配无部分写入；失败均结构化报错、不静默（§3/§6）。
+
+### 18.4 对下游任务包的影响与门槛
+
+1. B01 通过 → D01/D02 冻结 #6–#12 主数据 tool 契约具备权威输入；B01 的乐观版本断言与原子性结论为 D02 冻结 #6–#12 契约的前置（总则 §13）；
+2. F1–F5 结论写入 PRD 或成为 D01/D02 权威输入时走变更控制；本包本身不改 PRD 冻结语义；
+3. B02–B04 仍须各自实测销售/采购/库存链路，B01 不代其结论（尤其 confirm 状态漂移、交易单据 docstatus 与版本断言）；
+4. B01 已知限制不变：Customer/Supplier 的引用删除因引用源为交易单据（B02/B03 范围）本包未实测；Item Price 直接 DELETE 未单独实测（W05 范围外，通用删除路由 §1 已确认）；后端凭据为本地开发默认值，迁移共享/生产环境必须更换。
