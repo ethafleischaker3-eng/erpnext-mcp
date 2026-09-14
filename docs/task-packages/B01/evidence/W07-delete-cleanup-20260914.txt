@@ -1,0 +1,19 @@
+# W07 回滚/删除条件与清理证据（脱敏）
+
+认证 `Authorization: token <REDACTED>`；Base `http://localhost:8080/api/resource`。
+
+| 场景 | HTTP | 结果 |
+|---|---|---|
+| Customer 未引用删除 | 202 | {"data":"ok"}，GET 后 404 |
+| Supplier 未引用删除 | 202 | 同上 |
+| Item 未引用删除 | 202 | 同上 |
+| Item 被 2 条 Item Price 引用时删除 | 202 | **级联删除**：Item 与 2 条 Item Price 全部 404，不拒绝 |
+| docstatus=1 的 Item 删除 | 202 | 仍可删除 |
+
+清理清查（name/item_code LIKE `B01-PROBE-%`）：
+- Customer：0 残留
+- Supplier：0 残留
+- Item：0 残留（含 docstatus=1 的 B01-PROBE-ITEM-010 已删）
+- Item Price：0 残留（随 Item 级联删除）
+
+结论：后端删除对「被引用对象」走级联而非拒绝（Item→Item Price）；Customer/Supplier 的引用删除因引用源为交易单据（B02/B03 范围）本包未实测，MCP server 删除/回滚须自行前置引用检查。

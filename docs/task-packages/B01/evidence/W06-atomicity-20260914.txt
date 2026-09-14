@@ -1,0 +1,12 @@
+# W06 原子性与失败不静默证据（脱敏）
+
+认证 `Authorization: token <REDACTED>`；Base `http://localhost:8080/api/resource`。
+
+| 结论项 | 证据 |
+|---|---|
+| 单次请求原子完成 | 主数据 create/update/Item Price set 均为单次 REST 请求 → Frappe `insert()`/`save()` 单事务，无「先查后写」跨请求窗口 |
+| 版本校验与写入同事务 | `check_if_latest()` 在 `_save()` 内执行：`modified` 不匹配时抛 `TimestampMismatchError`（417），写入不发生、无部分写入 |
+| Item Price 区间校验 | 后端无原生区间校验，故「区间校验与写入同事务」须由 MCP server 自建（对应 F3） |
+| 失败不静默 | 全部失败返回结构化异常 + 4xx：LinkValidationError/ValidationError/TimestampMismatchError/CannotChangeConstantError=417，DuplicateEntryError=409，DoesNotExistError=404；未观察到任何「失败被报告为成功」 |
+
+失败路径抽查：无效 customer_group（417）、同名 Supplier（409）、陈旧 modified（417）、改 creation（417）均未产生写入（对应对象 GET 不存在或值未变）。

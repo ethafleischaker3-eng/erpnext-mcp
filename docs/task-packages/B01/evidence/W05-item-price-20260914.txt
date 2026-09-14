@@ -1,0 +1,12 @@
+# W05 Item Price 接口摸底证据（脱敏）
+
+认证 `Authorization: token <REDACTED>`；Base `http://localhost:8080/api/resource`。
+
+| 场景 | HTTP | 结果 |
+|---|---|---|
+| create #1（item_code=B01-PROBE-ITEM-001, price_list=Standard Selling, rate=100, selling=1, valid_from=2026-01-01, valid_upto=2026-12-31） | 200 | 成功；name 自动哈希（u8o5hlqgt4），currency 默认 CNY |
+| create #2 区间重叠（同 item+price_list，rate=120, valid_from=2026-06-01, valid_upto=2026-12-31） | 200 | **不拒绝、不自动调整**：第二条成功，第一条 valid_upto 仍 2026-12-31，两条重叠并存 |
+| update 陈旧 modified=2000-01-01 | 417 | TimestampMismatchError（版本断言与 Customer 同） |
+| 物料有效性 | — | item_code 无效→LinkValidationError（Frappe Link 校验） |
+
+关键结论：生效区间 `valid_from`/`valid_upto` 重叠不被后端原生强制，须由 MCP server 层实现（PRD §5.2 #12）。

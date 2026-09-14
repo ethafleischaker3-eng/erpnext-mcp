@@ -1,0 +1,16 @@
+# W03 Supplier 接口摸底证据（脱敏）
+
+认证 `Authorization: token <REDACTED>`；Base `http://localhost:8080/api/resource`。
+
+| 场景 | HTTP | 结果 |
+|---|---|---|
+| create 合法（supplier_name=B01-PROBE-SUP-001, supplier_group=Distributor） | 200 | 成功；name=supplier_name |
+| create 同名重复 | 409 | **拒绝** DuplicateEntryError: ('Supplier','B01-PROBE-SUP-001', IntegrityError 1062 Duplicate entry ... PRIMARY) |
+| create 无效 supplier_group=NONEXISTENT-SUPGROUP | 417 | LinkValidationError: Could not find Supplier Group |
+| update 陈旧 modified=2000-01-01 | 417 | TimestampMismatchError: Document has been modified after you have opened it（实测） |
+| update creation=2000-01-01 | 417 | CannotChangeConstantError: Value cannot be changed for Created On（实测） |
+| update owner=someoneelse | 417 | CannotChangeConstantError: Value cannot be changed for Created By（实测） |
+| update name=B01-PROBE-SUP-RENAMED | 404 | DoesNotExistError（重解析新 name 失败，实测） |
+| delete 未引用 | 202 | {"data":"ok"} |
+
+关键差异（相对 Customer）：Supplier 同名创建被后端原生拒绝（409），Customer 则自动改名不拒绝。版本断言与不可修改字段均逐项实测（非推断）。

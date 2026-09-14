@@ -1,0 +1,19 @@
+# W02 Customer 接口摸底证据（脱敏）
+
+认证 `Authorization: token <REDACTED>`；Base `http://localhost:8080/api/resource`。
+
+| 场景 | HTTP | 结果 |
+|---|---|---|
+| create 合法（customer_name=B01-PROBE-CUST-001, customer_group=Commercial, territory=All Territories） | 200 | 成功；name=customer_name |
+| create 同名重复 | 200 | **不拒绝**，name 自动改 `B01-PROBE-CUST-001 - 1`，customer_name 保持重复；服务端提示「Changed customer name to ... as ... already exists」 |
+| create 无效 customer_group=NONEXISTENT-GROUP | 417 | LinkValidationError: Could not find Customer Group |
+| create 无效 territory=NONEXISTENT-TERRITORY | 417 | LinkValidationError: Could not find Territory |
+| create customer_group=All Customer Groups（is_group=1） | 417 | ValidationError: Cannot select a Group type Customer Group |
+| update 陈旧 modified=2000-01-01 | 417 | TimestampMismatchError: Document has been modified after you have opened it |
+| update modified=当前值 + customer_type=Individual | 200 | 成功，customer_type 改 Individual，modified 更新 |
+| update 不带 modified | 200 | 成功，无版本校验 |
+| update creation=2000-01-01 | 417 | CannotChangeConstantError: Value cannot be changed for Created On |
+| update name=B01-PROBE-CUST-RENAMED | 404 | DoesNotExistError（重解析新 name 失败） |
+| delete 未引用 | 202 | {"data":"ok"}；GET 后 404 |
+
+清理：B01-PROBE-CUST-001 与自动产生的 `B01-PROBE-CUST-001 - 1` 均 DELETE 202，零残留。

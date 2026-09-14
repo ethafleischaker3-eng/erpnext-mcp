@@ -1,0 +1,17 @@
+# W04 Item 接口摸底证据（脱敏）
+
+认证 `Authorization: token <REDACTED>`；Base `http://localhost:8080/api/resource`。
+
+| 场景 | HTTP | 结果 |
+|---|---|---|
+| create 合法（item_code=B01-PROBE-ITEM-001, item_group=Products, stock_uom=Nos） | 200 | 成功；name=item_code，item_name 自动取 item_code；自动生成 item_defaults（company=gjg, default_warehouse=Stores - G）与 uoms |
+| create 同名重复 item_code | 409 | **拒绝** DuplicateEntryError（IntegrityError 1062 Duplicate entry PRIMARY） |
+| create 无效 item_group=NONEXISTENT-IG | 417 | LinkValidationError: Could not find Item Group |
+| create 无效 stock_uom=NONEXISTENT-UOM | 417 | LinkValidationError: Could not find Default Unit of Measure |
+| update 版本断言 | 417 | modified 陈旧→TimestampMismatchError（与 Customer 同） |
+| update docstatus=1 | 200 | **docstatus 可被普通 update 改写**（实际值变 1，未走提交流）；主数据恒 docstatus=0，无业务风险 |
+| update owner=someoneelse | 417 | CannotChangeConstantError: Value cannot be changed for Created By |
+| delete 未引用 | 202 | 成功 |
+| delete 被 Item Price 引用 | 202 | **不拒绝，级联删除全部 Item Price**（见 W07） |
+
+清理：B01-PROBE-ITEM-001（及级联的 Item Price）、B01-PROBE-ITEM-010 均删除，零残留。

@@ -1,0 +1,14 @@
+# W01 环境与凭据复核证据（脱敏）
+
+执行时间：2026-09-14（UTC+8）。执行者：Claude（B01 实施上下文）。环境：Windows 11 / Git Bash / Docker Desktop 29.7.2。
+
+| 检查项 | 结果 |
+|---|---|
+| Docker 容器 | `docker compose` 九容器 Up（frontend/backend/db/redis-cache/redis-queue/queue-short/queue-long/scheduler/websocket），db health starting→就绪 |
+| `localhost:8080` 可达 | `GET /api/method/frappe.auth.get_logged_user` → HTTP 200，`{"message":"Administrator"}` |
+| Token 认证 | `Authorization: token <REDACTED>` 有效（get_logged_user 返回 Administrator） |
+| 应用版本 | `bench --site erpnext.local list-apps`：frappe `15.120.1`、erpnext `15.121.2`（与冻结目标一致） |
+| 引用对象可访问 | Customer Group / Supplier Group / Item Group / UOM / Territory / Price List 列表均返回 data |
+| 快照重置实测 | 本包实测 dump→写探针→restore 往返：`mariadb-dump` 成功（8,474,160 字节）→ 创建 `B01-PROBE-SNAP-TEST`（200）→ `mariadb < snapshot.sql` restore 成功 → 探针对象 404（已还原清除）。快照重置可用，不依赖 B00 事实推断 |
+
+结论：前置条件「本地实例可达 + 凭据有效 + 版本符合 + 站点快照可重置」均已实测成立，进入 W02–W07。
