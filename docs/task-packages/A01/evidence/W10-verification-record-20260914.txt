@@ -1,0 +1,6 @@
+A01 W10 验证记录与结论（摘要）
+
+结论：L3 成立（客户端 Claude Code 2.1.263 / MCP 2025-11-25 / stdio 支持 server 侧发起确认机制，失败路径 fail-closed）。
+
+正文见：docs/task-packages/A01/verification-record.md
+覆盖 task.md §9.2 全部 10 项；接入方 gjg 签署待完成。

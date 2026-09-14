@@ -1,0 +1,34 @@
+{"ts":"2026-09-14T12:02:21.174Z","event":"server_start","serverInfo":{"name":"a01-probe","version":"1.0.0"},"pid":21820}
+{"ts":"2026-09-14T12:02:21.181Z","event":"initialize","protocolVersion":"2025-06-18","clientInfo":{"name":"a01-selftest-capable","version":"1.0.0"},"clientCapabilities":{"elicitation":{},"tools":{}},"clientSupportsElicitation":true}
+PASS  server advertises elicitation capability
+PASS  tools/list exposes probe_confirm_write
+PASS  annotation: readOnly=false, destructive=true, idempotent=false, openWorld=false
+{"ts":"2026-09-14T12:02:21.186Z","event":"tools_call","name":"probe_confirm_write","arguments":{"target_object_id":"OBJ-TEST-001","payload":"payload-xyz","scenario":"write"},"clientSupportsElicitation":true}
+{"ts":"2026-09-14T12:02:21.187Z","event":"elicitation_send","reqId":100001,"mode":"form","message":"Confirm a simulated human-confirmed write by tool \"probe_confirm_write\".\n\nFull call parameters:\n  target_object_id = \"OBJ-TEST-001\"\n  payload          = \"payload-xyz\"\n  scenario         = \"write\"\n\nIntended action: write a LOCAL synthetic marker file only (probe side effect under\nprobe/state/). This probe does NOT touch ERPNext, any database, or the network.\n\nApprove to perform the synthetic write, or decline to leave zero side effects.","requestedSchema":{"type":"object","properties":{"approved":{"type":"boolean","description":"true = approve the write; false = decline"}},"required":["approved"]},"scenario":"write"}
+PASS  normal write -> elicitation mode = form
+PASS  elicitation message shows tool name + full params + intended action
+{"ts":"2026-09-14T12:02:21.188Z","event":"elicitation_response","reqId":100001,"result":{"action":"decline"},"scenario":"write","mode":"form"}
+{"ts":"2026-09-14T12:02:21.189Z","event":"fail_closed_non_approve","action":"decline"}
+PASS  decline -> result.isError=true (fail-closed)
+PASS  decline -> marker NOT written
+{"ts":"2026-09-14T12:02:21.190Z","event":"tools_call","name":"probe_confirm_write","arguments":{"target_object_id":"OBJ-TEST-002","payload":"payload-abc","scenario":"write"},"clientSupportsElicitation":true}
+{"ts":"2026-09-14T12:02:21.190Z","event":"elicitation_send","reqId":100002,"mode":"form","message":"Confirm a simulated human-confirmed write by tool \"probe_confirm_write\".\n\nFull call parameters:\n  target_object_id = \"OBJ-TEST-002\"\n  payload          = \"payload-abc\"\n  scenario         = \"write\"\n\nIntended action: write a LOCAL synthetic marker file only (probe side effect under\nprobe/state/). This probe does NOT touch ERPNext, any database, or the network.\n\nApprove to perform the synthetic write, or decline to leave zero side effects.","requestedSchema":{"type":"object","properties":{"approved":{"type":"boolean","description":"true = approve the write; false = decline"}},"required":["approved"]},"scenario":"write"}
+{"ts":"2026-09-14T12:02:21.191Z","event":"elicitation_response","reqId":100002,"result":{"action":"accept"},"scenario":"write","mode":"form"}
+{"ts":"2026-09-14T12:02:21.192Z","event":"marker_written_approved"}
+PASS  accept -> result.isError=false (success)
+PASS  accept -> marker written
+{"ts":"2026-09-14T12:02:21.195Z","event":"tools_call","name":"probe_confirm_write","arguments":{"target_object_id":"OBJ-TEST-003","payload":"synthetic-secret-placeholder","scenario":"sensitive_credential"},"clientSupportsElicitation":true}
+{"ts":"2026-09-14T12:02:21.196Z","event":"sensitive_credential","mode":"url"}
+{"ts":"2026-09-14T12:02:21.196Z","event":"elicitation_send","reqId":100003,"mode":"url","message":"Confirm a simulated human-confirmed write by tool \"probe_confirm_write\".\n\nFull call parameters:\n  target_object_id = \"OBJ-TEST-003\"\n  payload          = \"synthetic-secret-placeholder\"\n  scenario         = \"sensitive_credential\"\n\nIntended action: write a LOCAL synthetic marker file only (probe side effect under\nprobe/state/). This probe does NOT touch ERPNext, any database, or the network.\n\nApprove to perform the synthetic write, or decline to leave zero side effects.\n\n[SENSITIVE CREDENTIAL] The server must NOT collect secrets via a form. Open the following synthetic URL to complete the redirect flow: https://probe.example.invalid/confirm?token=<synthetic-placeholder>","requestedSchema":{"type":"object","properties":{}},"scenario":"sensitive_credential"}
+PASS  sensitive_credential -> mode = url (never form)
+{"ts":"2026-09-14T12:02:21.197Z","event":"elicitation_response","reqId":100003,"result":{"action":"decline"},"scenario":"sensitive_credential","mode":"url"}
+{"ts":"2026-09-14T12:02:21.197Z","event":"fail_closed_non_approve","action":"decline"}
+PASS  sensitive_credential -> marker NOT written
+{"ts":"2026-09-14T12:02:21.288Z","event":"server_start","serverInfo":{"name":"a01-probe","version":"1.0.0"},"pid":15248}
+{"ts":"2026-09-14T12:02:21.295Z","event":"initialize","protocolVersion":"2025-06-18","clientInfo":{"name":"a01-selftest-unsupported","version":"1.0.0"},"clientCapabilities":{"tools":{}},"clientSupportsElicitation":false}
+{"ts":"2026-09-14T12:02:21.297Z","event":"tools_call","name":"probe_confirm_write","arguments":{"target_object_id":"OBJ-TEST-004","payload":"payload-unsupported","scenario":"write"},"clientSupportsElicitation":false}
+{"ts":"2026-09-14T12:02:21.297Z","event":"fail_closed_unsupported","reason":"client did not advertise elicitation capability"}
+PASS  unsupported client -> result.isError=true (fail-closed, no silent execute)
+PASS  unsupported client -> marker NOT written
+
+SELFTEST PASSED  (13 checks, 0 failed)

@@ -1,0 +1,7 @@
+The tool returned exactly:
+
+```
+Confirmation was not approved (action=cancel). Write NOT performed (fail-closed). No side effects occurred.
+```
+
+So the write was not performed — the confirmation was cancelled, and the tool fail-closed with no side effects.
