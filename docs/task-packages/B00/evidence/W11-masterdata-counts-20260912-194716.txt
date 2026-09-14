@@ -1,0 +1,12 @@
+===== B00 W11 补充：默认主数据计数（REST get_count，只读）=====
+执行时间: 2026-09-12 19:47:16    
+执行者: Claude (B00 实施上下文)
+
+Company            count={"message":1}
+Warehouse          count={"message":5}
+Item Group         count={"message":6}
+Customer Group     count={"message":5}
+Territory          count={"message":3}
+Currency           count={"message":149}
+UOM                count={"message":239}
+Price List         count={"message":2}

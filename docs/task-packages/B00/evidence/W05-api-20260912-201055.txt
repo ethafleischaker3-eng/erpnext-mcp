@@ -1,0 +1,20 @@
+===== B00 W05 原生 API 写探针（Customer Group）=====
+执行时间: 2026-09-12 20:10:56    
+执行者: Claude (B00 实施上下文)
+
+探针对象: customer_group_name=B00-PROBE-20260912-201055-26152
+
+--- 初始态断言（对象应不存在）---
+GET ��ʼ̬ HTTP 404
+
+--- 创建（POST，最小字段）---
+{"data":{"name":"B00-PROBE-20260912-201055-26152","owner":"Administrator","creation":"2026-09-12 20:10:56.527877","modified":"2026-09-12 20:10:56.527877","modified_by":"Administrator","docstatus":0,"idx":0,"customer_group_name":"B00-PROBE-20260912-201055-26152","parent_customer_group":"All Customer Groups","is_group":0,"lft":10,"rgt":11,"old_parent":"All Customer Groups","doctype":"Customer Group","credit_limits":[],"accounts":[]}}
+HTTP_CODE=200
+
+--- 创建后终态（GET 应可读）---
+
+--- 清理（DELETE，仅针对 B00-PROBE- 前缀）---
+DELETE HTTP 202
+
+--- 清理后终态（应不存在）---
+GET ������ HTTP 404

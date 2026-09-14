@@ -1,0 +1,26 @@
+===== B00 W01 环境与版本基线核查 =====
+执行时间: 2026-09-12 19:42:10     (UTC+0800)
+执行者: Claude (B00 实施上下文)
+OS: MINGW64_NT-10.0-26200 LAPTOP-DNCTQOH0 3.6.10-710e5275.x86_64 2026-07-28 09:32 UTC x86_64 Msys
+Docker: Docker version 29.7.2, build a7dcaa6
+
+----- S01: bench list-apps -----
+
+frappe  15.120.1 UNVERSIONED
+erpnext 15.121.2 UNVERSIONED
+
+
+----- 后端可达性: ping -----
+{"message":"pong"}
+HTTP_CODE=200
+
+----- 站点与地址 -----
+BASE_URL=http://localhost:8080  SITE=erpnext.local  DB=_ebde57cb5cf2199a
+
+----- 凭据可用性: token get_logged_user（命令脱敏，不记录凭据值）-----
+{"message":"Administrator"}
+HTTP_CODE=200
+
+----- 凭据可用性: cookie 登录（命令脱敏，不记录凭据值）-----
+{"message":"Logged In","home_page":"/app/home","full_name":"Administrator"}
+HTTP_CODE=200

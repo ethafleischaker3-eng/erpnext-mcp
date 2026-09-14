@@ -1,0 +1,26 @@
+===== B00 W11 存量证据接管：重新验证治理生效前探索事实 =====
+执行时间: 2026-09-12 19:46:43    
+执行者: Claude (B00 实施上下文)
+
+--- 原探索证据来源（PRD 与 erp/README.md 引用）---
+源1: erp/README.md §2 系统信息（版本/站点/DB/凭证）
+源2: erp/README.md §8.1 默认主数据已就位（Company/Warehouse/Item Group/Customer Group/Territory）
+源3: erp/README.md §9.2 已验证接口结论
+
+--- MariaDB 版本（原探索事实 re-verify）---
+mariadb from 11.8.9-MariaDB, client 15.2 for debian-linux-gnu (x86_64) using  EditLine wrapper
+
+--- 默认主数据计数（原探索事实 re-verify，只读 frappe.db.count）---
+Apps in this namespace:
+frappe, erpnext
+
+In [1]: 
+In [2]:    ...:    ...: Do you really want to exit ([y]/n)? 
+
+
+--- 接管映射（原探索事实 -> 新证据编号）---
+版本 frappe 15.120.1 / erpnext 15.121.2  -> EV-B00-001（W01 复核一致）
+Company gjg 唯一、CNY、Standard Selling 唯一 -> EV-B00-010（W10 复核一致）
+12+9 DocType 存在可访问                    -> EV-B00-002（W02 复核一致）
+默认主数据计数与 MariaDB 版本               -> 本记录（上方实测）
+接口读写/校验/删除结论（源3）              -> W05 写探针后由 EV-B00-005 接管（待 Owner 确认后执行）

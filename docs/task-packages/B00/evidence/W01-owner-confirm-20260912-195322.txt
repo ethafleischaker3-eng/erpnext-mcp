@@ -1,0 +1,58 @@
+===== B00 W01 è¡¥å……ï¼šOwner ç«™ç‚¹ç‹¬å ä¹¦é¢ç¡®è®¤ + éªŒæ”¶åŒºç»“æ„/é™æ€ ACL =====
+æ‰§è¡Œæ—¶é—´: 2026-09-12 19:53:22    
+æ‰§è¡Œè€…: Claude (B00 å®æ–½ä¸Šä¸‹æ–‡)
+
+--- Owner ä¹¦é¢ç¡®è®¤ï¼ˆgjg, 2026-09-12ï¼‰---
+ç¡®è®¤å†…å®¹ï¼šç«™ç‚¹ erpnext.localï¼ˆåº“ _ebde57cb5cf2199aï¼‰ä¸ºç‹¬å ã€éç”Ÿäº§ã€å¯é”€æ¯éªŒæ”¶ç¯å¢ƒï¼›
+        æ— å…±äº«/ç”Ÿäº§æ•°æ®ã€æ— å…¶ä»–ä½¿ç”¨è€…ã€restore ä¸å½±å“å…¶ä»–ç«™ç‚¹ã€‚
+
+--- éªŒæ”¶åŒºç›®å½•ç»“æ„ ---
+total 12
+drwxr-xr-x 1 ä¹ 197121 0 Sep 12 16:05 .
+drwxr-xr-x 1 ä¹ 197121 0 Sep 12 16:05 ..
+drwxr-xr-x 1 ä¹ 197121 0 Sep 12 16:05 assertions
+drwxr-xr-x 1 ä¹ 197121 0 Sep 12 16:05 evidence
+drwxr-xr-x 1 ä¹ 197121 0 Sep 12 16:05 reset
+drwxr-xr-x 1 ä¹ 197121 0 Sep 12 16:05 runs
+drwxr-xr-x 1 ä¹ 197121 0 Sep 12 16:05 snapshots
+drwxr-xr-x 1 ä¹ 197121 0 Sep 12 16:12 task-sets
+
+--- b00-impl è´¦æˆ·çŠ¶æ€ ---
+
+
+Name        : b00-impl
+Enabled     : True
+Description : B00 ÊµÊ©Ö÷ÌåÊÜÏŞÕË»§£¨·Ç¹ÜÀíÔ±£©
+
+
+
+
+--- é™æ€ ACLï¼štask-setsï¼ˆåº”å«å¯¹ b00-impl çš„ Denyï¼‰---
+D:\second-acceptance\task-sets LAPTOP-DNCTQOH0\b00-impl:(OI)(CI)(N)
+                               LAPTOP-DNCTQOH0\ÀÖ:(OI)(CI)(F)
+                               NT AUTHORITY\Authenticated Users:(OI)(CI)(F)
+                               NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+                               BUILTIN\Administrators:(OI)(CI)(F)
+                               BUILTIN\Users:(OI)(CI)(F)
+
+ÒÑ³É¹¦´¦Àí 1 ¸öÎÄ¼ş; ´¦Àí 0 ¸öÎÄ¼şÊ±Ê§°Ü
+
+--- é™æ€ ACLï¼šsnapshotsï¼ˆb00-impl åº”å¯å†™ï¼‰---
+D:\second-acceptance\snapshots LAPTOP-DNCTQOH0\b00-impl:(OI)(CI)(M)
+                               LAPTOP-DNCTQOH0\ÀÖ:(OI)(CI)(F)
+                               NT AUTHORITY\Authenticated Users:(OI)(CI)(F)
+                               NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+                               BUILTIN\Administrators:(OI)(CI)(F)
+                               BUILTIN\Users:(OI)(CI)(F)
+
+ÒÑ³É¹¦´¦Àí 1 ¸öÎÄ¼ş; ´¦Àí 0 ¸öÎÄ¼şÊ±Ê§°Ü
+
+--- é™æ€ ACLï¼ševidenceï¼ˆb00-impl åº”å¯å†™ï¼‰---
+D:\second-acceptance\evidence LAPTOP-DNCTQOH0\b00-impl:(OI)(CI)(M)
+                              LAPTOP-DNCTQOH0\ÀÖ:(OI)(CI)(F)
+                              NT AUTHORITY\Authenticated Users:(OI)(CI)(F)
+                              NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+                              BUILTIN\Administrators:(OI)(CI)(F)
+                              BUILTIN\Users:(OI)(CI)(F)
+
+ÒÑ³É¹¦´¦Àí 1 ¸öÎÄ¼ş; ´¦Àí 0 ¸öÎÄ¼şÊ±Ê§°Ü

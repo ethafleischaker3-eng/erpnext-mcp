@@ -1,0 +1,32 @@
+===== B00 W02 对象裁剪核查（12 操作 + 9 引用）=====
+执行时间: 2026-09-12 19:43:13    
+执行者: Claude (B00 实施上下文)
+方法: GET /api/resource/<doctype>?limit_page_length=1（只读，token 认证）
+
+--- 操作允许清单（12）---
+Customer               HTTP 200
+Supplier               HTTP 200
+Item                   HTTP 200
+Item Price             HTTP 200
+Sales Order            HTTP 200
+Purchase Order         HTTP 200
+Purchase Receipt       HTTP 200
+Delivery Note          HTTP 200
+Stock Entry            HTTP 200
+Stock Reconciliation   HTTP 200
+Bin                    HTTP 200
+Stock Ledger Entry     HTTP 200
+
+--- 引用允许清单（9）---
+Company                HTTP 200
+Warehouse              HTTP 200
+Price List             HTTP 200
+Currency               HTTP 200
+Customer Group         HTTP 200
+Supplier Group         HTTP 200
+Territory              HTTP 200
+Item Group             HTTP 200
+UOM                    HTTP 200
+
+--- UOM（Unit of Measure）命名确认 ---
+

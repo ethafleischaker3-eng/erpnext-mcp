@@ -1,0 +1,22 @@
+===== B00 W05 补证：原生 API 写探针·创建后 GET 可读 =====
+执行时间: 2026-09-14 10:56:20 CST (UTC+08:00)
+执行者: Claude（B00 实施补证上下文；由 Owner gjg 指示完善补充）
+方法: REST API，token 认证（凭据值脱敏，不落盘）
+目的: 补原 EV-B00-005 证据中「创建后终态（GET 应可读）」输出为空的一项，完整记录
+      初始态 404 → POST 200 → 创建后 GET 200（对象可读）→ DELETE 202 → 清理后 404。
+
+探针对象: customer_group_name=B00-PROBE-20260914-105620-8f3a（B00-PROBE- 前缀，最小字段）
+
+===== 原始输出（关键字段，凭据/owner/时间戳脱敏）=====
+[1] 初始态断言   GET  Customer Group/B00-PROBE-20260914-105620-8f3a  HTTP=404
+[2] 创建         POST Customer Group（customer_group_name / parent_customer_group=All Customer Groups / is_group=0）
+                 {"data":{"name":"B00-PROBE-20260914-105620-8f3a","docstatus":0,"customer_group_name":"B00-PROBE-20260914-105620-8f3a","parent_customer_group":"All Customer Groups","is_group":0,"doctype":"Customer Group",...}}
+                 HTTP=200
+[3] 创建后终态   GET  Customer Group/B00-PROBE-20260914-105620-8f3a
+                 {"data":{"name":"B00-PROBE-20260914-105620-8f3a","docstatus":0,"customer_group_name":"B00-PROBE-20260914-105620-8f3a","parent_customer_group":"All Customer Groups","is_group":0,"doctype":"Customer Group",...}}
+                 HTTP=200  （对象存在且 GET 可读）
+[4] 清理         DELETE Customer Group/B00-PROBE-20260914-105620-8f3a  HTTP=202
+[5] 清理后终态   GET  Customer Group/B00-PROBE-20260914-105620-8f3a  HTTP=404（回到初始态）
+
+结论: 写端点可用，创建后对象存在且 GET 可读（HTTP 200，返回完整对象），清理后回到初始态（404）。
+      仅针对 B00-PROBE- 前缀对象，DELETE 仅作清理，不视作对通用 delete 的验证。
