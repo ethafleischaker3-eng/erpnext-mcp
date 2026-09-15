@@ -7,7 +7,7 @@
 | 编号 | B05 |
 | 名称 | 幂等可实现性调研 |
 | 版本 | v1.0 |
-| 状态 | 待验收 |
+| 状态 | 已封存 |
 | 创建人 | Claude（B05 起草上下文） |
 | Owner | gjg |
 | Implementer | Claude（B05 独立实施上下文）；须与 Acceptor 为不同的执行实例并验证隔离 |
@@ -240,7 +240,7 @@ B05 不提供正式业务 tool，不定义业务 tool 语义或 schema。本节�
 - [x] Evidence Manifest 完整且正式证据可独立复核；
 - [x] 未修改禁止范围；
 - [x] 剩余限制和风险已记录；
-- [ ] 独立验收通过（含接入方 gjg 对调研结论确认有效）。
+- [x] 独立验收通过（含接入方 gjg 对调研结论确认有效）。
 
 ## 15. 停止与升级条件
 
@@ -278,3 +278,39 @@ B05 不提供正式业务 tool，不定义业务 tool 语义或 schema。本节�
 | 2026-09-15 | 待评审 | 已冻结 | gjg | 评审通过，无阻断问题；批准 B05 v1.0 冻结；评审中已修正「五条要求/十项列表」措辞与窗口期出处引用（PRD 决议 10、§5.1 表格）；尚未实施或验收 |
 | 2026-09-15 | 已冻结 | 实施中 | Claude（B05 实施上下文） | 前置条件核对成立（A01 §18 已封存；客户端 Claude Code 2.1.263 / MCP 2025-11-25 / stdio 经握手复测钉定）；搭建隔离重试/关联探针并开始实测 |
 | 2026-09-15 | 实施中 | 待验收 | Claude（B05 实施上下文） | W01–W11 完成；D01–D06 齐备；S01–S11 自检通过（selftest 25 项全 PASS）；idempotency-research.md 覆盖 §9.2 全部 10 项；独立验收与接入方签署由 gjg 执行 |
+| 2026-09-15 | 待验收 | 已通过 | gjg | Acceptor 独立验收通过：D01–D06 齐备、冻结快照哈希一致；证据逐项复核（握手钉定 claude-code 2.1.263 / MCP 2025-11-25；无透明重试三层区分成立；`claudecode/toolUseId` 不稳定出现有实据支撑）；两个待决点（窗口期 create 300s / confirm·cancel 60s、toolUseId 客户端特定判定）认可；§4/§7 对 confirm/cancel 的验收断言拆分为 §7.1/§7.2，消除不自洽 |
+| 2026-09-15 | 已通过 | 已封存 | gjg | 独立验收通过后归档；封存记录与对 E02/D01/D02 的输入/影响见第 18 节 |
+
+## 18. 封存记录与下游影响
+
+### 18.1 封存信息
+
+| 字段 | 内容 |
+|---|---|
+| 状态 | 已封存 |
+| 封存日期 | 2026-09-15 |
+| 操作人 | gjg |
+| 结论 | 幂等可实现性调研结论已冻结并通过独立验收：实测 Claude Code 2.1.263 / MCP 2025-11-25 / stdio 下 `tools/call` 无传输/SDK/harness 层透明重试，亦无「合规可信且跨重试可关联」的信号；幂等必须依赖 server 侧业务参数指纹 + 状态断言（confirm/cancel）+ 窗口期缩短（create 组 300s / confirm·cancel 组 60s）+ 业务引用号（可选），并如实记录误合并残余风险 |
+| 调研结论 | `docs/task-packages/B05/idempotency-research.md`（§10 接入方 gjg 确认有效） |
+| Freeze Manifest | `docs/task-records/freeze-manifests/B05-v1.0.md` |
+
+### 18.2 封存材料
+
+- 冻结版任务包及证据计划快照：`docs/task-packages/B05/frozen/v1.0/task.md`、`evidence-manifest.md`；
+- 交付物：D01（task.md）、D02（evidence-manifest.md，EV-B05-001..011）、D03（登记表 B05 行）、D04（probe/server.js + selftest.js + README）、D05（idempotency-research.md）、D06（evidence/ 10 份：握手 + 自测 + 四场景事件/输出）；
+- 独立验收记录：本文件第 17 节状态记录；接入方确认：idempotency-research.md §10；
+- 变更与退回记录：无退回。
+
+### 18.3 对下游任务包的输入（权威结论）
+
+1. **无透明重试（→ E02）**：传输/SDK/harness 层不自动重试；模型/agent 层可能重新发起 `tools/call`，但对 server 是全新请求（新 `id`/`progressToken`/`toolUseId`），与合法新业务不可区分；
+2. **无可信关联信号（→ E02/D01/D02）**：`id`/`progressToken`/`claudecode/toolUseId` 均每请求新值、不可跨重试关联；stdio 无 `sessionId`/`resumptionToken`；进程身份会话级、不区分重试与新建。E02 不得以这些字段作幂等依据；
+3. **窗口期冻结值（→ E02，实现不得放宽）**：create 组 300s、confirm/cancel 组 60s（替代 24h/1h 初始假设；缩短须走变更）；
+4. **指纹不可覆盖（→ E02/D02）**：指纹由 server 依业务参数规范化计算，agent 不感知；`id`/`progressToken`/`toolUseId` 及 agent 随机 request id/幂等键一律不进指纹；同参同指纹、异载异指纹；
+5. **两类可执行验收方法（→ E02/D02/G01）**：§7.1 create 组指纹合并、§7.2 confirm/cancel 组状态断言命中=幂等成功（返回「已在目标状态」而非通用错误）；§8 合法重复业务仅 create 组（业务引用号/窗口期外/改字段三选一）。
+
+### 18.4 对下游任务包的影响与门槛
+
+1. B05 封存 → **E02 冻结/实施门槛解除**（总则 §13/§16.2）；E02 实现幂等机制时窗口期不得放宽、指纹口径须沿用 §18.3 第 3/4 条；
+2. **D01/D02**：以 §18.3 的关联信号判定矩阵、窗口期冻结值、指纹不可覆盖结论为公共契约与错误模型的幂等边界输入；confirm/cancel 组的「幂等成功」返回结构由 D02 冻结（B05 仅冻结其可验收性）；
+3. 已知限制不变：结论仅适用于 Claude Code 2.1.263 / stdio / MCP 2025-11-25；更换客户端（含 VS Code 扩展、streamable HTTP）须重新起算核查；超时上限未测出（仅静态推导「超时不重发」）；`claudecode/toolUseId` 出现不稳定、不得作幂等依据（idempotency-research.md §9）。

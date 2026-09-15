@@ -1,6 +1,6 @@
 # B05 Evidence Manifest
 
-> 当前状态：B05 v1.0 已冻结并**已实施**（2026-09-15），下列 `EV-B05-*` 已按冻结自检方法 S01—S11 逐项执行并回填实际值、原始输出位置与状态。公开脱敏证据落盘于 `docs/task-packages/B05/evidence/`；本包不接入 ERPNext 后端、不涉数据库，无敏感后端原始输出需转存验收区。
+> 当前状态：B05 v1.0 已冻结并**已封存**（2026-09-15），下列 `EV-B05-*` 已按冻结自检方法 S01—S11 逐项执行并回填实际值、原始输出位置与状态。公开脱敏证据落盘于 `docs/task-packages/B05/evidence/`；本包不接入 ERPNext 后端、不涉数据库，无敏感后端原始输出需转存验收区。
 
 ## 1. 证据映射（实施回填）
 
@@ -15,7 +15,7 @@
 | EV-B05-007 | W07、S07 关联信号判定矩阵 | 汇总 W04–W06，逐候选信号判定四项 | 矩阵完整、逐项可复核 | 矩阵见 research §3；结论：无「合规可信且跨重试可关联」信号（id/progressToken/toolUseId 均每请求新值；进程身份会话级不区分；stdio 无 sessionId） | `idempotency-research.md` §3 | 已执行 |
 | EV-B05-008 | W08、S08 分叉决策 | 依矩阵形成分叉结论并记录依据 | 有信号→冻结；无信号→业务层方案+残余风险 | 走「无信号」分支：confirm/cancel 状态断言兜底；create 组业务引用号（可选）+ 窗口期缩短 + 误合并策略；残余风险记录 | `idempotency-research.md` §4、§6、§9 | 已执行 |
 | EV-B05-009 | W09、S09 指纹不可覆盖验证 | selftest 指纹稳定性 + 原则验证 | agent request id/幂等键不参与指纹；同参同指纹、异载异指纹 | 指纹仅业务参数稳定排序；同业务参数（键序不同）同指纹、不同 payload 不同指纹；不含 JSON-RPC id/连接身份；`id`/`progressToken`/`toolUseId` 不进指纹 | `evidence/S03-selftest.txt`；`idempotency-research.md` §5 | 已执行 |
-| EV-B05-010 | W10、S10 两类验收方法 | 形成两类终态断言 | 终态可判定、非 agent 自评 | 「同一业务意图连续调用只变更一次」（对象/单据计数=1、流水无重复）+「合法重复业务表达」（计数=2、不被合并）可执行断言 | `idempotency-research.md` §7、§8 | 已执行 |
+| EV-B05-010 | W10、S10 两类验收方法 | 形成两类终态断言 | 终态可判定、非 agent 自评 | 「只变更一次」拆两套：create 组指纹合并（对象/单据计数=1、流水无重复）+ confirm/cancel 组状态断言命中=幂等成功（docstatus 只流转一次、返回「已在目标状态」非通用错误）；「合法重复业务表达」仅 create 组（计数=2、不被合并） | `idempotency-research.md` §7（7.1/7.2）、§8 | 已执行 |
 | EV-B05-011 | W11、S11 调研结论汇总 | 汇总 W01–W10 形成 D05 | 覆盖 §9.2 全部 10 项、结论由接入方确认 | `idempotency-research.md` 覆盖 §9.2 全部 10 项；结论：无透明重试 + 无可信关联信号 → 业务层方案 + 窗口期冻结（create 300s / confirm·cancel 60s） | `idempotency-research.md` | 已执行 |
 
 ## 2. 正式证据记录要求
