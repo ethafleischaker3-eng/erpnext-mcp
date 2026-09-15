@@ -1,0 +1,6 @@
+The probe completed both stages:
+
+1. **First call** (`payload='p-err'`) → returned a business error (`isError=true`) with corrective action to retry with a valid payload.
+2. **Retry** (`payload='p-ok'`) → succeeded, writing only a local synthetic marker (no ERPNext, no database).
+
+The retry behavior worked as designed: error on the first call, success on retry with a corrected payload.

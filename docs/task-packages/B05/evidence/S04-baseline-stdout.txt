@@ -1,0 +1,8 @@
+Both probe calls succeeded:
+
+| target_object_id | payload | result |
+|---|---|---|
+| A | p1 | succeeded |
+| B | p2 | succeeded |
+
+Both returned "Probe write succeeded" (local synthetic marker only, no ERPNext/database side effects).

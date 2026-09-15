@@ -1,0 +1,3 @@
+The probe call completed successfully. It returned after a slow response of 70000ms (70 seconds).
+
+The `probe_retry_write` call with `target_object_id='OBJ-S'` and `payload='p-slow'` finished with a "slow response" result — this is the expected behavior for a slow-fault-injection probe.

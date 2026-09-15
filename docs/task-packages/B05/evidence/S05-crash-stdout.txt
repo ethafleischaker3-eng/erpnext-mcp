@@ -1,0 +1,9 @@
+The probe returned `MCP error -32000: Connection closed` — the MCP server dropped the connection on this call, which is what this retry/correlation probe is designed to observe.
+
+What I did (and what happened):
+- **Called** `probe_retry_write` with `target_object_id='OBJ-C'`, `payload='p-crash'`.
+- **Result:** server-side injection of a crash fault — the connection closed rather than producing a normal/slow/error response.
+
+Per the tool's stated purpose, this is a probe only: its sole local effect would be a synthetic marker under `probe/state/`, and no real business data or credential was involved.
+
+Do you want me to retry the same call (to observe whether the client retries after a disconnect), or try a different target/payload to correlate the crash behavior?

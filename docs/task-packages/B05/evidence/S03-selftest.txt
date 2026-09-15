@@ -1,0 +1,48 @@
+{"ts":"2026-09-15T08:54:40.944Z","event":"server_start","serverInfo":{"name":"b05-probe","version":"1.0.0"},"pid":25864,"connEpoch":1789462480943}
+{"ts":"2026-09-15T08:54:40.958Z","event":"initialize","protocolVersion":"2025-11-25","clientInfo":{"name":"b05-selftest","version":"1.0.0"},"clientCapabilities":{"tools":{}},"pid":25864,"connEpoch":1789462480943}
+PASS  server advertises tools capability
+{"ts":"2026-09-15T08:54:40.961Z","event":"rx_notification","method":"notifications/initialized"}
+PASS  tools/list exposes probe_retry_write
+PASS  annotation: readOnly=false, destructive=true, idempotent=false, openWorld=false
+{"ts":"2026-09-15T08:54:40.965Z","event":"tools_call","id":3,"name":"probe_retry_write","arguments":{"target_object_id":"OBJ-N","payload":"p-normal"},"params_meta":null,"params_progressToken":null,"fingerprint":"{\"payload\":\"p-normal\",\"target_object_id\":\"OBJ-N\"}","pid":25864,"connEpoch":1789462480943,"mode":"normal"}
+{"ts":"2026-09-15T08:54:40.967Z","event":"marker_written","id":3,"pid":25864,"connEpoch":1789462480943}
+PASS  normal -> success (isError=false)
+PASS  normal -> marker written
+{"ts":"2026-09-15T08:54:41.130Z","event":"server_start","serverInfo":{"name":"b05-probe","version":"1.0.0"},"pid":28292,"connEpoch":1789462481129}
+{"ts":"2026-09-15T08:54:41.145Z","event":"initialize","protocolVersion":"2025-11-25","clientInfo":{"name":"b05-selftest","version":"1.0.0"},"clientCapabilities":{"tools":{}},"pid":28292,"connEpoch":1789462481129}
+PASS  server advertises tools capability
+{"ts":"2026-09-15T08:54:41.147Z","event":"rx_notification","method":"notifications/initialized"}
+PASS  tools/list exposes probe_retry_write
+PASS  annotation: readOnly=false, destructive=true, idempotent=false, openWorld=false
+{"ts":"2026-09-15T08:54:41.155Z","event":"tools_call","id":6,"name":"probe_retry_write","arguments":{"target_object_id":"OBJ-E","payload":"p-err"},"params_meta":null,"params_progressToken":null,"fingerprint":"{\"payload\":\"p-err\",\"target_object_id\":\"OBJ-E\"}","pid":28292,"connEpoch":1789462481129,"mode":"error"}
+{"ts":"2026-09-15T08:54:41.158Z","event":"fault_error","id":6,"pid":28292,"connEpoch":1789462481129}
+PASS  error -> isError=true (business error)
+PASS  error -> marker NOT written
+PASS  error -> fault mode reset to normal
+{"ts":"2026-09-15T08:54:41.483Z","event":"server_start","serverInfo":{"name":"b05-probe","version":"1.0.0"},"pid":30380,"connEpoch":1789462481482}
+{"ts":"2026-09-15T08:54:41.500Z","event":"initialize","protocolVersion":"2025-11-25","clientInfo":{"name":"b05-selftest","version":"1.0.0"},"clientCapabilities":{"tools":{}},"pid":30380,"connEpoch":1789462481482}
+PASS  server advertises tools capability
+{"ts":"2026-09-15T08:54:41.503Z","event":"rx_notification","method":"notifications/initialized"}
+PASS  tools/list exposes probe_retry_write
+PASS  annotation: readOnly=false, destructive=true, idempotent=false, openWorld=false
+{"ts":"2026-09-15T08:54:41.508Z","event":"tools_call","id":9,"name":"probe_retry_write","arguments":{"target_object_id":"OBJ-S","payload":"p-slow","delay_ms":300},"params_meta":null,"params_progressToken":null,"fingerprint":"{\"delay_ms\":300,\"payload\":\"p-slow\",\"target_object_id\":\"OBJ-S\"}","pid":30380,"connEpoch":1789462481482,"mode":"slow"}
+{"ts":"2026-09-15T08:54:41.509Z","event":"fault_slow","id":9,"delayMs":300,"pid":30380,"connEpoch":1789462481482}
+{"ts":"2026-09-15T08:54:41.813Z","event":"marker_written","id":9,"pid":30380,"connEpoch":1789462481482}
+PASS  slow -> delayed success (isError=false)
+PASS  slow -> delayed by >= 300ms
+PASS  slow -> marker written
+{"ts":"2026-09-15T08:54:41.956Z","event":"server_start","serverInfo":{"name":"b05-probe","version":"1.0.0"},"pid":26172,"connEpoch":1789462481955}
+{"ts":"2026-09-15T08:54:41.966Z","event":"initialize","protocolVersion":"2025-11-25","clientInfo":{"name":"b05-selftest","version":"1.0.0"},"clientCapabilities":{"tools":{}},"pid":26172,"connEpoch":1789462481955}
+PASS  server advertises tools capability
+{"ts":"2026-09-15T08:54:41.967Z","event":"rx_notification","method":"notifications/initialized"}
+PASS  tools/list exposes probe_retry_write
+PASS  annotation: readOnly=false, destructive=true, idempotent=false, openWorld=false
+{"ts":"2026-09-15T08:54:41.973Z","event":"tools_call","id":12,"name":"probe_retry_write","arguments":{"target_object_id":"OBJ-C","payload":"p-crash"},"params_meta":null,"params_progressToken":null,"fingerprint":"{\"payload\":\"p-crash\",\"target_object_id\":\"OBJ-C\"}","pid":26172,"connEpoch":1789462481955,"mode":"crash"}
+{"ts":"2026-09-15T08:54:41.974Z","event":"fault_crash","id":12,"pid":26172,"connEpoch":1789462481955}
+PASS  crash -> server process exits (disconnect)
+PASS  crash -> fault mode reset to normal (one-shot)
+PASS  fingerprint: 键序归一化后相同业务参数 -> 同指纹
+PASS  fingerprint: 不同有效负载 -> 不同指纹
+PASS  fingerprint: 不含 JSON-RPC id / 连接身份（仅业务参数）
+
+SELFTEST PASSED  (25 checks, 0 failed)
