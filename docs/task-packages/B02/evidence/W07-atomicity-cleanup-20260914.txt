@@ -1,0 +1,42 @@
+# W07 原子性 / 失败不静默 / 清理确认证据（脱敏）
+
+执行时间：2026-09-14 23:31–23:33（UTC+8）。执行者：Claude（B02 实施上下文）。认证 `Authorization: token <REDACTED>`。
+
+## 1. 原子性（PRD §5.5）
+
+| 结论 | 依据 |
+|---|---|
+| create/confirm/cancel 均单次 REST → 单后端事务 | 源码核对：`frappe.api.v1.create_doc`→`insert()`；`submit()`/`cancel()`→`_save()`；`_save()` 内 `check_if_latest()`（版本断言）→ `validate`（业务校验）→ 落库为同一事务 |
+| confirm 状态校验与提交同一事务 | `check_if_latest`（含 `check_docstatus_transition`）在 `_save` 内、先于 validate，写入发生在同一次 `save()` |
+| 失败无部分写入 | 实测：DN confirm 失败（NegativeStockError）后 `modified` 不变、docstatus 仍 0；SO cancel 失败（LinkExistsError）后 docstatus 仍 1 |
+
+## 2. 失败不静默
+
+| 异常 | HTTP | 场景 |
+|---|---|---|
+| DoesNotExistError | 404 | SO create 无效 customer / item_code |
+| LinkValidationError | 417 | 无效 warehouse / company / currency / price list |
+| MandatoryError | 417 | 缺失 customer |
+| InvalidQtyError / NonNegativeError | 417 | qty=0 / qty<0 |
+| TimestampMismatchError | 417 | confirm/cancel 陈旧 modified |
+| DocstatusTransitionError | 417 | cancel 草稿 |
+| LinkExistsError | 417 | cancel 存在已确认下游 DN |
+| OverAllowanceError / NegativeStockError | 417 | DN confirm 超发 / 库存不足 |
+| ValidationError | 417 | 删已生效单据、cancel 已取消、mapper 来源草稿 |
+| TypeError | 500 | SO create 空 items、run_method:cancel 传 modified（未优雅处理，但仍非静默） |
+
+**例外（静默 no-op）**：submit 已生效单据 → HTTP 200 无报错、状态不变（后端视作 update_after_submit）。MCP server 须自行前置断言「confirm 仅草稿、cancel 仅已生效」（PRD §5.1/§5.2）。
+
+## 3. 清理终态
+
+清理顺序（§16）：先删下游 DN（草稿 DELETE 202；已生效 DN cancel→DELETE），再 cancel→delete SO，最后删前置 Customer/Item。
+
+| 对象 | 清理动作 | 终态 |
+|---|---|---|
+| MAT-DN-2026-00002/00003（草稿） | DELETE | 202 |
+| MAT-DN-2026-00001（已生效） | cancel 200 → DELETE | 202 |
+| SAL-ORD-2026-00002/00004（已生效） | cancel 200 → DELETE | 202 |
+| SAL-ORD-2026-00001（已取消） | DELETE | 202 |
+| B02-PROBE-CUST-001 / SVC-001 / STK-001 | DELETE | 202 |
+
+零残留复核（REST + DB）：Customer/Item/Sales Order/Delivery Note/`tabSales Order`/`tabDelivery Note`/`tabSales Order Item`/`tabDelivery Note Item` 以 `B02-PROBE-%` 过滤均 0；`tabStock Ledger Entry` item_code LIKE `B02-PROBE-%` = 0；`tabGL Entry` voucher/against LIKE `%B02-PROBE%` = 0。

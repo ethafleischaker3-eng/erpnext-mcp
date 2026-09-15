@@ -1,0 +1,20 @@
+# W02 Sales Order create 摸底证据（脱敏）
+
+执行时间：2026-09-14 23:20（UTC+8）。执行者：Claude（B02 实施上下文）。认证 `Authorization: token <REDACTED>`；Base `http://localhost:8080/api/resource`。前置 `B02-PROBE-CUST-001`（Commercial/All Territories）、`B02-PROBE-SVC-001`（Services/Nos/is_stock_item=0）、`B02-PROBE-STK-001`（Products/Nos/is_stock_item=1）均 create 200。
+
+| 场景 | HTTP | 结果 |
+|---|---|---|
+| create 合法（customer + company + transaction_date + delivery_date + items[{item_code,qty}]） | 200 | 成功；`name`=`SAL-ORD-2026-00001`，`naming_series`=`SAL-ORD-.YYYY.-`；`docstatus`=0、`status`=Draft；`currency`=CNY、`selling_price_list`=Standard Selling 自动填充；items[] 子表含 item_code/qty/warehouse(默认 Stores - G)/is_stock_item 等嵌套字段 |
+| create 无 price（item rate=0） | 200 | 成功，`grand_total`=0（SO create 不强制单价） |
+| 无效 customer=NONEXISTENT-CUST | 404 | `DoesNotExistError`: Customer NONEXISTENT-CUST not found |
+| 无效 item_code=NONEXISTENT-ITEM | 404 | `DoesNotExistError`: Item NONEXISTENT-ITEM not found |
+| 无效 items[].warehouse=NONEXISTENT-WH | 417 | `LinkValidationError`: Could not find Row #1: Source Warehouse |
+| 无效 company=NONEXISTENT-CO | 417 | `LinkValidationError`: Could not find Company |
+| 无效 currency=XXX | 417 | `LinkValidationError`: Could not find Currency |
+| 无效 selling_price_list=NONEXISTENT-PL | 417 | `LinkValidationError`: Could not find Price List |
+| 缺失 customer | 417 | `MandatoryError`: Value missing for Sales Order: Customer |
+| items 空数组 | 500 | `TypeError`: unsupported operand type(s) for *: 'NoneType' and 'float'（未优雅处理的 500，非静默） |
+| items[].qty=0 | 417 | `InvalidQtyError`: Quantity for Item ... cannot be zero |
+| items[].qty=-5 | 417 | `NonNegativeError`: Value cannot be negative for Quantity |
+
+结论：SO 命名 `SAL-ORD-.YYYY.-` 连续编号（非假设的 `SO-XXXXX`）；单据无「同名唯一性」概念（series 编号）；引用字段分两类——customer/item_code 走 `DoesNotExistError`(404)，warehouse/company/currency/price list 走 `LinkValidationError`(417)；空 items 触发未处理 500。

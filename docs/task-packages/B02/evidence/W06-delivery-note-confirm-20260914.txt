@@ -1,0 +1,12 @@
+# W06 Delivery Note confirm 摸底证据（脱敏）
+
+执行时间：2026-09-14 23:30（UTC+8）。执行者：Claude（B02 实施上下文）。认证 `Authorization: token <REDACTED>`。confirm 经 `POST /api/resource/Delivery%20Note/{name}` body `{"run_method":"submit"}`；版本断言经 `frappe.client.submit` 全量 doc 实测。
+
+| 场景 | HTTP | 结果 |
+|---|---|---|
+| confirm 非库存物料（service item，MAT-DN-2026-00001，qty 3） | 200 | 成功；docstatus 0→1、status→`To Bill`（非库存物料正向发货成立） |
+| confirm 超发（qty 6 > 来源未完成 5，MAT-DN-2026-00002） | 417 | `OverAllowanceError`: This document is over limit by Qty 1.0 for item ...（**超发校验在 confirm 触发**） |
+| confirm 库存不足（stock item qty 5、无库存，MAT-DN-2026-00003） | 417 | `NegativeStockError`: 5.0 units of Item B02-PROBE-STK-001 needed in Warehouse Stores - G to complete this transaction（**库存不足负向**） |
+| confirm 陈旧 modified（frappe.client.submit 全量 doc + modified=2000-01-01） | 417 | `TimestampMismatchError`（版本断言在 DN confirm 同样原生强制） |
+
+结论：DN confirm 状态漂移 0→1 实测；「来源行剩余可发数量（超发）」与「可用库存充足」均在 confirm 校验（OverAllowanceError / NegativeStockError，417）；非库存物料正向发货成立；版本断言原生强制。充足库存正向发货未在本包实测（需真实库存，留待 B03/B04/F02，冻结边界）。

@@ -1,0 +1,16 @@
+# W01 环境与凭据复核证据（脱敏）
+
+执行时间：2026-09-14 23:19（UTC+8）。执行者：Claude（B02 实施上下文）。环境：Windows 11 / Git Bash / Docker Desktop 29.7.2。
+
+认证 `Authorization: token <REDACTED>`；Base `http://localhost:8080/api`。
+
+| 检查项 | 结果 |
+|---|---|
+| Docker 容器 | `docker compose ps` 九容器 Up（frontend/backend/db/redis-cache/redis-queue/queue-short/queue-long/scheduler/websocket），db healthy |
+| `localhost:8080` 可达 | `GET /api/method/frappe.auth.get_logged_user` → HTTP 200，`{"message":"Administrator"}` |
+| Token 认证 | 有效（get_logged_user 返回 Administrator） |
+| 应用版本 | `bench --site erpnext.local list-apps`：frappe `15.120.1`、erpnext `15.121.2`（与冻结目标一致） |
+| 引用对象可用 | Company `gjg`（1）；Warehouse 5（`Stores - G` 为默认、`Finished Goods - G`/`Work In Progress - G`/`Goods In Transit - G`/`All Warehouses - G` 分组）；Item Group 6（Services/Products/Raw Material/Sub Assemblies/Consumable/All Item Groups）；Customer Group 5（Commercial/Individual/Non Profit/Government/All Customer Groups）；Territory 3（All Territories/China/Rest Of The World）；Price List 2（Standard Selling=selling、Standard Buying）；Currency CNY enabled |
+| 快照重置实测 | 本包实测 dump→写探针→restore 往返：创建 `B02-PROBE-SNAP-TEST` Customer（200）→ `mariadb-dump`（成功）→ 删除探针（202，404）→ `mariadb < snapshot` restore（成功）→ 探针回归（`B02-PROBE-SNAP-TEST` 可见）→ 再删除（202，404）。快照重置可用，不依赖 B00/B01 事实推断 |
+
+结论：前置条件「本地实例可达 + 凭据有效 + 版本符合 + 站点快照可重置」均实测成立，进入 W02–W07。

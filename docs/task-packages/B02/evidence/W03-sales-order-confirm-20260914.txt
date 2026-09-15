@@ -1,0 +1,12 @@
+# W03 Sales Order confirm 摸底证据（脱敏）
+
+执行时间：2026-09-14 23:23（UTC+8）。执行者：Claude（B02 实施上下文）。认证 `Authorization: token <REDACTED>`。confirm 经两条路径实测：`POST /api/resource/Sales%20Order/{name}` body `{"run_method":"submit"}`（不携带 modified）；`POST /api/method/frappe.client.submit` body `{"doc":"<完整 doc JSON>"}`（可携带 modified）。
+
+| 场景 | HTTP | 结果 |
+|---|---|---|
+| run_method:submit（草稿 SAL-ORD-2026-00001） | 200 | 成功；`docstatus` 0→1、`status` Draft→`To Deliver and Bill`、`modified` 变化（23:20:16→23:23:33） |
+| submit 陈旧 modified（frappe.client.submit 全量 doc + modified=2000-01-01） | 417 | `TimestampMismatchError`: Document has been modified after you have opened it；**未提交**，docstatus 仍 0 |
+| submit 正确 modified（frappe.client.submit 全量 doc + 当前 modified） | 200 | 成功；docstatus 0→1、status `To Deliver and Bill` |
+| submit 已提交单据（run_method:submit 于 docstatus=1） | 200 | **无报错**，docstatus 保持 1（后端将 1→1 视为 `update_after_submit`，静默 no-op，不重放库存/账目） |
+
+结论：confirm 状态漂移 0→1、modified 变化均实测；**乐观版本断言在后端原生强制**——传入陈旧 `modified` 被 `TimestampMismatchError`(417) 拒绝且无部分写入；省略 `modified`（run_method 路径加载当前值）则不校验；「已生效再 confirm」不报错、静默 no-op（须由 MCP server 层前置断言「仅草稿可 confirm」，PRD §5.1/§5.2 #14）。

@@ -1,0 +1,17 @@
+# W04 Sales Order cancel 摸底证据（脱敏）
+
+执行时间：2026-09-14 23:26（UTC+8）。执行者：Claude（B02 实施上下文）。认证 `Authorization: token <REDACTED>`。cancel 经 `POST /api/resource/Sales%20Order/{name}` body `{"run_method":"cancel"}`（不携带 modified）；版本断言另经 `frappe.client.save` 全量 doc 实测。
+
+| 场景 | HTTP | 结果 |
+|---|---|---|
+| cancel 已生效（docstatus=1，无下游） | 200 | 成功；docstatus 1→2、status→`Cancelled`、modified 变化 |
+| cancel 草稿（docstatus=0） | 417 | `DocstatusTransitionError`: Cannot change docstatus from 0 (Draft) to 2 (Cancelled) |
+| cancel 已取消（docstatus=2） | 417 | `ValidationError`: Cannot edit cancelled document |
+| cancel 陈旧 modified（run_method:cancel + body modified） | 500 | `TypeError`（`cancel()` 无参数，不接受 modified kwarg）——标准 cancel 端点无法携带 modified |
+| cancel 陈旧 modified（frappe.client.save 全量 doc + docstatus=2 + modified=2000-01-01） | 417 | `TimestampMismatchError`（save 路径将 1→2 识别为 cancel 动作，check_if_latest 生效）——版本断言机制本身通用，但需走 save 等价路径 |
+| cancel 已生效且存在已确认下游 DN（SAL-ORD-2026-00002 → MAT-DN-2026-00001） | 417 | `LinkExistsError`: Cannot delete or cancel because Sales Order ... is linked with Delivery Note ...；SO 保持 docstatus=1 |
+| DELETE 已生效 SO | 417 | `ValidationError`: Submitted Record cannot be deleted. You must Cancel... |
+| DELETE 草稿 SO | 202 | `{"data":"ok"}`，草稿删除为回滚路径 |
+| DELETE 已取消 SO | 202 | `{"data":"ok"}`，取消后可物理删除 |
+
+结论：cancel 合法前态仅「已生效」；草稿/已取消均被拒（DocstatusTransitionError/ValidationError）；下游已确认 DN 阻断 cancel（LinkExistsError）；版本断言机制通用（check_if_latest 在 save/submit/cancel 统一生效），但标准 `run_method:cancel`/`frappe.client.cancel` 加载当前值且不接受 modified，须走 `frappe.client.save`（docstatus=2 + modified）等价路径才能对 cancel 施加乐观并发断言。

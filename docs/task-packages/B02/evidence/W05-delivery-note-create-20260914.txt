@@ -1,0 +1,12 @@
+# W05 Delivery Note create 摸底证据（脱敏）
+
+执行时间：2026-09-14 23:29（UTC+8）。执行者：Claude（B02 实施上下文）。认证 `Authorization: token <REDACTED>`。按来源销售订单生成发货草稿经 `POST /api/method/erpnext.selling.doctype.sales_order.sales_order.make_delivery_note` body `{"source_name":"SAL-ORD-..."}` 取目标 dict，再 `POST /api/resource/Delivery%20Note` 插入；亦可直接 create 并逐行指定 `against_sales_order`/`so_detail`。
+
+| 场景 | HTTP | 结果 |
+|---|---|---|
+| make_delivery_note 来源已生效 SO（SAL-ORD-2026-00002） | 200 | 返回草稿 dict（docstatus=0、`__islocal`=1），含 customer/company/currency/selling_price_list/items[]（against_sales_order、so_detail、qty=未完成量、warehouse=Stores - G） |
+| insert 目标 dict → 草稿 DN | 200 | `name`=`MAT-DN-2026-00001`，`naming_series`=`MAT-DN-.YYYY.-`；docstatus=0、status Draft；items[] 含 against_sales_order/so_detail/qty 嵌套 |
+| make_delivery_note 来源草稿 SO（SAL-ORD-2026-00003） | 417 | `ValidationError`: Cannot map because following condition fails: docstatus=1（来源必须已生效） |
+| DN create 行数量 > 来源未完成量（qty 6 > 未完成 5，直接 create 指定 against_sales_order） | 200 | **草稿创建不校验超发**，成功生成 `MAT-DN-2026-00002`（超发校验延后至 confirm） |
+
+结论：DN 命名 `MAT-DN-.YYYY.-` 连续编号（非假设的 `DN-XXXXX`）；按 SO 生成草稿的官方方式为 `make_delivery_note` mapper（来源必须 docstatus=1）+ insert；「行数量 ≤ 来源未完成量」在**草稿创建阶段不校验**，留待 confirm（见 W06）。
