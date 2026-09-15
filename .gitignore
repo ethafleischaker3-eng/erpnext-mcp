@@ -29,3 +29,6 @@
 **/*.sql
 **/*.sqlite
 **/*.sqlite3
+
+# Claude Code 本地配置（含本机绝对路径与后端凭据，不入库）
+.claude/
