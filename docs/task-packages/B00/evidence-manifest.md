@@ -58,6 +58,8 @@ Owner 站点独占书面确认已于 2026-09-12 取得（W01 补充证据）；W
 3. **正式自检 S01—S12（已完成，2026-09-14）**：冻结后按冻结自检方法逐项复核（含五份不可变治理文件哈希），已转「待验收」并经 Acceptor 独立复核 + Acceptance Reviewer gjg 签核通过。
 4. **S04/W05 补证（已完成，2026-09-14）**：独立验收两项存疑/观察已关闭——① EV-B00-004 补字段级 dump `EV-B00-004-probe-docperm-fields-20260914-105516.txt`，21 条 DocPerm 均 read=1/write=0/create=0/delete=0/submit=0/cancel=0/amend=0（NON_READ_PERM_COUNT=0），证明最小只读；② EV-B00-005 补创建后 GET `W05-api-create-read-20260914-105620.txt`（POST 200 → 创建后 GET 200 → DELETE 202 → 404）。补证探针已 restore pristine 快照清理，零残留（Role/User/DocPerm/B00-PROBE Customer Group 均不存在）。
 
+5. **snapshots/ 由受控转隐藏（已完成，2026-09-15）**：B00 v1.0 封存后发现 snapshots/（初始数据与快照所在）实际 ACL 仍为 b00-impl Modify（B00 写基线的临时授权），实施主体可读基线快照，违反边界 §2「隐藏初始数据」隔离原则。已由 Owner gjg 于 2026-09-15 以管理员 icacls 将 snapshots/ 改为 b00-impl Deny（静态 `(OI)(CI)N`，与 task-sets/assertions/runs 同源），并经 `verify-isolation.ps1 -Sentinel D:\second-acceptance\snapshots\sentinel.txt` 负向读取返回 `ACCESS_DENIED: UnauthorizedAccessException`。证据：静态 `D:\second-acceptance\evidence\EV-B00-012-snapshots-deny-20260915-133520.txt`、动态 `D:\second-acceptance\evidence\EV-B00-012-snapshots-deny-verify-20260915-133929.txt`。对应边界文档升版 v1.1（CHG-20260915-001）。
+
 **独立验收结论（2026-09-14）**：Acceptor 独立复核 S01—S12 全通过、无阻断项；Acceptance Reviewer gjg 签核「独立验收通过」；S12 经 Owner 现场实测 `verify-isolation.ps1` 返回 `ACCESS_DENIED: UnauthorizedAccessException`；B00 状态转「验收通过」。
 
 ## 6. D12 脚本缺陷记录（已修复并重跑重拍）

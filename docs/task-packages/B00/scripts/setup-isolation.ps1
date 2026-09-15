@@ -7,11 +7,11 @@ B00 W12/S12 — 建立验收区真实文件系统权限隔离
   2. 创建受限本地账户 b00-impl（实施主体，默认 Users 组，非管理员）；
   3. 设置 NTFS ACL（/inheritance:r 移除继承 ACE，再显式授权）：
      - 根目录：Owner/SYSTEM/Administrators 全权 + b00-impl 最小遍历/读取（RX，仅本目录）；
-     - task-sets/assertions/runs（隐藏区）：拒绝 b00-impl；
-     - snapshots/reset：b00-impl 可写（B00 交付物）；
+     - task-sets/assertions/runs/snapshots（隐藏区）：拒绝 b00-impl；
+     - reset：b00-impl 可写（B00 交付物）；
      - evidence：b00-impl 可写（落盘原始证据）；
   4. 校验无残留的 Authenticated Users / Users / Everyone ACE（按 SID S-1-5-11 / S-1-5-32-545 / S-1-1-0 判定）；
-  5. 校验完整最小权限矩阵：Owner/SYSTEM/Administrators=FullControl；根目录 b00-impl=RX 且不得越权；snapshots/reset/evidence=Modify 且不得越权；task-sets/assertions/runs=Deny 覆盖 FullControl+(OI)(CI) 且无额外 Allow；
+  5. 校验完整最小权限矩阵：Owner/SYSTEM/Administrators=FullControl；根目录 b00-impl=RX 且不得越权；reset/evidence=Modify 且不得越权；task-sets/assertions/runs/snapshots=Deny 覆盖 FullControl+(OI)(CI) 且无额外 Allow；
      发现残留 ACE 或矩阵不满足即 fail-closed：输出路径/主体/SID/权限明细后抛出异常终止，不打印完成、不提示继续；icacls.exe 每条命令均校验原生退出码，非零即终止；全部通过后才打印最终 ACL 与完成信息。
 
 用法（管理员 PowerShell）：
@@ -88,12 +88,12 @@ $rootGrant = @("${Owner}:(OI)(CI)F", "SYSTEM:(OI)(CI)F", "Administrators:(OI)(CI
 Set-AclFor -Path $AcceptRoot -GrantList $rootGrant
 
 # 3b) 隐藏区：拒绝实施主体
-foreach ($h in @("task-sets", "assertions", "runs")) {
+foreach ($h in @("task-sets", "assertions", "runs", "snapshots")) {
     Set-AclFor -Path (Join-Path $AcceptRoot $h) -GrantList $full -DenyUser $ImplUser
 }
 
 # 3c) snapshots/reset：实施主体可写
-foreach ($d in @("snapshots", "reset")) {
+foreach ($d in @("reset")) {
     Set-AclFor -Path (Join-Path $AcceptRoot $d) -GrantList $implWrite
 }
 
@@ -161,7 +161,7 @@ $beyondMod = -bnot (([int]$modRights) -bor $syncBit)
 
 $dirRoles = @(
     @{ Path = $AcceptRoot;                          Role = 'root'  }
-    @{ Path = (Join-Path $AcceptRoot 'snapshots');  Role = 'write' }
+    @{ Path = (Join-Path $AcceptRoot 'snapshots');  Role = 'deny'  }
     @{ Path = (Join-Path $AcceptRoot 'reset');      Role = 'write' }
     @{ Path = (Join-Path $AcceptRoot 'evidence');   Role = 'write' }
     @{ Path = (Join-Path $AcceptRoot 'task-sets');  Role = 'deny'  }
