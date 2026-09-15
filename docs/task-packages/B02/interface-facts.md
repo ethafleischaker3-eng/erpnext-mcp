@@ -14,6 +14,7 @@
 | F4 | confirm 前态不校验 | **submit 已生效单据 → 200 静默 no-op**（后端视作 update_after_submit），不重放业务效果 | server 必须前置断言「confirm 仅草稿、cancel 仅已生效」（PRD §5.1/§5.2） |
 | F5 | DN 超发/库存校验时机 | **超发（qty>未完成量）在 confirm 触发**（`OverAllowanceError` 417），草稿创建不校验；库存不足在 confirm 触发（`NegativeStockError` 417） | server 草稿 create 可放行、confirm 前须校验来源未完成量 + 可用库存 |
 | F6 | 失败不静默（含例外） | 全部校验/版本/库存错误结构化 `exc_type` + 4xx；唯二例外：submit 已生效（静默 200）、SO create 空 items（`TypeError` 500 未优雅） | server 不得依赖后端拒绝重复 confirm；create 前须校验 items 非空 |
+| F7 | SO create 显式 rate 的写副作用 | 行上显式给**非零** `rate` → 自动创建 Item Price（Standard Selling、selling=1、price_list_rate=rate、valid_from=当日）；不给 rate 不创建；**删除 SO 不清除该 Item Price**（孤儿主数据） | `sales_order_create` 携带 rate 会写 Item Price 主数据，须在 D02 #13 明确「是否允许携带 rate、该副作用的台账/回滚归属」；「草稿创建仅引用主数据」（PRD §4.1②）在显式 rate 下不成立 |
 
 ## 1. 通用接口与认证
 
@@ -34,6 +35,7 @@
 | 子表 items[] | 嵌套读写；行含 item_code/qty/warehouse（默认 Stores - G）/is_stock_item/rate 等 |
 | 引用字段校验 | customer 无效→`DoesNotExistError`(404)；item_code 无效→`DoesNotExistError`(404)；warehouse/company/currency/selling_price_list 无效→`LinkValidationError`(417) |
 | 数量校验 | qty=0→`InvalidQtyError`(417)；qty<0→`NonNegativeError`(417)；空 items→`TypeError`(500 未优雅) |
+| 显式 rate 副作用 | 行上显式给**非零** `rate` → 自动创建 Item Price（Standard Selling、selling=1、price_list_rate=rate、valid_from=当日）；不给 rate（默认 0）不创建；删除该 SO **不**清除该 Item Price（见 F7） |
 | confirm | `run_method:submit` 或 `frappe.client.submit`：docstatus 0→1、status→`To Deliver and Bill`、modified 变化 |
 | 版本断言（confirm） | 陈旧 modified→`TimestampMismatchError`(417)；正确/省略→200 |
 | confirm 前态 | submit 已生效→200 静默 no-op（不重放，须 server 前置断言） |
@@ -71,6 +73,7 @@
 - cancel 合法前态仅「已生效」；草稿/已取消被拒（DocstatusTransitionError/ValidationError）。
 - 下游约束：已生效 SO 存在已确认 DN → cancel 被 `LinkExistsError`(417) 拒绝；须先删/取消下游 DN。
 - 清理顺序（§16）：先删下游 DN（草稿 DELETE；已生效 cancel→DELETE），再 cancel→delete SO，最后删前置 Customer/Item。
+- **回滚注意**：SO 草稿删除不删除其显式 rate 自动创建的 Item Price（孤儿主数据，须另行清理，见 F7）。
 
 ## 5. 状态机与 docstatus 语义
 
@@ -103,4 +106,5 @@
 3. `sales_order_cancel` 版本断言不可经标准 cancel 端点实现，须走 `frappe.client.save`（docstatus=2+modified）等价路径，或契约冻结时明确放弃 cancel 的版本保护（F3）。
 4. confirm/cancel 均须 server 前置断言合法前态（confirm 仅草稿、cancel 仅已生效），后端不拒绝重复 confirm（静默 no-op，F4）。
 5. `delivery_note_confirm` 的超发与库存校验由后端在 confirm 强制（F5），但 server 仍应前置校验来源未完成量与可用库存以给出可自纠报错（PRD §7）。
-6. 以上结论写入 PRD 或成为 D01/D02 权威输入时走变更控制；本记录本身不改 PRD 冻结语义。
+6. `sales_order_create` 携带显式非零 `rate` 会对 Item Price 产生主数据写入副作用（自动创建，删除 SO 不清除），须在 D02 #13 契约中明确「create 是否允许携带 rate、该副作用的台账归属与回滚」（F7）。
+7. 以上结论写入 PRD 或成为 D01/D02 权威输入时走变更控制；本记录本身不改 PRD 冻结语义。

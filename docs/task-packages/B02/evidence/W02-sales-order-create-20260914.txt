@@ -16,5 +16,6 @@
 | items 空数组 | 500 | `TypeError`: unsupported operand type(s) for *: 'NoneType' and 'float'（未优雅处理的 500，非静默） |
 | items[].qty=0 | 417 | `InvalidQtyError`: Quantity for Item ... cannot be zero |
 | items[].qty=-5 | 417 | `NonNegativeError`: Value cannot be negative for Quantity |
+| items[].rate=77（显式非零，补测 2026-09-15） | 200 | **自动创建 Item Price**：price_list=Standard Selling、selling=1、price_list_rate=77、currency=CNY、valid_from=当日；不给 rate（默认 0）不创建；删除该 SO 后该 Item Price **仍残留**（孤儿主数据，见 interface-facts.md F7） |
 
-结论：SO 命名 `SAL-ORD-.YYYY.-` 连续编号（非假设的 `SO-XXXXX`）；单据无「同名唯一性」概念（series 编号）；引用字段分两类——customer/item_code 走 `DoesNotExistError`(404)，warehouse/company/currency/price list 走 `LinkValidationError`(417)；空 items 触发未处理 500。
+结论：SO 命名 `SAL-ORD-.YYYY.-` 连续编号（非假设的 `SO-XXXXX`）；单据无「同名唯一性」概念（series 编号）；引用字段分两类——customer/item_code 走 `DoesNotExistError`(404)，warehouse/company/currency/price list 走 `LinkValidationError`(417)；空 items 触发未处理 500；**显式非零 rate 会对 Item Price 产生主数据写副作用（自动创建，删 SO 不清除）**。
