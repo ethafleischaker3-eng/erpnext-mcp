@@ -179,16 +179,16 @@
 
 ## 14. 完成定义
 
-- [ ] 全部前置条件已经验证（含 Owner 已分别建立「盲出题主体对 B0[1-5]/ 与 task-sets/assertions/runs/snapshots 只读拒绝」及「实施主体对 task-sets/assertions/runs/snapshots 与 candidates/ 只读拒绝」、盲出题主体负向自证通过、对象范围边界名单已下发）；
-- [ ] W01–W06 全部完成；
-- [ ] 销售/采购多步场景候选各 ≥1 条，三段式完备且可判定；
-- [ ] 候选对象均在对象范围边界名单内，无实施侧结论痕迹（含 PRD tool 清单/档位口径）；
-- [ ] 不变量均有证据；
-- [ ] S01–S03 自检通过，S04（零 B 系列/tool/档位/接口痕迹）由 Implementation Reviewer 核对通过；
-- [ ] Evidence Manifest 完整；
-- [ ] 未修改禁止范围；
-- [ ] 剩余限制和风险已记录；
-- [ ] 独立验收通过。
+- [x] 全部前置条件已经验证（含 Owner 已分别建立「盲出题主体对 B0[1-5]/ 与 task-sets/assertions/runs/snapshots 只读拒绝」及「实施主体对 task-sets/assertions/runs/snapshots 与 candidates/ 只读拒绝」、盲出题主体负向自证通过、对象范围边界名单已下发）；
+- [x] W01–W06 全部完成；
+- [x] 销售/采购多步场景候选各 ≥1 条，三段式完备且可判定；
+- [x] 候选对象均在对象范围边界名单内，无实施侧结论痕迹（含 PRD tool 清单/档位口径）；
+- [x] 不变量均有证据；
+- [x] S01–S03 自检通过，S04（零 B 系列/tool/档位/接口痕迹）由 Implementation Reviewer 核对通过；
+- [x] Evidence Manifest 完整；
+- [x] 未修改禁止范围；
+- [x] 剩余限制和风险已记录；
+- [x] 独立验收通过。
 
 ## 15. 停止与升级条件
 
@@ -222,3 +222,42 @@
 | 2026-09-15 | 待评审 | 待评审 | gjg | v0.9（评审修正）：移除 §5 注/§16 中「只出方案=只出 plan 档=盘点档位」的档位映射泄露（归一映射改随 Freeze Manifest 记录，盲会话不可见）；S04 改为 Implementation Reviewer 核对并删档位词枚举；§4 负向自证验证方式改 Owner 运行 verify 脚本、W01 降为盲会话复核 |
 | 2026-09-15 | 待评审 | 待评审 | gjg | v0.10（盲隔离 ACL 补漏）：核查发现 PRD 全文与 docs/task-records/（B 系列 Freeze Manifest/变更记录）继承 Authenticated Users:F，c01a-blind 可读即泄实施侧结论；§4 盲主体只读拒绝范围补 PRD + task-records，§6.1 严禁读补 task-records；setup/verify 脚本同步补 Deny 与哨兵，待 Owner 重跑 teardown→setup→verify |
 | 2026-09-15 | 待评审 | 已冻结 | gjg | v1.0：Implementation Reviewer 复核通过，无阻断；§4 前置条件全部已满足（含 PRD/task-records 补漏后重跑 setup/verify，B01–B04 + PRD + task-records + 4 隐藏哨兵全 READ_DENIED）；冻结产出 C01a v1.0 Freeze Manifest 与 frozen/v1.0 快照（task.md + object-scope.md 哈希随附） |
+| 2026-09-15 | 已冻结 | 实施中 | Claude/C01a 盲出题上下文 | 开工：第 0 步核对（whoami=c01a-blind、模型连通正常、frozen/v1.0 与 task.md/object-scope.md 逐字节一致）；W01 盲隔离负向自证通过（B01–B05 + PRD + task-records + 4 隐藏哨兵全 ACCESS_DENIED，candidates/C01a WRITE_OK）；进入 W02 |
+| 2026-09-15 | 实施中 | 待验收 | Claude/C01a 盲出题上下文 | 完成：W02 链路梳理；W03 销售候选 2 条、W04 采购候选 2 条（落 D:\second-acceptance\candidates\C01a\，三段式完备、字段级可判定）；W05 自检 S01–S03 通过、S04 关键词扫描零命中；W06 evidence-manifest.md 产出；未触发停止条件；不变量均核对；不自标「已通过」，待 Acceptor（gjg）独立验收 |
+| 2026-09-15 | 待验收 | 已通过 | gjg | Acceptor 独立验收通过：盲隔离 W01 可复核（whoami=c01a-blind + 全严禁路径 ACCESS_DENIED，非承诺不读）；三段式完备且断言字段级可判定；对象全落 12 操作 + 9 引用名单内；S04 零 B 系列结论/tool 名/档位词/接口路径/MCP·server 痕迹/幂等·断言·回滚口径（Acceptor 手握 B01–B05 与 PRD §3.3 逐条交叉核对）；落点仅在 candidates/C01a/；§17 止于「待验收」未自标「已通过」；完成定义十项全勾选 |
+| 2026-09-15 | 已通过 | 已封存 | gjg | 独立验收通过后归档；封存记录与对 C01b/D01/D02 及下游任务包的输入/影响见第 18 节 |
+
+## 18. 封存记录与下游影响
+
+### 18.1 封存信息
+
+| 字段 | 内容 |
+|---|---|
+| 状态 | 已封存 |
+| 封存日期 | 2026-09-15 |
+| 操作人 | gjg |
+| 结论 | 盲生成业务验收场景候选已冻结并通过独立验收：销售候选 2 条（S01 下单→发货全链路、S02 发货后作废冲回）、采购候选 2 条（P01 下单→收货全链路、P02 收货后作废冲回）；三段式完备（初始数据状态 / 自然语言指令 / 期望终态断言骨架）、断言字段级可判定；对象全部落在 object-scope.md 的 12 操作 + 9 引用名单内；候选无 B01–B05 接口结论、tool 名、档位词、接口路径、MCP/server 实现痕迹、幂等/断言/回滚口径（S04 由 Acceptor 逐条交叉核对通过） |
+| Freeze Manifest | `docs/task-records/freeze-manifests/C01a-v1.0.md` |
+
+### 18.2 封存材料
+
+- 冻结版任务包及证据计划快照：`docs/task-packages/C01a/frozen/v1.0/task.md`、`object-scope.md`；
+- 权威输入版本清单：本文件第 5 节；
+- 交付物：D01（task.md）、D02/D03（销售/采购候选 4 条）、D04（evidence-manifest.md）；
+- 隐藏验收材料（候选正文/初始态/断言，对实施主体拒绝，冻结后迁入 task-sets/）：`D:\second-acceptance\candidates\C01a\`（S01-sales-fulfillment.md、S02-sales-void.md、P01-purchase-receipt.md、P02-purchase-void.md）；
+- 自检记录：`docs/task-packages/C01a/evidence-manifest.md`（EV-C01a-001..006）；
+- 独立验收记录：本文件第 17 节状态记录；
+- 变更与退回记录：无退回。
+
+### 18.3 对下游任务包的输入
+
+1. **候选三段式骨架（→ C01b）**：4 条候选（销售 S01/S02、采购 P01/P02），每条含初始数据状态（合成数据、基于 schema）+ 自然语言指令（业务任务，不用 ERPNext 专有名词）+ 期望终态断言骨架（字段级可判定：明确哪些记录的哪些字段变成什么；具体值、tool 映射与评分脚本由 C01b 补齐）；
+2. **对象范围约束（→ C01b）**：候选对象仅用 object-scope.md 的 12 操作 + 9 引用名单；C01b 补齐精确断言与 tool 覆盖映射时不得越出该名单；
+3. **盲隔离保持（→ C01b/D01/D02）**：候选正文/初始态/断言为隐藏验收材料，D01/D02 仅见版本标识，不得读取 C01a 题目正文、隐藏数据或终态断言（总则 §13、登记表 D01/D02 行约束）。
+
+### 18.4 对下游任务包的影响与门槛
+
+1. C01a 封存 → C01b 具备「覆盖映射与任务集最终冻结」的候选输入，可依据冻结 D02 契约做 tool 覆盖映射与精确断言补齐（task.md §9）；
+2. D01/D02 与 C01a 的依赖为「仅完成状态/版本门槛」，不读取候选正文（登记表 D01/D02 行）；本包封存不改变 D01/D02 的规划中状态；
+3. C01b 补齐时须以冻结 D02 契约为准复核 Bin/Stock Ledger Entry 的字段名（候选字段名来自 ERPNext 数据模型委托，见 evidence-manifest §4）；
+4. 已知限制不变：候选为三段式骨架、精确终态断言/tool 覆盖映射/初始数据快照与重置脚本归 C01b；单一自然人 gjg 兼任 Owner/Implementation Reviewer/Acceptor，读候选后即受题污染，不得参与 D/E/F 实现、调参或定向修复（§16）。

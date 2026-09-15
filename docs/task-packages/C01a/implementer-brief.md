@@ -7,6 +7,7 @@
 
 ## 开工前（按序）
 
+0. 确认进程身份与模型连通：`whoami` 必须显示 `c01a-blind`（若显示别的账户，说明隔离未生效，立即停止上报）；再发一句话确认模型能正常应答。本会话必须经 `D:\claude\claude-blind.cmd` 启动（该脚本注入中转环境变量 `ANTHROPIC_BASE_URL`/`ANTHROPIC_AUTH_TOKEN=PROXY_MANAGED`）；不要直接跑裸的 claude.exe，也不要 `claude login`（直连 api.anthropic.com 会被 403，login 在中转模式下不适用）。
 1. 先读 `docs/task-packages/C01a/task.md`（冻结正文，以 `frozen/v1.0/task.md` 快照为准）——这是你的权威任务定义，覆盖 §8 工作项 W01–W06、§9 三段式骨架格式契约、§10 不变量、§14 完成定义、§15 停止条件。
 2. 核对 §4 前置条件已满足（尤其 `object-scope.md` 已下发、隔离 ACL 已建立）。
 3. 做 W01 负向自证：你以 `c01a-blind` 身份尝试读取下列路径，必须**全部得到 ACCESS_DENIED（读不到）**：
