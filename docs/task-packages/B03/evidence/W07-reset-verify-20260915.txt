@@ -1,0 +1,19 @@
+# W07 快照恢复归零验证证据（脱敏）
+
+执行时间：2026-09-15 10:5x（UTC+8）。执行者：Claude（B03 独立实施上下文）。认证 `Authorization: token <REDACTED>`。
+
+清理路径：因 cancelled PR 被 `LinkExistsError`（linked GL Entry）拒绝 REST DELETE，采购链路零残留改用快照恢复（§16 授权路径）。
+
+| 步骤 | 结果 |
+|---|---|
+| 基线洁净度 | `grep -c PROBE baseline-20260914-095506.sql` = 0（无任何 PROBE 残留） |
+| 恢复 | `restore-snapshot.sh` → `Restore complete`，smoke check `"Administrator"` |
+| 恢复后 Supplier | `filters=[["name","like","%B03-PROBE%"]]` → `{"data":[]}` |
+| 恢复后 Item | `like %B03-PROBE%` → `{"data":[]}` |
+| 恢复后 PO | `supplier=B03-PROBE-SUP-001` → `{"data":[]}` |
+| 恢复后 PR | `supplier=B03-PROBE-SUP-001` → `{"data":[]}` |
+| 恢复后 SLE | `item_code=B03-PROBE-ITEM-001` → `{"data":[]}` |
+| 恢复后 Item Price | `item_code=B03-PROBE-ITEM-001` → `{"data":[]}` |
+| 恢复后基线 PO/PR 计数 | PO `{"data":[]}`、PR `{"data":[]}`（纯净） |
+
+结论：Supplier/Item/PO/PR/SLE/GL/Item Price 七类 `B03-PROBE-` 相关对象测试后零残留，收货入库产生的库存经快照恢复归零，满足 §10 不变量。

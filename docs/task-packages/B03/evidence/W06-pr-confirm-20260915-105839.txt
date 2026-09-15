@@ -1,0 +1,11 @@
+== stock before PR confirm ==
+(200, [{'warehouse': 'Stores - G', 'actual_qty': 0.0, 'reserved_qty': 0.0}])
+[417] confirm PR#1 stale modified -> exc_type=TimestampMismatchError
+      after: docstatus=0 (0 expected, unchanged)
+[417] confirm PR#2 over-receipt qty=6 -> exc_type=OverAllowanceError exc=erpnext.controllers.status_updater.OverAllowanceError: This document is over limit by <strong>Qty</strong> <strong>1.0</strong> for item <st
+[200] confirm PR#1 correct -> {"data": {"name": "MAT-PRE-2026-00001", "owner": "Administrator", "creation": "2
+      doc: docstatus=1 status=To Bill modified=2026-09-15 10:58:40.759424
+== stock after PR#1 confirm ==
+(200, [{'warehouse': 'Stores - G', 'actual_qty': 5.0, 'reserved_qty': 0.0}])
+[200] SLE entries:
+      Purchase Receipt MAT-PRE-2026-00001 actual_qty=5.0 wh=Stores - G after=5.0

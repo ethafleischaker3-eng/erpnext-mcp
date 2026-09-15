@@ -1,0 +1,16 @@
+# W01 环境与凭据复核证据（脱敏）
+
+执行时间：2026-09-15 10:4x（UTC+8）。执行者：Claude（B03 独立实施上下文）。认证 `Authorization: token <REDACTED>`。
+
+| 检查项 | 结果 |
+|---|---|
+| 应用版本 | `bench list-apps`：frappe 15.120.1 UNVERSIONED、erpnext 15.121.2 UNVERSIONED（符合冻结目标） |
+| 凭据有效性 | `GET /api/method/frappe.auth.get_logged_user` → `{"message":"Administrator"}`（Token 有效） |
+| Company / 币种 | Company `gjg`、`default_currency`=CNY（唯一） |
+| Price List | `Standard Buying`（buying=1、selling=0、currency=CNY、enabled=1）+ `Standard Selling`（共 2 条，符合 B02 W01） |
+| Supplier Group | `All Supplier Groups`（is_group=1，根分组）；`Distributor`（is_group=0，非分组，可作 Supplier 的 supplier_group） |
+| Item Group / UOM | 非分组 Item Group：Consumable/Products/Raw Material/Services/Sub Assemblies；UOM 含 `Nos`/`Unit` |
+| 快照重置可用 | `D:\second-acceptance\reset\restore-snapshot.sh` → 纯净基线 `baseline-20260914-095506.sql`（grep 无 PROBE 残留）；恢复后 smoke check 返回 `Administrator` |
+| 初始零残留 | 实施前 `B03-PROBE-` Supplier/Item/PO/PR 查询均 `{"data":[]}` |
+
+结论：站点 `erpnext.local` 独占非生产可销毁、版本符合冻结目标、凭据有效、快照可重置；Supplier Group（Distributor）与 Standard Buying 价格表就位，无需本包创建 Supplier Group。

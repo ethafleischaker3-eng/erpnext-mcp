@@ -1,0 +1,3 @@
+[200] create PO#3 draft name=PUR-ORD-2026-00003 docstatus=0
+[417] make_purchase_receipt(draft PUR-ORD-2026-00003) -> exc_type=ValidationError exc=frappe.exceptions.ValidationError: Cannot map because following condition fails: docstatus=1
+[200] direct PR over-receipt qty=6 -> name=MAT-PRE-2026-00002 docstatus=0 (draft create does NOT validate over-receipt)

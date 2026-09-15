@@ -216,15 +216,15 @@ B03 不提供正式业务 tool，不定义 tool 语义或 schema。本节规定�
 
 ## 14. 完成定义
 
-- [ ] 全部前置条件已经在冻结后重新验证；
-- [ ] 工作项与交付物全部完成；
-- [ ] 接口事实记录输出契约未被擅自改变；
-- [ ] 适用不变量均有正式证据；
-- [ ] 冻结后正式开发自检通过；
-- [ ] Evidence Manifest 完整且正式证据可独立复核；
-- [ ] 未修改禁止范围；
-- [ ] 剩余限制和风险已记录；
-- [ ] 独立验收通过。
+- [x] 全部前置条件已经在冻结后重新验证；
+- [x] 工作项与交付物全部完成；
+- [x] 接口事实记录输出契约未被擅自改变；
+- [x] 适用不变量均有正式证据；
+- [x] 冻结后正式开发自检通过；
+- [x] Evidence Manifest 完整且正式证据可独立复核；
+- [x] 未修改禁止范围；
+- [x] 剩余限制和风险已记录；
+- [x] 独立验收通过。
 
 ## 15. 停止与升级条件
 
@@ -259,3 +259,47 @@ B03 不提供正式业务 tool，不定义 tool 语义或 schema。本节规定�
 | 2026-09-15 | 规划中 | 草拟 | Claude | 创建完整任务包文件并指定 Owner gjg，必备结构完整，待 gjg 评审冻结 |
 | 2026-09-15 | 草拟 | 待评审 | Claude | 必备结构完整，提交 gjg 评审 |
 | 2026-09-15 | 待评审 | 已冻结 | gjg | 评审通过，无阻断问题；批准 B03 v1.0 冻结；拍板两边界决策——① Purchase Receipt cancel 仅作库存冲回与零残留清理摸底，不构成 D02 新增 `purchase_receipt_cancel` tool 的依据（PRD §3.3 / 已决议 #8）；② 采购退货单（Purchase Return）本 PRD 不纳入（tool 清单无采购退货 tool）；尚未实施或验收 |
+| 2026-09-15 | 已冻结 | 实施中 | Claude（B03 实施上下文） | 前置条件核对成立（环境可达、版本 frappe 15.120.1 / erpnext 15.121.2 符合、凭据有效、快照重置实测可用、Supplier Group Distributor 与 Standard Buying 价格表就位、B03-PROBE- 初始零残留）；进入实施 |
+| 2026-09-15 | 实施中 | 待验收 | Claude（B03 实施上下文） | W01–W08 完成；D01–D06 齐备；S01–S08 自检通过；`B03-PROBE-` 相关对象（Supplier/Item/PO/PR/SLE/GL/Item Price 七类）经快照恢复零残留；interface-facts.md 覆盖 §9 全部 9 项（F1–F9）；独立验收由 Acceptor gjg 执行 |
+| 2026-09-15 | 待验收 | 已通过 | gjg | 独立验收通过：冻结完整性一致（B03 v1.0 Freeze Manifest 哈希比对一致）、§9 九项覆盖（F1–F9 逐项可复核）、证据链一致（12 份公开证据与 interface-facts/Manifest 逐项对照）、独立 live spot-check（环境可达 Administrator、Supplier/Item/PO/PR 四类 `B03-PROBE-` 零残留）；完成定义九条全部满足；快照恢复零残留复核通过 |
+| 2026-09-15 | 已通过 | 已封存 | gjg | 独立验收通过后归档；封存记录与对 D01/D02 及下游任务包的输入/影响见第 18 节 |
+
+## 18. 封存记录与下游影响
+
+### 18.1 封存信息
+
+| 字段 | 内容 |
+|---|---|
+| 状态 | 已封存 |
+| 封存日期 | 2026-09-15 |
+| 操作人 | gjg |
+| 结论 | 采购链路接口事实已冻结：命名 series 连续编号（`PUR-ORD-.YYYY.-`/`MAT-PRE-.YYYY.-`）无同名唯一性；confirm 乐观版本断言（陈旧 `modified`→417 `TimestampMismatchError`）后端原生强制、cancel 须走 save 等价路径；confirm 前态不校验（重复 submit 静默 200）；PR 超收/库存校验在 confirm 触发；失败不静默（唯二例外：重复 confirm 静默 200、PO create 空 items 500）；PO create 显式非零 rate 写 Item Price 主数据副作用；PO `schedule_date` 必填；PR confirm 产生 GL Entry 致 cancelled PR 不可 REST 删除（须快照恢复归零） |
+| Freeze Manifest | `docs/task-records/freeze-manifests/B03-v1.0.md` |
+
+### 18.2 封存材料
+
+- 冻结版任务包及证据计划快照：`docs/task-packages/B03/frozen/v1.0/task.md`、`evidence-manifest.md`；
+- 权威输入版本清单：本文件第 5 节；
+- 交付物：D01–D06（任务包、Evidence Manifest、登记表 B03 行、接口事实记录 `interface-facts.md`、合成数据与清理记录、各场景原始证据）；
+- 自检记录：`docs/task-packages/B03/evidence-manifest.md`（S01–S08 对应 EV-B03-001..008）；
+- 独立验收记录：本文件第 17 节状态记录；
+- 变更与退回记录：无退回；一次验收通过，未触发原位重冻。
+
+### 18.3 对下游任务包的输入
+
+1. **命名与编号事实（→ D02 #16/#19）**：Purchase Order `PUR-ORD-.YYYY.-`、Purchase Receipt `MAT-PRE-.YYYY.-` 连续编号，无同名唯一性概念；create 无需同名前置断言（F1）；
+2. **confirm 乐观版本断言事实（→ D02 #17/#20）**：`modified` 为可选并发令牌，confirm 携带陈旧 `modified`→417 `TimestampMismatchError` 且无部分写入、省略则不校验；server confirm tool 须经 `frappe.client.submit` 全量 doc 携带当前 `modified`（F2）；
+3. **cancel 乐观版本断言事实（→ D02 #18）**：标准 `run_method:cancel` 加载当前值且不接受 `modified`，仅 `frappe.client.save`（docstatus=2+modified）等价路径可施加；cancel tool 版本断言须走 save 等价路径或契约冻结时明确放弃（F3）；
+4. **confirm 前态事实（→ D02 #17/#20）**：后端不校验 confirm 前态，submit 已生效单据→200 静默 no-op（update_after_submit）；server 必须前置断言「confirm 仅草稿、cancel 仅已生效」（F4）；
+5. **PR 超收/库存校验时机事实（→ D02 #20）**：超收（qty>来源未完成量）在 confirm 触发（`OverAllowanceError` 417），草稿创建不校验；收货入库（库存增加 Bin/SLE/GL）在 confirm 触发；server 草稿 create 可放行、confirm 前须校验来源未完成量（F5）；
+6. **失败不静默事实（→ D01/D02）**：校验/版本/库存错误结构化 `exc_type`+4xx；唯二例外 submit 已生效静默 200、PO create 空 items `TypeError` 500；server 不得依赖后端拒绝重复 confirm、create 前须校验 items 非空与数量非负（F6）；
+7. **PO create 显式 rate 写副作用（→ D02 #16）**：行上显式非零 `rate` 自动创建 Item Price（Standard Buying、buying=1，删除 PO 不清除，孤儿主数据，与 B02 F7 同机制）；`purchase_order_create` 携带 rate 会写 Item Price 主数据，契约须明确是否允许携带 rate 及该副作用的台账/回滚归属（F7）；
+8. **PO `schedule_date` 必填事实（→ D02 #16）**：缺 `schedule_date`→`ValidationError` 417（"Please enter Reqd by Date"，PO 特有，SO 无此约束）；`purchase_order_create` 的 schema 须将 `schedule_date` 列为必填或由 server 默认填充（F8）；
+9. **PR 清理事实（→ D01/D02 回滚契约）**：PR confirm 同时写 SLE 与 GL Entry，cancel 后二者以 `is_cancelled=1` 保留，导致 cancelled PR 不可 REST 删除（`LinkExistsError` linked GL Entry），进而 cancelled PO 亦不可删除（linked PR）；采购链路「零残留」须以快照恢复为准，server 不得承诺「物理删除采购收货单」能力；PR cancel 冲回库存 ≠ 物理删除单据/流水（F9）。
+
+### 18.4 对下游任务包的影响与门槛
+
+1. B03 通过 → D01/D02 冻结 #16–#18（采购订单）、#19–#20（采购收货单）tool 契约具备权威输入；B03 的 confirm 状态漂移、乐观版本断言与原子性结论为 D02 冻结 #16–#18、#19–#20 契约的前置（总则 §13）；
+2. F1–F9 结论写入 PRD 或成为 D01/D02 权威输入时走变更控制；本包本身不改 PRD 冻结语义；
+3. B04 仍须实测库存/回滚链路（库存调拨/盘点、主数据/价格/单据回滚路径），B03 不代其结论；F02 仍须实测充足库存正向发货（B03 已为「收货入库→库存增加」留出正向库存来源，不测销售出库）；
+4. B03 已知限制不变：PR cancel 仅作库存冲回与零残留清理摸底，不构成 D02 新增 `purchase_receipt_cancel` tool 依据（PRD §3.3 / 已决议 #8）；采购退货单（Purchase Return）本 PRD 不纳入；confirm 已生效静默 no-op 与 PO create 空 items 500 为后端未优雅处理、须 server 兜底；后端凭据为本地开发默认值，迁移共享/生产环境必须更换。

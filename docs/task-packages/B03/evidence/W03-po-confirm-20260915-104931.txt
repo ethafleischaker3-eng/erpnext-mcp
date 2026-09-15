@@ -1,0 +1,7 @@
+[200] GET doc: docstatus=0 status=Draft modified=2026-09-15 10:47:31.567856
+[417] submit stale modified -> exc_type=TimestampMismatchError exc=frappe.exceptions.TimestampMismatchError: Error: Document has been modified after you have opened it
+      after stale submit: docstatus=0 modified=2026-09-15 10:47:31.567856
+[200] submit correct modified -> name=None
+      after correct submit: docstatus=1 status=To Receive and Bill modified=2026-09-15 10:49:31.921646
+[200] submit already-submitted -> {"data": {"name": "PUR-ORD-2026-00001", "owner": "Administrator", "creation": "2026-09-15 10:47:31.567856", "modified": 
+      after re-submit: docstatus=1 status=To Receive and Bill

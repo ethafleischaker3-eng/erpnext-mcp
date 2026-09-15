@@ -1,0 +1,11 @@
+[417] cancel PO#1 (has submitted PR) -> exc_type=LinkExistsError exc=frappe.exceptions.LinkExistsError: Cannot delete or cancel because Purchase Order <a href="http://localhost/app/purchase-order/PUR-ORD-2026-
+== stock before PR cancel == [{'warehouse': 'Stores - G', 'actual_qty': 5.0}]
+[200] cancel PR#1 (submitted) -> {"data": {"name": "MAT-PRE-2026-00001", "owner": "Administra
+      PR#1 docstatus=2 status=Cancelled
+== stock after PR cancel == [{'warehouse': 'Stores - G', 'actual_qty': 0.0}]
+[200] SLE after cancel:
+      Purchase Receipt MAT-PRE-2026-00001 qty=5.0 cancelled=1 after=5.0
+      Purchase Receipt MAT-PRE-2026-00001 qty=-5.0 cancelled=1 after=0.0
+[202] DELETE draft PR#2 -> {"data": "ok"}
+[417] DELETE cancelled PR#1 -> {"exception": "frappe.exceptions.LinkExistsError: Cannot del
+[200] cancel PO#1 (no downstream now) -> {"data": {"name": "PUR-ORD-2026-00001", "owner": "Administra

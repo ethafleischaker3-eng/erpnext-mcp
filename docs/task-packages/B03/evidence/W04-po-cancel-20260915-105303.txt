@@ -1,0 +1,9 @@
+[200] create PO#2 name=PUR-ORD-2026-00002 docstatus=0 status=Draft
+[417] cancel draft -> exc_type=DocstatusTransitionError exc=frappe.exceptions.DocstatusTransitionError: Cannot change docstatus from 0 (Draft) to 2 (Cancelled)
+[200] submit -> docstatus became 1
+      doc: docstatus=1 status=To Receive and Bill modified=2026-09-15 10:53:04.221331
+[417] cancel stale modified (save docstatus=2) -> exc_type=TimestampMismatchError
+      after stale cancel: docstatus=1 (unchanged=1 expected)
+[200] cancel submitted (run_method:cancel) -> {"data": {"name": "PUR-ORD-2026-00002", "owner": "Administrator", "creation": "2
+      after cancel: docstatus=2 status=Cancelled modified=2026-09-15 10:53:04.760277
+[417] cancel cancelled -> exc_type=ValidationError exc=frappe.exceptions.ValidationError: Cannot edit cancelled document
