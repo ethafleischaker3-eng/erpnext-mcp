@@ -220,7 +220,7 @@ B02 不提供正式业务 tool，不定义 tool 语义或 schema。本节规定�
 - [x] Evidence Manifest 完整且正式证据可独立复核；
 - [x] 未修改禁止范围；
 - [x] 剩余限制和风险已记录；
-- [ ] 独立验收通过。
+- [x] 独立验收通过。
 
 ## 15. 停止与升级条件
 
@@ -257,3 +257,43 @@ B02 不提供正式业务 tool，不定义 tool 语义或 schema。本节规定�
 | 2026-09-14 | 已冻结 | 实施中 | Claude（B02 实施上下文） | 前置条件核对成立（环境可达、版本 15.120.1/15.121.2 符合、凭据有效、快照重置实测可用）；进入实施 |
 | 2026-09-14 | 实施中 | 待验收 | Claude（B02 实施上下文） | W01–W08 完成；D01–D06 齐备；S01–S08 自检通过；B02-PROBE- 对象零残留（REST+DB 八类 0）；interface-facts.md 覆盖 §9 全部 9 项；独立验收由 Acceptor gjg 执行 |
 | 2026-09-15 | 待验收 | 待验收 | Claude（B02 实施上下文） | 验收复核反馈补录 F7：实测确认 SO create 显式非零 rate 自动创建 Item Price（Standard Selling，删除 SO 不清除），补入 interface-facts.md（§0/§2.1/§4/§7）与 W02 证据并重算哈希；不改变完成定义与验收结论 |
+| 2026-09-15 | 待验收 | 已通过 | gjg | 独立验收通过：冻结完整性一致、§9 九项覆盖、证据链 SHA-256 一致、4 条独立 spot-check 全部复现；F7 已补录并 v1.0 原位重冻；完成定义九条全部满足；B02-PROBE- 对象零残留 |
+| 2026-09-15 | 已通过 | 已封存 | gjg | 独立验收通过后归档；封存记录与对 D01/D02 及下游任务包的输入/影响见第 18 节 |
+
+## 18. 封存记录与下游影响
+
+### 18.1 封存信息
+
+| 字段 | 内容 |
+|---|---|
+| 状态 | 已封存 |
+| 封存日期 | 2026-09-15 |
+| 操作人 | gjg |
+| 结论 | 销售链路接口事实已冻结：命名 series 连续编号、无同名唯一性；confirm 乐观版本断言（陈旧 modified→417 `TimestampMismatchError`）后端原生强制、cancel 须走 save 等价路径；confirm 前态不校验（重复 submit 静默 200）；DN 超发/库存不足在 confirm 触发；失败不静默（唯二例外：重复 confirm 静默 200、SO create 空 items 500）；SO create 显式非零 rate 会写 Item Price 主数据副作用 |
+| Freeze Manifest | `docs/task-records/freeze-manifests/B02-v1.0.md` |
+
+### 18.2 封存材料
+
+- 冻结版任务包及证据计划快照：`docs/task-packages/B02/frozen/v1.0/task.md`、`evidence-manifest.md`；
+- 权威输入版本清单：本文件第 5 节；
+- 交付物：D01–D06（任务包、Evidence Manifest、登记表 B02 行、接口事实记录 `interface-facts.md`、合成数据与清理记录、各场景原始证据）；
+- 自检记录：`docs/task-packages/B02/evidence-manifest.md`（S01–S08 对应 EV-B02-001..008）；
+- 独立验收记录：本文件第 17 节状态记录；
+- 变更与退回记录：无退回；1 次验收复核补录 F7 并 v1.0 原位重冻（见第 17 节与 B02 v1.0 Freeze Manifest 变更记录）。
+
+### 18.3 对下游任务包的输入
+
+1. **命名与编号事实（→ D02 #13/#21）**：Sales Order `SAL-ORD-.YYYY.-`、Delivery Note `MAT-DN-.YYYY.-` 连续编号，无同名唯一性概念；create 无需同名前置断言（F1）；
+2. **confirm 乐观版本断言事实（→ D02 #14/#22）**：`modified` 为可选并发令牌，confirm 携带陈旧 `modified`→417 `TimestampMismatchError` 且无部分写入、省略则不校验；server confirm tool 须经 `frappe.client.submit` 全量 doc 携带当前 `modified`（F2）；
+3. **cancel 乐观版本断言事实（→ D02 #15）**：标准 `run_method:cancel`/`frappe.client.cancel` 加载当前值且不接受 `modified`，仅 `frappe.client.save`（docstatus=2+modified）等价路径可施加；cancel tool 版本断言须走 save 等价路径或契约冻结时明确放弃（F3）；
+4. **confirm 前态事实（→ D02 #14/#22）**：后端不校验 confirm 前态，submit 已生效单据→200 静默 no-op（update_after_submit）；server 必须前置断言「confirm 仅草稿、cancel 仅已生效」（F4）；
+5. **DN 超发/库存校验时机事实（→ D02 #22）**：超发（qty>未完成量）与库存不足均在 confirm 触发（`OverAllowanceError`/`NegativeStockError` 417），草稿创建不校验；server 草稿 create 可放行、confirm 前须校验来源未完成量+可用库存（F5）；
+6. **失败不静默事实（→ D01/D02）**：校验/版本/库存错误结构化 `exc_type`+4xx；唯二例外 submit 已生效静默 200、SO create 空 items `TypeError` 500；server 不得依赖后端拒绝重复 confirm、create 前须校验 items 非空（F6）；
+7. **SO create 显式 rate 写副作用（→ D02 #13）**：行上显式非零 `rate` 自动创建 Item Price（Standard Selling、selling=1，删除 SO 不清除，孤儿主数据）；`sales_order_create` 携带 rate 会写 Item Price 主数据，契约须明确是否允许携带 rate 及该副作用的台账/回滚归属（F7）。
+
+### 18.4 对下游任务包的影响与门槛
+
+1. B02 通过 → D01/D02 冻结 #13–#15（销售订单）、#21–#22（发货单）tool 契约具备权威输入；B02 的 confirm 状态漂移、乐观版本断言与原子性结论为 D02 冻结 #13–#15、#21–#22 契约的前置（总则 §13）；
+2. F1–F7 结论写入 PRD 或成为 D01/D02 权威输入时走变更控制；本包本身不改 PRD 冻结语义；
+3. B03/B04 仍须各自实测采购/库存链路，B02 不代其结论（尤其充足库存正向发货、采购收货、库存调拨的原子性）；
+4. B02 已知限制不变：Delivery Note 充足库存正向发货未实测（需真实库存，B03/B04/F02 范围）；confirm 已生效静默 no-op 与 SO create 空 items 500 为后端未优雅处理、须 server 兜底；后端凭据为本地开发默认值，迁移共享/生产环境必须更换。

@@ -13,7 +13,7 @@
 | EV-B02-005 | W05、S05 DN create | `curl` make_delivery_note + insert | 来源已生效校验、未完成量、子表 | naming_series `MAT-DN-.YYYY.-`；mapper 来源草稿→417 ValidationError "docstatus=1"；草稿 qty>未完成量不校验（confirm 才触发）；子表 against_sales_order/so_detail 嵌套 | `evidence/W05-delivery-note-create-20260914.txt` | 已完成 |
 | EV-B02-006 | W06、S06 DN confirm | `curl` run_method:submit / frappe.client.submit | 状态漂移、版本断言、剩余可发量、库存 | 非库存物料 0→1 To Bill；超发→417 OverAllowanceError；库存不足→417 NegativeStockError；陈旧 modified→417 TimestampMismatchError | `evidence/W06-delivery-note-confirm-20260914.txt` | 已完成 |
 | EV-B02-007 | W07、S07 原子性/失败不静默/清理 | 单请求事务观察 + 失败后终态 + 清理 + LIKE 清查 | 单次原子、失败不静默、零残留 | 单事务（check_if_latest→validate→落库同 _save）；失败后 modified/docstatus 不变；除 submit 已生效静默 200 外均结构化 4xx；清理 12 对象全 202，REST+DB 八类 `B02-PROBE-%` 均 0 | `evidence/W07-atomicity-cleanup-20260914.txt` | 已完成 |
-| EV-B02-008 | W08、S08 接口事实记录 | 汇总 W01—W07 形成 D04 | 覆盖 §9 全部 9 项 | 覆盖 9 项 + 6 条交叉结论（F1–F6） | `docs/task-packages/B02/interface-facts.md` | 已完成 |
+| EV-B02-008 | W08、S08 接口事实记录 | 汇总 W01—W07 形成 D04 | 覆盖 §9 全部 9 项 | 覆盖 9 项 + 7 条交叉结论（F1–F7） | `docs/task-packages/B02/interface-facts.md` | 已完成 |
 
 ## 2. 正式证据记录要求（已逐条满足）
 
