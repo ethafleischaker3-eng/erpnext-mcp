@@ -1,0 +1,63 @@
+=== B04 W03-W05 Stock Entry（仓库间调拨）create/confirm/cancel 摸底（脱敏）===
+时间 2026-09-15 (UTC+8)  执行者 Claude（B04 独立实施上下文）  认证 token <REDACTED>
+
+---- 1. 前置 Item ----
+  [create Item] HTTP 200: name=B04-PROBE-STE-ITEM-001
+
+---- 2. 正向库存就位：SR confirm qty=10（复用 W02 SR 事实）----
+  [SR 就位 qty=10] HTTP 200: OK name=MAT-RECO-2026-00001
+  [就位后] Bin(B04-PROBE-STE-ITEM-001@Stores - G) HTTP 200: [{"warehouse": "Stores - G", "actual_qty": 10.0, "reserved_qty": 0.0}]
+
+---- 3. STE create 有效（Material Transfer）----
+  [create STE] HTTP 200: name=MAT-STE-2026-00001 naming_series=MAT-STE-.YYYY.- docstatus=0 purpose=Material Transfer stock_entry_type=Material Transfer
+  items[0]={"item_code": "B04-PROBE-STE-ITEM-001", "qty": 4.0, "s_warehouse": "Stores - G", "t_warehouse": "Finished Goods - G", "uom": "Nos", "stock_uom": "Nos", "conversion_factor": 1.0, "basic_rate": 10.0}
+
+---- 4. STE create 无效引用/数量 ----
+  [from_warehouse 无效] HTTP 417: exc_type=LinkValidationError exception=frappe.exceptions.LinkValidationError: Could not find Default Source Warehouse: NO-SUCH-WH
+  [to_warehouse 无效] HTTP 417: exc_type=LinkValidationError exception=frappe.exceptions.LinkValidationError: Could not find Default Target Warehouse: NO-SUCH-WH
+  [item_code 无效] HTTP 417: exc_type=ValidationError exception=frappe.exceptions.ValidationError: B04-PROBE-NOITEM is not a stock Item
+  [company 无效] HTTP 417: exc_type=LinkValidationError exception=frappe.exceptions.LinkValidationError: Could not find Company: NO-SUCH-CO
+  [stock_entry_type 无效] HTTP 200: OK name=MAT-STE-2026-00002 (草稿创建不校验库存/同仓)
+  [qty=0] HTTP 417: exc_type=InvalidQtyError exception=erpnext.controllers.accounts_controller.InvalidQtyError: Row #1: Quantity for Item <strong>B04-PROBE-STE-ITEM-001</strong> cannot be zero.
+  [qty<0] HTTP 417: exc_type=ValidationError exception=frappe.exceptions.ValidationError: Row 1: The item <strong>B04-PROBE-STE-ITEM-001</strong>, quantity must be positive number
+  [items 空] HTTP 417: exc_type=MandatoryError exception=frappe.exceptions.MandatoryError: [Stock Entry, MAT-STE-2026-00003]: items
+  [源/目同仓] HTTP 200: OK name=MAT-STE-2026-00003 (草稿创建不校验库存/同仓)
+  [源仓库存不足(qty=100>10)] HTTP 200: OK name=MAT-STE-2026-00004 (草稿创建不校验库存/同仓)
+
+---- 5. STE confirm：版本断言 / 库存变动 / 库存不足 / 重复提交 ----
+  [get STE] HTTP 200: docstatus=0 modified=2026-09-15 14:36:08.847772
+  [confirm 前 SRC] Bin(B04-PROBE-STE-ITEM-001@Stores - G) HTTP 200: [{"warehouse": "Stores - G", "actual_qty": 10.0, "reserved_qty": 0.0}]
+  [confirm 前 TGT] Bin(B04-PROBE-STE-ITEM-001@Finished Goods - G) HTTP 200: []
+  [submit stale modified] HTTP 417: exc_type=TimestampMismatchError exception=frappe.exceptions.TimestampMismatchError: Error: Document has been modified after you have opened it (2026-09-15 14:36:08.847772, 2026-09-15 14:36:09.805310). Please refresh to get the latest document.
+  [submit correct modified] HTTP 200: OK
+      after confirm: docstatus=1 modified=2026-09-15 14:36:09.900214
+  [confirm 后 SRC (应 6)] Bin(B04-PROBE-STE-ITEM-001@Stores - G) HTTP 200: [{"warehouse": "Stores - G", "actual_qty": 6.0, "reserved_qty": 0.0}]
+  [confirm 后 TGT (应 4)] Bin(B04-PROBE-STE-ITEM-001@Finished Goods - G) HTTP 200: [{"warehouse": "Finished Goods - G", "actual_qty": 4.0, "reserved_qty": 0.0}]
+  [confirm 后] SLE(B04-PROBE-STE-ITEM-001) HTTP 200: [{"vn": "MAT-STE-2026-00001", "wh": "Finished Goods - G", "qty": 4.0, "after": 4.0, "canc": 0}, {"vn": "MAT-RECO-2026-00001", "wh": "Stores - G", "qty": 0.0, "after": 10.0, "canc": 0}, {"vn": "MAT-STE-2026-00001", "wh": "Stores - G", "qty": -4.0, "after": 6.0, "canc": 0}]
+
+---- 6. STE 库存不足 confirm（qty=100>10）----
+  [create STE#2 qty=100] name=MAT-STE-2026-00005; [confirm] HTTP 417: exc_type=NegativeStockError exception=erpnext.stock.stock_ledger.NegativeStockError: <strong>94.0</strong> units of <a href="/app/Form/Item/B04-PROBE-STE-ITEM-001" style="font-weight: bold;">Item B04-PROBE-STE-ITEM-001</a> needed in <a href="/app/Form/Warehouse/Stores%20-%20G" style="font-weight: bold;">Warehouse Stores - G</a> to complete this transaction.
+  [STE#2 confirm 失败后 SRC (应仍 6)] Bin(B04-PROBE-STE-ITEM-001@Stores - G) HTTP 200: [{"warehouse": "Stores - G", "actual_qty": 6.0, "reserved_qty": 0.0}]
+
+---- 7. 源/目同仓 confirm ----
+  [create STE#3 同仓] name=MAT-STE-2026-00006; [confirm] HTTP 200: OK (同仓确认不被拒)
+
+---- 8. 重提交已生效 STE ----
+  [re-submit STE] HTTP 200: OK (200 no-op)
+      after re-submit: docstatus=1
+
+---- 9. STE cancel：库存冲回 ----
+  [cancel STE via frappe.client.cancel] HTTP 200: OK
+      after cancel: docstatus=2
+  [cancel 后 SRC (应回 10)] Bin(B04-PROBE-STE-ITEM-001@Stores - G) HTTP 200: [{"warehouse": "Stores - G", "actual_qty": 10.0, "reserved_qty": 0.0}]
+  [cancel 后 TGT (应回 0)] Bin(B04-PROBE-STE-ITEM-001@Finished Goods - G) HTTP 200: [{"warehouse": "Finished Goods - G", "actual_qty": 0.0, "reserved_qty": 0.0}]
+  [cancel 后] SLE(B04-PROBE-STE-ITEM-001) HTTP 200: [{"vn": "MAT-STE-2026-00001", "wh": "Finished Goods - G", "qty": 4.0, "after": 4.0, "canc": 1}, {"vn": "MAT-STE-2026-00001", "wh": "Finished Goods - G", "qty": -4.0, "after": 0.0, "canc": 1}, {"vn": "MAT-RECO-2026-00001", "wh": "Stores - G", "qty": 0.0, "after": 10.0, "canc": 0}, {"vn": "MAT-STE-2026-00001", "wh": "Stores - G", "qty": -4.0, "after": 6.0, "canc": 1}, {"vn": "MAT-STE-2026-00001", "wh": "Stores - G", "qty": 4.0, "after": 0.0, "canc": 1}, {"vn": "MAT-STE-2026-00006", "wh": "Stores - G", "qty": -1.0, "after": 9.0, "canc": 0}, {"vn": "MAT-STE-2026-00006", "wh": "Stores - G", "qty": 1.0, "after": 10.0, "canc": 0}]
+
+---- 10. STE cancel 前态 / DELETE 拒绝 ----
+  [cancel 草稿 STE#2] HTTP 417: exc_type=DocstatusTransitionError exception=frappe.exceptions.DocstatusTransitionError: Cannot change docstatus from 0 (Draft) to 2 (Cancelled)
+  [cancel 已取消 STE] HTTP 417: exc_type=ValidationError exception=frappe.exceptions.ValidationError: Cannot edit cancelled document
+  [DELETE 已取消 STE] HTTP 417: exc_type=LinkExistsError exception=frappe.exceptions.LinkExistsError: Cannot delete or cancel because Stock Entry <a href="http://localhost/app/stock-entry/MAT-STE-2026-00001">MAT-STE-2026-00001</a> is linked with Stock Ledger Entry <a href="http://localhost/app/stock-ledger-entry/534eb62893">534eb62893</a> 
+  [DELETE 草稿 STE#2] HTTP 202: exc_type=None exception=None
+  [DELETE 草稿 STE#3] HTTP 417: exc_type=ValidationError exception=frappe.exceptions.ValidationError: Stock Entry MAT-STE-2026-00006: Submitted Record cannot be deleted. You must <a href='https://docs.frappe.io/erpnext/user/manual/en/delete-submitted-document' target='_blank'> Cancel </a> it first.
+
+== W03-W05 完（最终状态由 W07 快照恢复归零）==

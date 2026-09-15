@@ -1,0 +1,37 @@
+=== B04 W02b SR 覆盖基线/回滚/重提交（正确端点 frappe.client.*）复测（脱敏）===
+
+---- 1. 前置 Item ----
+  [create Item] HTTP 200: name=B04-PROBE-SR-ITEM-001
+
+---- 2. SR#A 开盘 qty=5（Temporary Opening 账户）----
+  [create SR#A] HTTP 200: name=MAT-RECO-2026-00001
+  [submit SR#A via frappe.client.submit(full doc)] HTTP 200: OK
+  [SR#A confirm 后 (应为 5)] Bin HTTP 200: [{"warehouse": "Stores - G", "actual_qty": 5.0, "reserved_qty": 0.0}]
+  [SR#A confirm 后] SLE HTTP 200: [{"vn": "MAT-RECO-2026-00001", "qty": 0.0, "after": 5.0, "canc": 0}]
+
+---- 3. 重提交已生效 SR#A（frappe.client.submit 全量 doc，含当前 modified）----
+  [re-submit SR#A] HTTP 200: OK (观察是否 200 静默 no-op)
+      after re-submit: docstatus=1
+  [re-submit 后（应仍 5）] Bin HTTP 200: [{"warehouse": "Stores - G", "actual_qty": 5.0, "reserved_qty": 0.0}]
+
+---- 4. SR#B 覆盖基线 5->3（默认 P&L 账户）----
+  [create SR#B 缺 expense_account] HTTP 200: name=MAT-RECO-2026-00002 (SLE 非空默认账户可过)
+  [submit SR#B] HTTP 200: OK
+  [SR#B 覆盖后 (应为 3)] Bin HTTP 200: [{"warehouse": "Stores - G", "actual_qty": 3.0, "reserved_qty": 0.0}]
+  [SR#B 覆盖后] SLE HTTP 200: [{"vn": "MAT-RECO-2026-00001", "qty": 0.0, "after": 5.0, "canc": 0}, {"vn": "MAT-RECO-2026-00002", "qty": 0.0, "after": 3.0, "canc": 0}]
+
+---- 5. cancel SR#B，观察回滚（是否确定性回 5）----
+  [cancel SR#B via frappe.client.cancel] HTTP 200: OK
+  [SR#B cancel 后（观察回 5 / 0 / 停 3）] Bin HTTP 200: [{"warehouse": "Stores - G", "actual_qty": 5.0, "reserved_qty": 0.0}]
+  [SR#B cancel 后] SLE HTTP 200: [{"vn": "MAT-RECO-2026-00001", "qty": 0.0, "after": 5.0, "canc": 0}, {"vn": "MAT-RECO-2026-00002", "qty": 0.0, "after": 3.0, "canc": 1}, {"vn": "MAT-RECO-2026-00002", "qty": 5.0, "after": 5.0, "canc": 1}]
+
+---- 6. get_items 用当前时点读现状 ----
+  [get_items @2026-09-15 14:32:57] HTTP 200: {"message": [{"item_code": "B04-PROBE-SR-ITEM-001", "warehouse": "Stores - G", "qty": 5.0, "item_name": null, "valuation_rate": 10.0, "current_qty": 5.0, "current_valuation_rate": 10.0, "current_serial_no": "", "serial_no": "", "batch_no": null, "stock_uom": "Nos"}]}
+
+---- 7. cancel SR#A 后 DELETE 拒绝（GL Entry 持久化）----
+  [cancel SR#A] HTTP 200: OK
+  [SR#A cancel 后] Bin HTTP 200: [{"warehouse": "Stores - G", "actual_qty": 0.0, "reserved_qty": 0.0}]
+  [DELETE 已取消 SR#A] HTTP 417: exc_type=LinkExistsError exception=frappe.exceptions.LinkExistsError: Cannot delete or cancel because Stock Reconciliation <a href="http://localhost/app/stock-reconciliation/MAT-RECO-2026-00001">MAT-RECO-2026-00001</a> is linked with GL Entry <a href="http://localhost/app/gl-entry/91a1ffb4cc">91a1ffb4cc</a> 
+  [DELETE 已取消 SR#B] HTTP 417: exc_type=LinkExistsError exception=frappe.exceptions.LinkExistsError: Cannot delete or cancel because Stock Reconciliation <a href="http://localhost/app/stock-reconciliation/MAT-RECO-2026-00002">MAT-RECO-2026-00002</a> is linked with GL Entry <a href="http://localhost/app/gl-entry/39bad33e23">39bad33e23</a> 
+
+== W02b 完（最终状态由 W07 快照恢复归零）==

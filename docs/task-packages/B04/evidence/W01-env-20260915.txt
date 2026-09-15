@@ -1,0 +1,40 @@
+=== B04 W01 环境与凭据复核（脱敏）===
+时间: 2026-09-15 (UTC+8)  执行者: Claude（B04 独立实施上下文）  认证: Authorization: token <REDACTED>
+
+[get_logged_user] HTTP 200 -> {'message': 'Administrator'}
+
+== 应用版本（docker exec bench list-apps，见下）==
+[Company] HTTP 200 -> [{"name": "gjg", "default_currency": "CNY"}]
+[Warehouse] HTTP 200 ->
+    All Warehouses - G | is_group= 1 | company= gjg
+    Finished Goods - G | is_group= 0 | company= gjg
+    Goods In Transit - G | is_group= 0 | company= gjg
+    Stores - G | is_group= 0 | company= gjg
+    Work In Progress - G | is_group= 0 | company= gjg
+[Stock Entry Type] HTTP 200 ->
+    Disassemble | purpose= Disassemble
+    Manufacture | purpose= Manufacture
+    Material Consumption for Manufacture | purpose= Material Consumption for Manufacture
+    Material Issue | purpose= Material Issue
+    Material Receipt | purpose= Material Receipt
+    Material Transfer | purpose= Material Transfer
+    Material Transfer for Manufacture | purpose= Material Transfer for Manufacture
+    Repack | purpose= Repack
+    Send to Subcontractor | purpose= Send to Subcontractor
+[Item Group] HTTP 200 ->
+    All Item Groups | is_group= 1
+    Consumable | is_group= 0
+    Products | is_group= 0
+    Raw Material | is_group= 0
+    Services | is_group= 0
+    Sub Assemblies | is_group= 0
+[UOM Nos/Unit] HTTP 200 -> [{"name": "Nos"}, {"name": "Unit"}]
+
+== 初始零残留（实施前 B04-PROBE 清查）==
+  Item like %B04-PROBE%: HTTP 200 -> []
+  Stock Entry like %B04-PROBE%: HTTP 200 -> []
+
+== 快照重置脚本可用性 ==
+  restore-snapshot.sh 位于 D:\second-acceptance\reset\（已读取，经 site_config 读 db_name/db_password，无硬编码密钥）
+  基线 snapshots\baseline-*.sql 经 reset 脚本间接使用，本包不直接读取
+  结论：实例可达、版本符合、凭据有效、4 个非分组仓库+Material Transfer 类型就位；快照恢复路径沿用 B03 已冻结事实，实施末执行一次 restore 归零

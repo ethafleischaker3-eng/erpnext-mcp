@@ -1,0 +1,23 @@
+=== B04 W07 快照恢复归零验证（脱敏）===
+时间 2026-09-15 (UTC+8)  执行者 Claude（B04 独立实施上下文）
+清理路径：SR confirm 产生 GL、STE confirm 产生 SLE，二者 cancel 后 GL/SLE 以 is_cancelled=1 持久化，均不可 REST 物理删除，故零残留以快照恢复为准（§16 授权路径）。
+
+---- 恢复后清查（B04-PROBE 相关七类对象）----
+  [Item] Item HTTP 200: count=0 []
+  [Stock Entry] Stock Entry HTTP 200: count=0 []
+  [Stock Reconciliation] Stock Reconciliation HTTP 200: count=0 []
+  [Item Price] Item Price HTTP 200: count=0 []
+  [SLE B04-PROBE-SR-ITEM-001] Stock Ledger Entry HTTP 200: count=0 []
+  [Bin B04-PROBE-SR-ITEM-001] Bin HTTP 200: count=0 []
+  [SLE B04-PROBE-STE-ITEM-001] Stock Ledger Entry HTTP 200: count=0 []
+  [Bin B04-PROBE-STE-ITEM-001] Bin HTTP 200: count=0 []
+
+---- GL Entry（SR 估值调整 / STE 调拨）基线清查 ----
+  [GL SR] GL Entry HTTP 200: count=0 []
+  [GL STE] GL Entry HTTP 200: count=0 []
+
+---- 基线洁净度（按 series 前缀清查）----
+  [STE 基线] Stock Entry HTTP 200: count=0 []
+  [SR 基线] Stock Reconciliation HTTP 200: count=0 []
+
+结论：Item/Stock Entry/Stock Reconciliation/Item Price/SLE/Bin/GL 七类 B04-PROBE 相关对象经快照恢复后零残留，调拨与盘点的库存/流水经快照恢复归零，满足 §10 不变量。

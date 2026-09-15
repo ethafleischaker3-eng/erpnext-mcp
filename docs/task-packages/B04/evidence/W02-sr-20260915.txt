@@ -1,0 +1,62 @@
+=== B04 W02 Stock Reconciliation create/confirm/cancel 摸底（脱敏）===
+时间 2026-09-15 (UTC+8)  执行者 Claude（B04 独立实施上下文）  认证 token <REDACTED>
+合成标识经物料承载：B04-PROBE-SR-ITEM-001；单据 name 为 series 自动编号（MAT-RECO-）
+
+---- 1. 前置 Item 创建（复用 B01 事实）----
+  [create Item] HTTP 200: {"name": "B04-PROBE-SR-ITEM-001", "is_stock_item": 1}
+
+---- 2. get_items（只出 plan 读取：读当前库存现状生成调整方案）----
+  [get_items] HTTP 200: {"message": [{"item_code": "B04-PROBE-SR-ITEM-001", "warehouse": "Stores - G", "qty": 0.0, "item_name": null, "valuation_rate": 0.0, "current_qty": 0.0, "current_valuation_rate": 0.0, "current_serial_no": "", "serial_no": "", "batch_no": null, "stock_uom": "Nos"}]}
+
+---- 3. SR create 有效（含 expense_account 口径）----
+  3a. 缺 expense_account（纯净实例：SLE 为空→按 Opening Entry 校验，P&L 默认账户被拒）
+      HTTP 417: exc_type=OpeningEntryAccountError exception=erpnext.stock.doctype.stock_reconciliation.stock_reconciliation.OpeningEntryAccountError: Difference Account must be a Asset/Liability type account, since this Stock Reconciliation is an Opening Entry
+  3b. 显式 expense_account=Temporary Opening - G（Balance Sheet，通过）
+      HTTP 200: name=MAT-RECO-2026-00001 naming_series=MAT-RECO-.YYYY.- docstatus=0 status=None purpose=Stock Reconciliation
+      items[0]={"item_code": "B04-PROBE-SR-ITEM-001", "warehouse": "Stores - G", "qty": 5.0, "current_qty": 0.0, "valuation_rate": 10.0}
+
+---- 4. SR create 无效引用/数量 ----
+  [warehouse 无效] HTTP 417: exc_type=LinkValidationError exception=frappe.exceptions.LinkValidationError: Could not find Row #1: Warehouse: NO-SUCH-WH
+  [item_code 无效] HTTP 417: exc_type=ValidationError exception=frappe.exceptions.ValidationError: Items B04-PROBE-NOITEM do not exist in the Item master.
+  [company 无效] HTTP 417: exc_type=LinkValidationError exception=frappe.exceptions.LinkValidationError: Could not find Company: NO-SUCH-CO
+  [purpose 无效] HTTP 417: exc_type=ValidationError exception=frappe.exceptions.ValidationError:  Purpose cannot be "Nope". It should be one of "", "Opening Stock", "Stock Reconciliation"
+  [qty<0] HTTP 417: exc_type=ValidationError exception=frappe.exceptions.ValidationError: ['Row #1: Negative Quantity is not allowed']
+  [qty 缺失] HTTP 200: OK name=MAT-RECO-2026-00002
+  [items 空] HTTP 417: exc_type=EmptyStockReconciliationItemsError exception=erpnext.stock.doctype.stock_reconciliation.stock_reconciliation.EmptyStockReconciliationItemsError: None of the items have any change in quantity or value.
+
+---- 5. SR confirm：版本断言、覆盖基线、重复提交 ----
+  [get SR#1] HTTP 200: docstatus=0 status=None modified=2026-09-15 14:27:01.186150
+  [confirm 前] Bin(B04-PROBE-SR-ITEM-001@Stores - G) HTTP 200: []
+  [submit stale modified] HTTP 417: exc_type=TimestampMismatchError exception=frappe.exceptions.TimestampMismatchError: Error: Document has been modified after you have opened it (2026-09-15 14:27:01.186150, 2026-09-15 14:27:01.765162). Please refresh to get the latest document.
+      after stale: docstatus=0 modified=2026-09-15 14:27:01.186150
+  [submit correct modified] HTTP 200: {"name": null}
+      after correct: docstatus=1 status=None modified=2026-09-15 14:27:01.836460
+  [confirm 后] Bin(B04-PROBE-SR-ITEM-001@Stores - G) HTTP 200: [{"warehouse": "Stores - G", "actual_qty": 5.0, "reserved_qty": 0.0}]
+  [confirm 后] SLE(B04-PROBE-SR-ITEM-001) HTTP 200: [{"vt": "Stock Reconciliation", "vn": "MAT-RECO-2026-00001", "qty": 0.0, "after": 5.0, "canc": 0}]
+  [confirm 后] GL(vn=MAT-RECO-2026-00001) HTTP 200: [{"acct": "Temporary Opening - G", "db": 0.0, "cr": 50.0, "canc": 0}, {"acct": "Stock In Hand - G", "db": 50.0, "cr": 0.0, "canc": 0}]
+  [submit already-submitted] HTTP 500: exc_type=JSONDecodeError exception=json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+      after re-submit: docstatus=1 status=None
+
+---- 6. get_items（confirm 后读取现状）----
+  [get_items] HTTP 200: {"message": [{"item_code": "B04-PROBE-SR-ITEM-001", "warehouse": "Stores - G", "qty": 0.0, "item_name": null, "valuation_rate": 0.0, "current_qty": 0.0, "current_valuation_rate": 0.0, "current_serial_no": "", "serial_no": "", "batch_no": null, "stock_uom": "Nos"}]}
+
+---- 7. SR#2 覆盖基线(5->3) 后 cancel，观察回滚行为 ----
+  [create SR#2 缺 expense_account] HTTP 200: name=MAT-RECO-2026-00003 (SLE 已非空，P&L 默认账户可过)
+  [submit SR#2] HTTP 500: exc_type=JSONDecodeError exception=json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+  [SR#2 覆盖后 (应为 3)] Bin(B04-PROBE-SR-ITEM-001@Stores - G) HTTP 200: [{"warehouse": "Stores - G", "actual_qty": 5.0, "reserved_qty": 0.0}]
+  [cancel SR#2] HTTP 417: exc_type=DocstatusTransitionError exception=frappe.exceptions.DocstatusTransitionError: Cannot change docstatus from 0 (Draft) to 2 (Cancelled)
+  [SR#2 cancel 后（观察是否回 5）] Bin(B04-PROBE-SR-ITEM-001@Stores - G) HTTP 200: [{"warehouse": "Stores - G", "actual_qty": 5.0, "reserved_qty": 0.0}]
+  [SR#2 cancel 后] SLE(B04-PROBE-SR-ITEM-001) HTTP 200: [{"vt": "Stock Reconciliation", "vn": "MAT-RECO-2026-00001", "qty": 0.0, "after": 5.0, "canc": 0}]
+
+---- 8. SR cancel 前态、DELETE 拒绝 ----
+  [cancel 草稿 SRD] HTTP 417: exc_type=DocstatusTransitionError exception=frappe.exceptions.DocstatusTransitionError: Cannot change docstatus from 0 (Draft) to 2 (Cancelled)
+  [DELETE 草稿 SRD] HTTP 202: exc_type=None exception=None
+  [cancel 已取消 SR#2] HTTP 417: exc_type=DocstatusTransitionError exception=frappe.exceptions.DocstatusTransitionError: Cannot change docstatus from 0 (Draft) to 2 (Cancelled)
+  [DELETE 已取消 SR#2] HTTP 202: exc_type=None exception=None
+
+---- 9. SR#1 cancel（正向）----
+  [cancel SR#1] HTTP 200: {"name": null}
+  [SR#1 cancel 后] Bin(B04-PROBE-SR-ITEM-001@Stores - G) HTTP 200: [{"warehouse": "Stores - G", "actual_qty": 0.0, "reserved_qty": 0.0}]
+  [DELETE 已取消 SR#1] HTTP 417: exc_type=LinkExistsError exception=frappe.exceptions.LinkExistsError: Cannot delete or cancel because Stock Reconciliation <a href="http://localhost/app/stock-reconciliation/MAT-RECO-2026-00001">MAT-RECO-2026-00001</a> is linked with GL Entry <a href="http://localhost/app/gl-entry/0eeeda4fa8">0eeeda4fa8</a> 
+
+== W02 完（最终状态由 W07 快照恢复归零）==
