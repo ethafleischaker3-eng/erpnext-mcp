@@ -138,7 +138,7 @@ function s04() {
   check('S04.2 返回幂等成功语义（非通用错误）',
     resp.isError === false && resp.idempotent_replay === true && resp.already_in_target_state === true,
     JSON.stringify(resp));
-  check('S04.3 幂等成功非 precondition_failed', resp.code !== 'precondition_failed' && !/失败|错误/.test(resp.message) || true);
+  check('S04.3 幂等成功非 precondition_failed', resp.code !== 'precondition_failed' && !/失败|错误/.test(resp.message));
 
   // cancel 已取消单据：current=cancelled, target=cancelled → 幂等成功
   check('S04.4 cancel 已在目标状态 → 命中幂等成功',

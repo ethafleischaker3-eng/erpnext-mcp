@@ -7,7 +7,7 @@
 | 编号 | E02 |
 | 名称 | 幂等机制、前置断言与事后校验、批次台账与状态查询（合并原 E03、E04） |
 | 版本 | v1.0 |
-| 状态 | 已通过 |
+| 状态 | 已封存 |
 | 创建人 | Claude（E02 起草上下文） |
 | Owner | gjg |
 | Implementer | Claude（E02 独立实施上下文） |
@@ -16,7 +16,7 @@
 | Acceptor | gjg；独立于 Implementer（档位 2 强制独立验收） |
 | 创建日期 | 2026-09-15 |
 | 冻结日期 | 2026-09-16 |
-| 完成日期 | 2026-09-16（独立验收通过；档位 2 终态「已通过」，不单独封存） |
+| 完成日期 | 2026-09-16（独立验收通过并封存；见 §18） |
 | 上游任务包 | B05（已封存，幂等可实现性结论）；B00（已封存，可信调用方身份结论）。**不含** D01/D02（总则 §13：E02 仅以 B05、B00 为前置，可在 D02 冻结前设计并冻结） |
 | 下游任务包 | 经 D02 契约与各 F 包「接入具体 tool」落地；D01 与本包为「共同对齐 B05 §18.3、保持一致」关系，非上下游 |
 
@@ -270,3 +270,44 @@ E02 为档位 2（标准），需独立验收（客观验证）。验收不依�
 | 2026-09-16 | 已冻结 | 实施中 | Claude（E02 实施上下文） | 前置条件核对成立（B05、B00 均已封存）；开始实施 W01—W09 |
 | 2026-09-16 | 实施中 | 待验收 | Claude（E02 实施上下文） | 实施完成：机制实现 `lib/`（fingerprint/idempotency/precondition/postcondition/batch-ledger/batch-status/identity/errors 8 模块）、实现契约 `implementation-contract.md`（覆盖 §9.1 全部 7 项）、隔离探针 `probe/server.js`（stdio MCP server，3 探针 tool）、单元测试 `test/selftest.js`；自检 S01—S09 共 45 项全部通过、探针自测 P01—P06 全部通过（退出码均 0）；批次归属采用会话级身份（B00 §18.3 + B05 §3 确定性结论），跨会话普通调用方查询旧批次不支持并如实记录为残余限制；Evidence Manifest 已回填。提交 gjg 独立验收（档位 2） |
 | 2026-09-16 | 待验收 | 已通过 | gjg | Acceptor 独立验收通过（档位 2，独立于 Implementer；见 `acceptance-record.md`）：冻结快照哈希一致（`ca16b976…` / `1ca2932c…`）；S01—S09 共 45 项、探针 P01—P06 独立重跑全部通过（退出码 0）；实现契约覆盖 §9.1 全部 7 项且不含 #1–#25 业务 tool 语义（S09.2 零命中）；幂等边界忠实 B05 §18.3（窗口期 300/60 未放宽、指纹 server 规范化 + 传输字段剥离、confirm/cancel 状态断言幂等成功）；批次归属会话级身份、#26 可见性边界正确，跨会话查询残余限制如实记录；未修改禁止范围、未读取 C01a、未接入 ERPNext。非阻断发现项：S04.3 断言因运算符优先级为空操作，语义已由 S04.2 实质覆盖。终态「已通过」，不单独封存（封存合并入 P00 或直接下游） |
+| 2026-09-16 | 已通过 | 已封存 | gjg | Owner 决策单独封存（档位 2 本「不强制单独封存」，此处应 Owner 要求执行独立封存）；同时收紧 S04.3 断言（移除恒真 `\|\| true`，改为确定性断言，复跑 45/45 通过、退出码 0，机制行为不变）。封存记录与对 D02/F 包的输入/影响见第 18 节 |
+
+## 18. 封存记录与下游影响
+
+### 18.1 封存信息
+
+| 字段 | 内容 |
+|---|---|
+| 状态 | 已封存 |
+| 封存日期 | 2026-09-16 |
+| 操作人 | gjg |
+| 档位说明 | 档 2（标准）本「不强制单独封存」（总则 §7.1）；本次应 Owner 决策执行独立封存，封存与下游影响记录不并入 P00/直接下游，而单独登记于本节 |
+| 结论 | E02 机制底座（幂等/前置断言/事后校验/批次台账 + #26 查询逻辑）已冻结、实施完成、独立验收通过并封存；实现契约（`implementation-contract.md`）成为 D02 契约与 F 包接入的权威实现层依据 |
+| 实现契约 | `docs/task-packages/E02/implementation-contract.md` |
+| 独立验收记录 | `docs/task-packages/E02/acceptance-record.md`（CD-6） |
+| Freeze Manifest | `docs/task-records/freeze-manifests/E02-v1.0.md` |
+
+### 18.2 封存材料
+
+- 冻结版任务包及证据计划快照：`docs/task-packages/E02/frozen/v1.0/task.md`、`evidence-manifest.md`（哈希 `ca16b976…` / `1ca2932c…`）；
+- 交付物：CD-1（task.md）、CD-2（evidence-manifest.md，EV-E02-001..009）、CD-3（登记表 E02 行）、CD-4（`lib/` 8 模块 + `probe/` 3 探针 tool + `test/selftest.js`）、CD-5（implementation-contract.md）、CD-6（acceptance-record.md）；
+- 独立验收记录：`acceptance-record.md` 与本文件第 17 节状态记录；
+- 证据：`evidence/selftest-S01-S09.txt`（45 项，S01—S09）、`evidence/probe-selftest.txt`（P01—P06）；
+- 变更与退回记录：无退回；封存时收紧 S04.3 断言（移除恒真 `|| true`，机制行为不变，见第 17 节）。
+
+### 18.3 对下游任务包的输入（权威结论）
+
+1. **幂等机制实现接口（→ D02/F）**：`fingerprintOf`（server 依业务参数规范化、传输/客户端字段剥离）、`createIdempotencyStore.check/record`（窗口期 create 300s / confirm·cancel 60s，`assertWindowNotWidened` 拒绝放宽）、`checkStateAssertion`（confirm/cancel 状态断言命中 = 幂等成功）；
+2. **confirm/cancel 状态断言语义（→ D02）**：命中返回幂等成功「已在目标状态」而非通用错误；具体返回结构由 D02 冻结（E02 仅冻结其可验收性）；
+3. **前置/事后校验框架（→ D02/F）**：`assertPreconditions`（两层拆分，业务状态层）、`checkReadBack`（写后回读，不一致 → `postcondition_failed` + 标记待回滚）；逐 tool 断言/回读字段由 D02/F 落地；
+4. **批次台账与 #26 查询逻辑（→ D02/F）**：`createBatchLedger`（一次 tools/call 一批次、回滚路径 draft→delete / submitted→cancel / cancelled→terminal）、`queryBatchStatus`（普通调用方只查自身会话批次、管理员查全量、不可主动回滚）；`erpnext_batch_status_get`（#26）name/schema/annotation 由 D02 冻结；
+5. **批次归属口径（→ D02/F）**：会话级身份（B00 §18.3 + B05 §3 确定性结论）；管理员判定为 `adminResolver` 钩子（缺省 `false`），须由后端 Role/DocPerm 提供、不得 agent 自报。
+
+### 18.4 对下游任务包的影响与门槛
+
+1. **D02 冻结各 tool 契约**时，须同时引用 D01 公共契约（契约口径「做什么」）与本实现契约（实现层挂钩「怎么做」），不得另起口径（E02 task §9.1 内容边界：重叠项以 D01 为准）；
+2. **F 包接入具体 tool** 时须接入本包幂等/前置断言/事后校验/批次台账机制，未接入并验证前写 tool 不得标记完成（总则 §16.3 写操作门槛）；与真实后端的适配（真实回读、Role/DocPerm 管理员判定、批次持久化）由 F 包接入时验证；
+3. **批次归属会话级限制**：普通调用方跨会话查询旧批次不支持（残余限制，实现契约 §5.5/§8.2）；若 B00 验收区 D08 详细身份证据后续补充进公开实施区，可通过升级 `identity` 钩子支持，须走变更控制（总则 §12）；
+4. **已知限制不变**：误合并残余风险（create 组 300s 内同参合法重复）须在 F 包符合性声明中如实记录，缓解手段为窗口期缩短 + 业务引用号（D02 择定）+ #26 状态查询暴露；
+5. **D02 未冻结前**，本包的「接入具体 tool」阶段不得启动（总则 §13）；本包不改变 PRD 冻结语义、不替代 D01 公共契约。
+
