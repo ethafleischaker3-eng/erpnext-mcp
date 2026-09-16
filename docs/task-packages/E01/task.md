@@ -63,7 +63,7 @@
 | 实施区/验收区实际路径已填写、隔离已生效 | 检查边界文档 v1.1 + B00 证据 | 已验证 |
 | 本地验收环境可写用户/角色/权限（站点 `erpnext.local` 独占、非生产、可销毁） | 检查 B00 结论与快照重置能力 | 已验证 |
 | Owner 已明确、Implementer/Implementation Reviewer/Acceptor 已确定 | 本文件 §1 | 已验证 |
-| Implementer 会话对 C01b `task-sets/`、`assertions/` 只读拒绝（负向自证 ACCESS_DENIED） | 负向读取自证 + `icacls` 核查 | 待验证 |
+| Implementer 会话对 C01b `task-sets/`、`assertions/` 只读拒绝（负向自证 ACCESS_DENIED） | 负向读取自证 + `icacls` 核查 | 已验证（2026-09-16，Owner 以 `b00-impl` 补跑 `verify-isolation.ps1` 得 ACCESS_DENIED） |
 
 > 任一强制前置不成立，任务不得进入实施中。第 9 条为实施前隔离自证（总则 §16.2 精神）：ACL 归 Owner（复用 B00/C01b 隔离），Implementer 会话只做只读负向自证。
 
@@ -196,17 +196,17 @@ E01 不定义可调用业务 tool 契约（不适用）。本节规定 E01 输�
 
 ## 14. 完成定义
 
-- [ ] 全部前置条件已验证（含 Implementer 会话隔离自证）；
-- [ ] 工作项与交付物全部完成（W01–W09；D01–D08）；
-- [ ] 权限矩阵与 D02 契约、D01 §7 逐项一致，无清单外对象；
-- [ ] 两张允许清单成员忠实 PRD §2.3（12 操作 + 9 引用），清单外 MUST NOT 读写；
-- [ ] 正式账号/角色权限收敛最小，不沿用 B00 临时探针权限；
-- [ ] 人工确认与 fail-closed 对齐 A01 L3 结论与 PRD 决议 1/2；
-- [ ] 越权验证通过（清单外/引用增删改/跨调用方批次均拒绝）；
-- [ ] 隐藏材料未进入实施区，未修改禁止范围；
-- [ ] Evidence Manifest 完整、Freeze Manifest 已登记；
-- [ ] 剩余限制和风险已记录；
-- [ ] 独立验收通过（档位 3）。
+- [x] 全部前置条件已验证（含 Implementer 会话隔离自证）；
+- [x] 工作项与交付物全部完成（W01–W09；D01–D08）；
+- [x] 权限矩阵与 D02 契约、D01 §7 逐项一致，无清单外对象；
+- [x] 两张允许清单成员忠实 PRD §2.3（12 操作 + 9 引用），清单外 MUST NOT 读写；
+- [x] 正式账号/角色权限收敛最小，不沿用 B00 临时探针权限；
+- [x] 人工确认与 fail-closed 对齐 A01 L3 结论与 PRD 决议 1/2；
+- [x] 越权验证通过（清单外/引用增删改均拒绝；跨调用方批次读取属 MCP server 侧，见 §18.1 说明）；
+- [x] 隐藏材料未进入实施区，未修改禁止范围；
+- [x] Evidence Manifest 完整、Freeze Manifest 已登记；
+- [x] 剩余限制和风险已记录；
+- [x] 独立验收通过（档位 3）。
 
 ## 15. 停止与升级条件
 
@@ -236,3 +236,57 @@ E01 不定义可调用业务 tool 契约（不适用）。本节规定 E01 输�
 | 2026-09-16 | 规划中 | 草拟 | Claude（E01 起草上下文） | 依据总则 §5 与登记表 E01 行，创建完整任务包并指定 Owner gjg；档位 3（完整）；前置 C01b/D02/D01/B00/A01 均已完成；待 gjg 评审冻结 |
 | 2026-09-16 | 草拟 | 待评审 | Claude（E01 起草上下文） | 必备结构完整，提交 gjg 评审 |
 | 2026-09-16 | 待评审 | 已冻结 | gjg | 评审通过，无阻断问题；批准 E01 v1.0 冻结。评审中已修正三处：① §2 目标 2/3 与 W04 将笼统「操作允许清单 12 类读写」改为「按 PRD §2.1 声明能力：9 读写 / 2 只读 / 1 只出方案」「可经授权 tool 访问」，避免对只读对象（Bin、Stock Ledger Entry）与只出方案对象（Stock Reconciliation）超额授权；② 工作项拆分：W08 仅对齐 D02 契约 + D01 §7（Implementer），新增 W09 将 C01b T11–T15 口径对齐归 Acceptor（Implementer 不读题，与 S08/§1 一致）；③ 交付物 D06 越权验证记录钉死文件名 `authorization-verification.md`。尚未实施或验收 |
+| 2026-09-16 | 已冻结 | 实施中 | Claude（E01 独立实施上下文） | 依据 D02/D01/C01a/PRD/规范/B00 §18.3/A01 完成 W02–W08：产出 `permission-matrix.md`、`allowlist.md`、`roles.md`、`confirmation-failclosed.md`、`authorization-verification.md`、`evidence-manifest.md`；后端落地专用角色 `MCP Business Caller`（21 DocType DocPerm）+ 账号 `mcp-service`；越权验证通过（清单外业务对象/引用增删改/只读写均 403），并如实记录框架级残余（User 自读、Contact/Address 自建自读的「All」角色 if_owner + dynamic_links，MCP tool 层白名单兜底）。未读 C01b 冻结任务集正文/断言 |
+| 2026-09-16 | 实施中 | 待验收 | Claude（E01 独立实施上下文） | 全部交付物与证据已提交；W01 隔离自证已由 Owner 以 `b00-impl` 补跑 `verify-isolation.ps1` 得 ACCESS_DENIED，前置条件第 9 条「已验证」；W09（C01b T11–T15 口径对齐）归 Acceptor。待 gjg 独立验收（档位 3） |
+| 2026-09-16 | 待验收 | 已封存 | gjg（Acceptor，独立验收） | 独立验收通过（档位 3）。Acceptor 读 C01b T11–T15 完成 W09/S08 对齐核对（T14 建仓库越权 ↔ 写 Warehouse 403、T15 作废发货单 ↔ DN 无 cancel DocPerm，均一致；T11/T12/T13 属 D02/E02 机制层，E01 底座无冲突）；独立重跑越权/正向用例全通过；验收期修正 `mcp-service` user_type Website→System User（与 roles.md §2 对齐）并复测无回归。详见 §18。读题后受题污染，不再参与 F01/F02/F04 实现/评审/调参 |
+
+## 18. 封存记录与下游影响
+
+### 18.1 封存信息
+
+| 字段 | 内容 |
+|---|---|
+| 状态 | 已封存 |
+| 封存日期 | 2026-09-16 |
+| 操作人 | gjg（Acceptor，独立于 Implementer） |
+| 档位 | 档位 3（完整），强制独立验收 |
+| 结论 | **独立验收通过**。核心安全底座（正式账号/角色、21 DocPerm 最小权限、两张允许清单 server 侧强制、人工确认、fail-closed、越权拒绝）经 Acceptor 独立重跑实测成立，与 D02/D01/C01a/PRD/C01b T11–T15 逐项一致 |
+| Freeze Manifest | `docs/task-records/freeze-manifests/E01-v1.0.md`（冻结哈希 `c779bd44…` 已核一致） |
+
+### 18.2 独立验收方式与结果
+
+Acceptor（gjg）不采信实施侧自证，独立完成：
+
+1. **冻结完整性**：`frozen/v1.0/task.md` SHA-256 = `c779bd4436b4b810b16b2def39991e73b967aefb6045d3307603455dd9c4661f`，与 Freeze Manifest 一致；当前 `task.md` 仅追加状态记录、未覆盖冻结语义。
+2. **后端终态独立复核（DB 直查 + token 直调）**：
+   - `MCP Business Caller` 角色 21 个 DocPerm 与 `roles.md` §3 / `permission-matrix.md` §3 **逐项一致**（9 读写含 SO/PO cancel、PR/DN/SE 无 cancel、2 只读、1 只出方案、9 引用只读；`delete`/`amend` 全 0）；
+   - 账号 `mcp-service@erpnext.local` 仅挂 `MCP Business Caller` 一个角色；DocPerm `if_owner=0`；
+   - 独立重跑：越权 9 项（读 Role/Sales Invoice、写 User/Sales Invoice、Warehouse 增、Company 改、Currency 删、Bin/SLE 写）全 403；正向读 4 项（Customer/Warehouse/Bin/SLE）全 200；Customer create 200；跨 owner 读（mcp-service 读 admin 建客户）可见。
+3. **W09/S08（C01b T11–T15 口径对齐，Acceptor 核对）**：
+   - T14 越权（建仓库）↔ `authorization-verification.md` §3.2 写 Warehouse 403 —— 一致（Warehouse 属引用清单，只可引用不可增，后端原生拒绝，agent 得 `permission_denied`）；
+   - T15 声明与实现不一致（作废发货单）↔ `roles.md` §1 异常回滚仅管理员 + `permission-matrix.md` §3 Delivery Note 无 cancel DocPerm —— 一致（DN 无 cancel tool 且无 cancel 权限，普通调用方无法作废）；
+   - T11 参数缺失 / T12 前置断言 / T13 幂等冲突 —— 属 D02 schema/前置断言、E02/B05 幂等机制层，E01 权限底座与其无冲突（#6 customer_group 引用只读正确、#21 来源 SO 引用正确、#26 无后端对象正确不授 DocPerm）。
+
+### 18.3 验收期修正（user_type）
+
+- 实施期将 `mcp-service` 落地为 `user_type=Website User`，与 `roles.md` §2 声明「System User」不符。Acceptor 独立验收时修正为 `user_type=System User`（`frappe.db.set_value`，未改角色/DocPerm/token），并独立重跑全部用例无回归（越权 9 项仍 403、正向仍 200）。
+- 修正副作用如实记录：`User` 列表可见性由「仅自身」放宽为「全量」（Frappe System User 内置 `has_permission` 行为，非角色 DocPerm 授予，仅暴露 name/email 基础字段），由 MCP tool 层白名单兜底，接受为残余风险（`authorization-verification.md` §5 已按 System User 终态改写并附修正说明）。
+
+### 18.4 发现项（非阻断）
+
+1. **跨调用方批次读取未实测**：批次台账为 MCP server 侧状态（非 ERPNext 后端对象），E01 无 MCP server 运行实例、如实不实测（`authorization-verification.md` §4）。属 E02 机制 + D01 §6.4 + F 包接入范围，由 G01 实测闭环；E01 已提供对象级权限基础。
+2. **框架级残余（Contact/Address 自建自读、User 列表可读）**：Owner 已决断接受（选项 A），依赖 F 包第二层白名单（`document_search`/`document_get` 硬编码 `object_type` 枚举不含 Contact/Address/User）兜底，F 包实施时须落实该白名单层。
+3. **原始证据为脱敏汇总**：`D:\second-acceptance\evidence\E01-raw-*.txt` 为状态码汇总（每方向一行），非完整 HTTP 原始输出；与 `authorization-verification.md` 16 用例逐项一致，Acceptor 已独立重跑复核，结论成立。
+
+### 18.5 对下游任务包的输入（权威结论）
+
+1. **→ F01/F02/F04（通用查询/销售采购闭环/库存主数据维护）**：E01 正式账号 `mcp-service` + 角色 `MCP Business Caller`（21 DocPerm 最小权限）、权限矩阵（`permission-matrix.md`）、两张允许清单（`allowlist.md`）、人工确认与 fail-closed（`confirmation-failclosed.md`）为实施权威输入，须逐 tool 挂接本底座：后端用 `mcp-service` 调用、MCP tool 层白名单（第二层）强制对象类型枚举、人确认档写 tool 经 server 侧确认、币种/价格表与客户端不支持确认时 fail-closed。
+2. **→ G01（完整集成验收）**：越权/失败路径客观口径与 C01b T11–T15 对齐（T14 建仓库越权、T15 作废发货单边界），越权一律后端 403 转译 `permission_denied` 可自纠；跨调用方批次隔离由 G01 在 F 包接入后实测闭环。
+3. **→ 对齐参照**：与 D01 §7 / D02 26 tool 契约逐项一致，无清单外对象、无越界读写、引用对象只读、最小权限收敛，不沿用 B00 临时探针权限（B00 探针已清理）。
+
+### 18.6 对下游任务包的影响与门槛
+
+1. E01 封存 → **F01/F02/F04 冻结/实施门槛解除**（总则 §13「公共安全底座先于依赖它的业务写 tool」）；F 包须以 `mcp-service` + `MCP Business Caller` 为后端调用方，不得改用 Administrator 或临时探针。
+2. F 包须落实 MCP tool 层白名单（第二层拦截）——26 个 tool 的 `object_type`/Link 字段目标硬编码枚举，切断 Contact/Address/User 框架残余的 agent 触达路径；这是 E01 残余风险兜底的前置条件。
+3. 人确认档写 tool（#6–#12、#14/#15/#17/#18/#20/#22/#24）未经有效 server 侧确认不得写入；客户端不支持 `elicitation` 时全部写 tool（含全自动草稿创建）fail-closed——由 F 包实现时挂接（E01 已冻结机制规范）。
+4. 已知限制不变：`mcp-service` token 仅存后端容器 `/tmp/mcp_token.txt`（供验收验证），F 包接线前须以正式凭证管理方式重发/托管 token；框架级残余（Contact/Address/User）接受为残余风险，若需后端原生拒绝须走框架级变更控制（总则 §12）。
