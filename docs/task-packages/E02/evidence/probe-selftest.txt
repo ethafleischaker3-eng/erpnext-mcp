@@ -1,0 +1,8 @@
+PASS  P01 initialize 返回 protocolVersion 与 serverInfo
+PASS  P02 tools/list 含 3 个探针 tool
+PASS  P03 fingerprint_probe 返回指纹
+PASS  P04 idempotency_probe 二次调用命中合并
+PASS  P05 故障注入 postcondition_mismatch 生效
+PASS  P06 batch_status_probe 不存在批次返回 batch_not_found
+
+结果：6 通过 / 0 失败

@@ -1,0 +1,69 @@
+E02 机制自测 S01—S09
+时间（UTC）: 2026-09-16T01:22:25.333Z
+
+== S01 幂等指纹引擎（W01）==
+PASS  S01.1 同参（键序不同）同指纹
+PASS  S01.2 异载异指纹
+PASS  S01.3 注入传输/客户端字段指纹不变
+PASS  S01.4 行项目顺序不同 → 异指纹
+
+== S02 窗口期管理（W02）==
+PASS  S02.1 窗口期内命中
+PASS  S02.2 create 组 300s 超期不命中
+PASS  S02.3 confirm 组 60s 内命中
+PASS  S02.4 confirm 组 60s 超期不命中
+PASS  S02.5 create 组窗口期放宽被拒绝
+PASS  S02.6 冻结值未放宽（create=300 / confirm·cancel=60）
+
+== S03 误合并策略与业务引用号（W03）==
+PASS  S03.1 同参命中返回「已合并」
+PASS  S03.2 合并返回含首次结果 + idempotent_replay
+PASS  S03.3 不同业务引用号 → 异指纹（接入点存在）
+
+== S04 confirm/cancel 状态断言兜底（W04）==
+PASS  S04.1 confirm 已在目标状态 → 命中幂等成功
+PASS  S04.2 返回幂等成功语义（非通用错误）
+PASS  S04.3 幂等成功非 precondition_failed
+PASS  S04.4 cancel 已在目标状态 → 命中幂等成功
+PASS  S04.5 confirm 对已取消单据不命中（交前置断言）
+
+== S05 前置断言框架（W05）==
+PASS  S05.1 业务状态断言失败 → precondition_failed
+PASS  S05.2 失败返回含当前状态 + 建议动作
+PASS  S05.3 断言全部通过 → ok
+PASS  S05.4 两层拆分标记（schema vs business_state）
+PASS  S05.5 完成 schema 校验 ≠ 满足前置断言（框架只含业务状态层）
+
+== S06 事后校验框架（W06）==
+PASS  S06.1 回读一致 → ok
+PASS  S06.2 回读不一致 → postcondition_failed
+PASS  S06.3 回读不一致 → 标记待回滚
+PASS  S06.4 不一致 → 记批次并标记待回滚
+PASS  S06.5 两层拆分标记（return_shape vs write_back）
+
+== S07 批次台账（W07）==
+PASS  S07.1 一次调用一批次、server 生成批次标识
+PASS  S07.2 同批变更聚合
+PASS  S07.3 草稿 → delete
+PASS  S07.4 已生效 → cancel
+PASS  S07.5 已取消 → terminal（不可回滚）
+PASS  S07.6 未知状态不猜测（返回 null）
+PASS  S07.7 ROLLBACK_PATH 冻结值一致
+PASS  S07.8 批次归属会话级身份
+
+== S08 #26 查询逻辑（W08）==
+PASS  S08.1 归属自身批次可查
+PASS  S08.2 返回涉及对象与状态
+PASS  S08.3 他人批次不可见（permission_denied）
+PASS  S08.4 管理员可查全量（含他人批次）
+PASS  S08.5 不存在批次 → batch_not_found
+PASS  S08.6 查询不可主动回滚（只读、状态不变）
+
+== S09 实现契约覆盖（W09）==
+PASS  S09.1 实现契约覆盖 §9.1 全部 7 项
+PASS  S09.2 契约不含 #1–#25 业务 tool 契约（零命中）
+PASS  S09.3 #26 以查询语义引用存在（不冻结 name/schema/annotation）
+
+========================================
+结果：45 通过 / 0 失败
+========================================
