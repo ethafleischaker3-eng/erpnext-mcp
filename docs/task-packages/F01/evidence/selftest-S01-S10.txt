@@ -1,0 +1,101 @@
+F01 开发自检 S01—S10
+时间（UTC）: 2026-09-16T15:30:02.335Z
+
+== S01 隔离自证（W02）==
+PASS  S01.task-sets 负向读取 ACCESS_DENIED（隔离生效）
+PASS  S01.assertions 负向读取 ACCESS_DENIED（隔离生效）
+PASS  S01.runs 负向读取 ACCESS_DENIED（隔离生效）
+PASS  S01.snapshots 负向读取 ACCESS_DENIED（隔离生效）
+
+== S02 6 读 tool 与 D02 §2 核对（W03/W04）==
+PASS  S02.1 tool 名称与 D02 §2 一致（6 个，无增无减）
+PASS  S02.2 erpnext_document_search annotation readOnly/idempotent 显式声明且 destructive=false
+PASS  S02.2 erpnext_document_get annotation readOnly/idempotent 显式声明且 destructive=false
+PASS  S02.2 erpnext_stock_level_query annotation readOnly/idempotent 显式声明且 destructive=false
+PASS  S02.2 erpnext_stock_ledger_query annotation readOnly/idempotent 显式声明且 destructive=false
+PASS  S02.2 erpnext_supplier_search annotation readOnly/idempotent 显式声明且 destructive=false
+PASS  S02.2 erpnext_batch_status_get annotation readOnly/idempotent 显式声明且 destructive=false
+PASS  S02.3 #1 object_type 九类枚举（排除 supplier/bin/sle）
+PASS  S02.4 #2 object_type 九类枚举
+PASS  S02.5 #1 object_type 枚举不含 supplier/bin/sle
+PASS  S02.6 #5 无 object_type，目标仅 Supplier（keyword/supplier_group）
+PASS  S02.7 #26 仅 batch_id 可选、无 object_type（无后端业务对象）
+
+== S03 白名单枚举核对（W06）==
+PASS  S03.1 九类对象 → DocType 映射正确
+PASS  S03.2 #3 目标 Bin、#4 目标 SLE、#5 目标 Supplier（硬编码）
+PASS  S03.3 显式排除 supplier/bin/stock_ledger_entry
+PASS  S03.4 引用允许清单九类
+PASS  S03.5 Link 字段目标枚举（#3/#4 Warehouse、#5 Supplier Group）
+PASS  S03.6 白名单不含 Contact/Address/User（切断框架残余触达，E01 §18.4）
+
+== S05 错误转译核对（W07）==
+PASS  S05.1 后端原生异常 → 语义化 code 映射正确
+PASS  S05.2 统一错误形状（isError/code/message/retryable）
+PASS  S05.3 报错含下一步该怎么做（自纠 message 非仅状态码）
+PASS  S05.4 后端不可达 → backend_unavailable（写不自动重试口径）
+
+== S07 #26 可见性边界（W04）==
+PASS  S07.1 归属自身批次可查
+PASS  S07.2 他人批次不可见（permission_denied）
+PASS  S07.3 管理员可查全量（含他人批次）
+PASS  S07.4 不存在批次 → batch_not_found
+PASS  S07.5 查询不可主动回滚（只读、状态不变）
+PASS  S07.6 回滚路径冻结值
+
+== S08 只读「不适用」标注（W07/W08）==
+PASS  S08.1 document-search.js 未挂接写机制（幂等/前置/事后/批次写入）
+PASS  S08.1 document-get.js 未挂接写机制（幂等/前置/事后/批次写入）
+PASS  S08.1 stock-level-query.js 未挂接写机制（幂等/前置/事后/批次写入）
+PASS  S08.1 stock-ledger-query.js 未挂接写机制（幂等/前置/事后/批次写入）
+PASS  S08.1 supplier-search.js 未挂接写机制（幂等/前置/事后/批次写入）
+PASS  S08.2 #26 仅挂接 queryBatchStatus（只读，无 rollback 入口）
+PASS  S08.3 6 tool readOnly 与 idempotent 分别显式声明
+
+== S09 Evidence Manifest + 只读口径（静态）==
+PASS  S09.1 Evidence Manifest 存在
+PASS  S09.2 后端客户端仅只读（无 POST/PUT/DELETE/run_method/submit/cancel）
+
+== S10 #1 filters 白名单核对（W05）==
+PASS  S10.1 白名单覆盖九类对象、不含 supplier/bin/sle
+PASS  S10.2 customer 含 customer_name/customer_group/territory
+PASS  S10.3 item 含 item_code/item_name/item_group/stock_uom
+PASS  S10.4 item_price 含 item_code/price_list/price_list_rate/valid_from/valid_upto
+PASS  S10.5 sales_order 含 customer/transaction_date/delivery_date/status/docstatus
+PASS  S10.6 purchase_order 含 supplier/transaction_date/schedule_date/status
+PASS  S10.7 purchase_receipt/delivery_note 含 posting_date/status/docstatus
+PASS  S10.8 stock_entry 含 stock_entry_type/from_warehouse/to_warehouse/purpose
+PASS  S10.9 stock_reconciliation 含 purpose/posting_date/expense_account
+PASS  S10.10 customer 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 item 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 item_price 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 sales_order 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 purchase_order 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 purchase_receipt 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 delivery_note 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 stock_entry 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 stock_reconciliation 白名单不含子表 items（Table 不作标量过滤）
+
+== S04 只读正确性（W03）==
+PASS  S04.1 #1 customer 检索成功
+PASS  S04.2 #1 返回语义化摘要（无 owner/_user_tags 低层字段）
+PASS  S04.3 #1 分页/截断字段完整（items/total/page/page_size/truncated）
+PASS  S04.4 #2 单对象详情成功
+PASS  S04.5 #2 目标不存在 → precondition_failed
+PASS  S04.6 #3 Bin 余量 actual/available/reserved 语义化
+PASS  S04.7 #4 SLE 流水语义化（change_qty/balance_qty/source_document）
+PASS  S04.8 #5 Supplier 检索成功
+
+== S06 越权拒绝（W06/W07）==
+PASS  S06.1 清单外 object_type「supplier」→ invalid_argument
+PASS  S06.1 清单外 object_type「bin」→ invalid_argument
+PASS  S06.1 清单外 object_type「stock_ledger_entry」→ invalid_argument
+PASS  S06.1 清单外 object_type「contact」→ invalid_argument
+PASS  S06.1 清单外 object_type「user」→ invalid_argument
+PASS  S06.1 清单外 object_type「sales_invoice」→ invalid_argument
+PASS  S06.2 未知过滤字段 → invalid_argument
+PASS  S06.3 跨会话批次读取 → permission_denied（不泄露他人批次）
+
+========================================
+结果：75 通过 / 0 失败
+========================================
