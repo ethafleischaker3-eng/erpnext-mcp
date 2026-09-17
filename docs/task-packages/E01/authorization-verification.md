@@ -98,5 +98,5 @@
 ## 7. 终端态与清理
 
 - 探测对象（`E01-PROBE-CONTACT`、`E01-PROBE-CUST`）验证后经 `Administrator` 删除，`tabContact`/`tabCustomer` 中 `E01%` 前缀计数为 0，零残留。
-- 正式账号 `mcp-service` + 角色 `MCP Business Caller`（21 DocType DocPerm）为 E01 交付终态，保留供 F 包接线（不删除）。
+- 正式账号 `mcp-service` + 角色 `MCP Business Caller`（23 DocType DocPerm：21 操作/引用 + Account/Cost Center 框架级只读 `read`+`select`，CHG-20260917-E01-001）为 E01 交付终态，保留供 F 包接线（不删除）。
 - 原始证据（命令、HTTP 状态码、脱敏前原始输出）落 `D:\second-acceptance\evidence\`，脱敏引用登记入 `evidence-manifest.md`。

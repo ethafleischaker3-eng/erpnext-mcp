@@ -1,0 +1,218 @@
+F01+F04+F02 开发自检 S01—S24
+时间（UTC）: 2026-09-17T06:37:57.336Z
+
+== S01 隔离自证（W02）==
+FAIL  S01.task-sets 负向读取 ACCESS_DENIED（隔离生效） :: D:\second-acceptance\task-sets
+FAIL  S01.assertions 负向读取 ACCESS_DENIED（隔离生效） :: D:\second-acceptance\assertions
+FAIL  S01.runs 负向读取 ACCESS_DENIED（隔离生效） :: D:\second-acceptance\runs
+FAIL  S01.snapshots 负向读取 ACCESS_DENIED（隔离生效） :: D:\second-acceptance\snapshots
+
+== S02 tool 与 D02 §2/§3/§6 核对（W03/W04）==
+PASS  S02.1 tool 名称与 D02 一致（26 个：6 读 + 20 写/只出 plan，无增无减）
+PASS  S02.2 erpnext_document_search 读 tool annotation（readOnly/非destructive/idempotent/openWorld=false）
+PASS  S02.2 erpnext_document_get 读 tool annotation（readOnly/非destructive/idempotent/openWorld=false）
+PASS  S02.2 erpnext_stock_level_query 读 tool annotation（readOnly/非destructive/idempotent/openWorld=false）
+PASS  S02.2 erpnext_stock_ledger_query 读 tool annotation（readOnly/非destructive/idempotent/openWorld=false）
+PASS  S02.2 erpnext_supplier_search 读 tool annotation（readOnly/非destructive/idempotent/openWorld=false）
+PASS  S02.2 erpnext_batch_status_get 读 tool annotation（readOnly/非destructive/idempotent/openWorld=false）
+PASS  S02.2w erpnext_customer_create 写 tool annotation（readOnly=false/destructive=true/idempotent=true）
+PASS  S02.2w erpnext_customer_update 写 tool annotation（readOnly=false/destructive=true/idempotent=true）
+PASS  S02.2w erpnext_supplier_create 写 tool annotation（readOnly=false/destructive=true/idempotent=true）
+PASS  S02.2w erpnext_supplier_update 写 tool annotation（readOnly=false/destructive=true/idempotent=true）
+PASS  S02.2w erpnext_item_create 写 tool annotation（readOnly=false/destructive=true/idempotent=true）
+PASS  S02.2w erpnext_item_update 写 tool annotation（readOnly=false/destructive=true/idempotent=true）
+PASS  S02.2w erpnext_item_price_set 写 tool annotation（readOnly=false/destructive=true/idempotent=true）
+PASS  S02.2w erpnext_stock_transfer_confirm 写 tool annotation（readOnly=false/destructive=true/idempotent=true）
+PASS  S02.2w erpnext_sales_order_confirm 写 tool annotation（readOnly=false/destructive=true/idempotent=true）
+PASS  S02.2w erpnext_sales_order_cancel 写 tool annotation（readOnly=false/destructive=true/idempotent=true）
+PASS  S02.2w erpnext_purchase_order_confirm 写 tool annotation（readOnly=false/destructive=true/idempotent=true）
+PASS  S02.2w erpnext_purchase_order_cancel 写 tool annotation（readOnly=false/destructive=true/idempotent=true）
+PASS  S02.2w erpnext_purchase_receipt_confirm 写 tool annotation（readOnly=false/destructive=true/idempotent=true）
+PASS  S02.2w erpnext_delivery_note_confirm 写 tool annotation（readOnly=false/destructive=true/idempotent=true）
+PASS  S02.2s #23 stock_transfer_create（可逆草稿，destructive=false）
+PASS  S02.2f #13/#16/#19/#21 草稿 create（可逆，destructive=false）
+PASS  S02.2p #25 stock_reconciliation_plan（只出 plan，readOnly=true）
+PASS  S02.3 #1 object_type 九类枚举（排除 supplier/bin/sle）
+PASS  S02.4 #2 object_type 九类枚举
+PASS  S02.5 #1 object_type 枚举不含 supplier/bin/sle
+PASS  S02.6 #5 无 object_type，目标仅 Supplier（keyword/supplier_group）
+PASS  S02.7 #26 仅 batch_id 可选、无 object_type（无后端业务对象）
+
+== S03 白名单枚举核对（W06）==
+PASS  S03.1 九类对象 → DocType 映射正确
+PASS  S03.2 #3 目标 Bin、#4 目标 SLE、#5 目标 Supplier（硬编码）
+PASS  S03.3 显式排除 supplier/bin/stock_ledger_entry
+PASS  S03.4 引用允许清单九类
+PASS  S03.5 Link 字段目标枚举（#3/#4 Warehouse、#5 Supplier Group）
+PASS  S03.6 白名单不含 Contact/Address/User（切断框架残余触达，E01 §18.4）
+
+== S05 错误转译核对（W07）==
+PASS  S05.1 后端原生异常 → 语义化 code 映射正确
+PASS  S05.2 统一错误形状（isError/code/message/retryable）
+PASS  S05.3 报错含下一步该怎么做（自纠 message 非仅状态码）
+PASS  S05.4 后端不可达 → backend_unavailable（写不自动重试口径）
+
+== S07 #26 可见性边界（W04）==
+PASS  S07.1 归属自身批次可查
+PASS  S07.2 他人批次不可见（permission_denied）
+PASS  S07.3 管理员可查全量（含他人批次）
+PASS  S07.4 不存在批次 → batch_not_found
+PASS  S07.5 查询不可主动回滚（只读、状态不变）
+PASS  S07.6 回滚路径冻结值
+
+== S08 只读「不适用」标注（W07/W08）==
+PASS  S08.1 document-search.js 未挂接写机制（幂等/前置/事后/批次写入）
+PASS  S08.1 document-get.js 未挂接写机制（幂等/前置/事后/批次写入）
+PASS  S08.1 stock-level-query.js 未挂接写机制（幂等/前置/事后/批次写入）
+PASS  S08.1 stock-ledger-query.js 未挂接写机制（幂等/前置/事后/批次写入）
+PASS  S08.1 supplier-search.js 未挂接写机制（幂等/前置/事后/批次写入）
+PASS  S08.2 #26 仅挂接 queryBatchStatus（只读，无 rollback 入口）
+PASS  S08.3 26 tool readOnly 与 idempotent 分别显式声明（写 tool readOnly=false）
+
+== S09 Evidence Manifest + 写端点口径（静态）==
+PASS  S09.1 F01 Evidence Manifest 存在
+PASS  S09.2 backend 写端点含 submit/save/mapper、无 DELETE 资源端点
+
+== S10 #1 filters 白名单核对（W05）==
+PASS  S10.1 白名单覆盖九类对象、不含 supplier/bin/sle
+PASS  S10.2 customer 含 customer_name/customer_group/territory
+PASS  S10.3 item 含 item_code/item_name/item_group/stock_uom
+PASS  S10.4 item_price 含 item_code/price_list/price_list_rate/valid_from/valid_upto
+PASS  S10.5 sales_order 含 customer/transaction_date/delivery_date/status/docstatus
+PASS  S10.6 purchase_order 含 supplier/transaction_date/schedule_date/status
+PASS  S10.7 purchase_receipt/delivery_note 含 posting_date/status/docstatus
+PASS  S10.8 stock_entry 含 stock_entry_type/from_warehouse/to_warehouse/purpose
+PASS  S10.9 stock_reconciliation 含 purpose/posting_date/expense_account
+PASS  S10.10 customer 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 item 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 item_price 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 sales_order 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 purchase_order 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 purchase_receipt 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 delivery_note 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 stock_entry 白名单不含子表 items（Table 不作标量过滤）
+PASS  S10.10 stock_reconciliation 白名单不含子表 items（Table 不作标量过滤）
+
+== S04 只读正确性（W03）==
+PASS  S04.1 #1 customer 检索成功
+PASS  S04.2 #1 返回语义化摘要（无 owner/_user_tags 低层字段）
+PASS  S04.3 #1 分页/截断字段完整（items/total/page/page_size/truncated）
+PASS  S04.4 #2 单对象详情成功
+PASS  S04.5 #2 目标不存在 → precondition_failed
+PASS  S04.6 #3 Bin 余量 actual/available/reserved 语义化
+PASS  S04.7 #4 SLE 流水语义化（change_qty/balance_qty/source_document）
+PASS  S04.8 #5 Supplier 检索成功
+
+== S06 越权拒绝（W06/W07）==
+PASS  S06.1 清单外 object_type「supplier」→ invalid_argument
+PASS  S06.1 清单外 object_type「bin」→ invalid_argument
+PASS  S06.1 清单外 object_type「stock_ledger_entry」→ invalid_argument
+PASS  S06.1 清单外 object_type「contact」→ invalid_argument
+PASS  S06.1 清单外 object_type「user」→ invalid_argument
+PASS  S06.1 清单外 object_type「sales_invoice」→ invalid_argument
+PASS  S06.2 未知过滤字段 → invalid_argument
+PASS  S06.3 跨会话批次读取 → permission_denied（不泄露他人批次）
+
+== S11 写 tool 契约核对（W03/W04）==
+PASS  S11.1 #6/#8/#10 create 不带 modified（schema 无 modified 或不 require）
+PASS  S11.2 #7/#9/#11/#24 必带 modified（required 含 modified）
+PASS  S11.3 #12 item_price_set modified 条件必填（新增不带，修改必带）
+PASS  S11.4 #23 全自动免确认、#25 只出 plan（annotation destructive 区分）
+
+== S12 可写字段白名单核对（W05）==
+PASS  S12.1 5 个写对象 DocType 映射正确
+PASS  S12.2 不可改字段统一排除 name/creation/owner/docstatus
+PASS  S12.3 create/update 白名单不含 name/creation/owner/docstatus
+PASS  S12.4 #6 create 白名单含 customer_name/customer_group/territory
+PASS  S12.5 #10 create 白名单含 item_code/item_group/stock_uom
+PASS  S12.6 #12 白名单含 price_list_rate/valid_from/valid_upto
+PASS  S12.7 Link 字段目标硬编码枚举（引用允许清单）
+
+== S13 确认边界（W06）==
+PASS  S13.1 accept→写入成功（Customer 落库）
+PASS  S13.2 accept 后客户已落库
+PASS  S13.3 decline→permission_denied 且零副作用
+PASS  S13.4 decline 后零写入（count=0）
+PASS  S13.5 cancel→permission_denied 且零副作用
+PASS  S13.6 客户端不支持 elicitation→fail-closed（permission_denied 零写入）
+
+== S14 幂等边界（W07）==
+PASS  S14.1 create 组同参数二次命中 → idempotent_replay=true
+PASS  S14.2 异参数（不同名）→ 不合并，正常写入
+PASS  S14.3 #23 调拨草稿创建成功
+PASS  S14.4 #24 生效成功（submitted）
+PASS  S14.5 #24 二次 confirm 命中状态断言 → already_in_target_state（幂等成功）
+
+== S15 前置断言（W07）==
+PASS  S15.1 #10 同名 item_code 已存在 → duplicate_name
+PASS  S15.1b #10 无效 item_group → precondition_failed
+PASS  S15.2 #23 源仓可用量不足 → precondition_failed
+PASS  S15.3 #12 生效区间重叠 → precondition_failed
+PASS  S15.4 #23 源/目同仓→草稿仍可创建（#24 才拦截）
+PASS  S15.5 #24 源/目同仓 → precondition_failed
+
+== S16 事后回读 + #25 只出 plan（W04/W07）==
+PASS  S16.1 #25 只出 plan 成功（无写入、输出 objective plan）
+PASS  S16.2 #25 未产生批次（batchLedger 空）
+PASS  S16.2b #25 缺省时点走 Bin（valuation_rate=null、current_qty=actual_qty）
+PASS  S16.2c #25 提供时点走 getItems（as-of-time 读 current_qty/valuation_rate）
+PASS  S16.3 #24 写后回读 docstatus=1（终态 submitted）
+PASS  S16.4 #24 产生批次台账（batchLedger 非空）
+
+== S17 错误转译 + fail-closed（W07/W08）==
+PASS  S17.1 币种 fail-closed → permission_denied 零写入
+PASS  S17.2 不可改字段 docstatus 传入 → invalid_argument
+PASS  S17.3 写 tool 无 object_type/DocType 字符串输入面（硬编码目标对象）
+
+== S18 F02 写 tool 契约核对（W03/W04）==
+PASS  S18.1 create 组不带 modified（schema 无 modified）
+PASS  S18.2 confirm/cancel 组必带 modified（required 含 modified）
+PASS  S18.3 create description 含消歧（create 只产草稿、生效走 confirm）
+PASS  S18.4 #13/#16 schema 无 rate 字段（不接受显式 rate，消除 B02/B03 F7 副作用）
+PASS  S18.5 #16 必填 schedule_date（B03 F8）
+PASS  S18.6 #15/#18 cancel destructive=true（作废已生效单据）
+
+== S19 F02 可写字段白名单核对（W05）==
+PASS  S19.1 F02 写对象 DocType 映射正确
+PASS  S19.2 F02 白名单不含不可改字段 name/creation/owner/docstatus
+PASS  S19.3 #13 白名单含 customer/items/transaction_date/delivery_date
+PASS  S19.4 #16 白名单含 supplier/schedule_date/items
+PASS  S19.5 #19/#21 白名单含来源订单/items/posting_date
+PASS  S19.6 Link 字段目标硬编码枚举（customer→Customer、supplier→Supplier、来源订单）
+
+== S20 F02 create 行为（#13）==
+PASS  S20.1 #13 创建销售订单草稿成功（Draft）
+PASS  S20.2 #13 同参数二次命中 → idempotent_replay
+PASS  S20.3 #13 items 空 → invalid_argument（B02 F6）
+PASS  S20.4 #13 显式 rate → invalid_argument（不接受 rate）
+PASS  S20.5 #13 客户不存在 → precondition_failed
+
+== S21 F02 confirm 状态断言（#14）==
+PASS  S21.1 #13 创建草稿成功
+PASS  S21.2 #14 生效成功（Submitted）
+PASS  S21.3 #14 二次 confirm 命中状态断言 → already_in_target_state
+PASS  S21.4 #14 modified 陈旧 → concurrency_conflict
+
+== S22 F02 cancel（#15）==
+PASS  S22.1 前置：生效成功
+PASS  S22.2 #15 取消成功（Cancelled）
+PASS  S22.3 #15 二次 cancel 命中状态断言 → already_in_target_state
+PASS  S22.4 #15 cancel 草稿 → precondition_failed
+
+== S23 F02 mapper create（#19/#21）==
+PASS  S23.1 #21 来源 SO 未生效 → precondition_failed
+PASS  S23.2 #21 mapper 创建发货草稿成功（Draft，缺省取未完成量）
+PASS  S23.3 #21 显式 items 超发 → precondition_failed
+
+== S24 F02 确认边界（#14 人确认）==
+PASS  S24.1 #14 confirm decline → permission_denied 零副作用
+PASS  S24.2 decline 后仍为草稿（docstatus=0，零写入）
+
+========================================
+结果：155 通过 / 4 失败
+失败项：
+  - S01.task-sets 负向读取 ACCESS_DENIED（隔离生效） :: D:\second-acceptance\task-sets
+  - S01.assertions 负向读取 ACCESS_DENIED（隔离生效） :: D:\second-acceptance\assertions
+  - S01.runs 负向读取 ACCESS_DENIED（隔离生效） :: D:\second-acceptance\runs
+  - S01.snapshots 负向读取 ACCESS_DENIED（隔离生效） :: D:\second-acceptance\snapshots
+========================================

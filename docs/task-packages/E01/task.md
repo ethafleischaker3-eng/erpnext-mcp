@@ -239,6 +239,7 @@ E01 不定义可调用业务 tool 契约（不适用）。本节规定 E01 输�
 | 2026-09-16 | 已冻结 | 实施中 | Claude（E01 独立实施上下文） | 依据 D02/D01/C01a/PRD/规范/B00 §18.3/A01 完成 W02–W08：产出 `permission-matrix.md`、`allowlist.md`、`roles.md`、`confirmation-failclosed.md`、`authorization-verification.md`、`evidence-manifest.md`；后端落地专用角色 `MCP Business Caller`（21 DocType DocPerm）+ 账号 `mcp-service`；越权验证通过（清单外业务对象/引用增删改/只读写均 403），并如实记录框架级残余（User 自读、Contact/Address 自建自读的「All」角色 if_owner + dynamic_links，MCP tool 层白名单兜底）。未读 C01b 冻结任务集正文/断言 |
 | 2026-09-16 | 实施中 | 待验收 | Claude（E01 独立实施上下文） | 全部交付物与证据已提交；W01 隔离自证已由 Owner 以 `b00-impl` 补跑 `verify-isolation.ps1` 得 ACCESS_DENIED，前置条件第 9 条「已验证」；W09（C01b T11–T15 口径对齐）归 Acceptor。待 gjg 独立验收（档位 3） |
 | 2026-09-16 | 待验收 | 已封存 | gjg（Acceptor，独立验收） | 独立验收通过（档位 3）。Acceptor 读 C01b T11–T15 完成 W09/S08 对齐核对（T14 建仓库越权 ↔ 写 Warehouse 403、T15 作废发货单 ↔ DN 无 cancel DocPerm，均一致；T11/T12/T13 属 D02/E02 机制层，E01 底座无冲突）；独立重跑越权/正向用例全通过；验收期修正 `mcp-service` user_type Website→System User（与 roles.md §2 对齐）并复测无回归。详见 §18。读题后受题污染，不再参与 F01/F02/F04 实现/评审/调参 |
+| 2026-09-17 | 已封存（v1.0） | 已封存（v1.1，待后端授权+复测） | gjg（Owner） | CHG-20260917-E01-001 批准：`MCP Business Caller` 补 Account/Cost Center 只读 DocPerm（21→23），解除 F02 #13–#22 真实后端写 403 阻断（建销售/采购单据须解析行项目 income_account/expense_account/cost_center，Link 到 Account/Cost Center）。`permission-matrix.md`/`roles.md`/`allowlist.md` 升版 v1.1（Account/Cost Center 仅 `read`，不授写、不升允许清单成员、不作 tool 目标对象）。后端运行时授权 + F02 realsmoke 复测 + 越权复测（Account/Cost Center 仅读不可写）待执行，通过后回填封存 |
 
 ## 18. 封存记录与下游影响
 

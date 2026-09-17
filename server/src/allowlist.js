@@ -153,7 +153,7 @@ const FILTER_OPERATORS = Object.freeze(['=', '!=', '<', '>', '<=', '>=', 'like',
 //     Link 字段目标硬编码枚举（E01 allowlist §3 第二层拦截）：不接受任意字段名/DocType。
 // ---------------------------------------------------------------------------
 
-// 写 tool 目标对象 → DocType（#6–#12 主数据 + #23/#24 调拨；#25 只读 Bin/SLE）。
+// 写 tool 目标对象 → DocType（#6–#12 主数据 + #23/#24 调拨；#25 只读 Bin/SLE；#13–#22 销售/采购）。
 const WRITE_DOCTYPES = Object.freeze({
   customer_create: 'Customer',
   customer_update: 'Customer',
@@ -164,6 +164,16 @@ const WRITE_DOCTYPES = Object.freeze({
   item_price_set: 'Item Price',
   stock_transfer_create: 'Stock Entry',
   stock_transfer_confirm: 'Stock Entry',
+  sales_order_create: 'Sales Order',
+  sales_order_confirm: 'Sales Order',
+  sales_order_cancel: 'Sales Order',
+  purchase_order_create: 'Purchase Order',
+  purchase_order_confirm: 'Purchase Order',
+  purchase_order_cancel: 'Purchase Order',
+  purchase_receipt_create: 'Purchase Receipt',
+  purchase_receipt_confirm: 'Purchase Receipt',
+  delivery_note_create: 'Delivery Note',
+  delivery_note_confirm: 'Delivery Note',
 });
 
 // 各写 tool 的 Link 字段目标硬编码枚举（引用允许清单；E01 permission-matrix §1.2）。
@@ -177,6 +187,16 @@ const WRITE_LINK_TARGETS = Object.freeze({
   item_price_set: Object.freeze({ item_code: 'Item', price_list: 'Price List' }),
   stock_transfer_create: Object.freeze({ from_warehouse: 'Warehouse', to_warehouse: 'Warehouse' }),
   stock_transfer_confirm: Object.freeze({}),
+  sales_order_create: Object.freeze({ customer: 'Customer' }),
+  sales_order_confirm: Object.freeze({}),
+  sales_order_cancel: Object.freeze({}),
+  purchase_order_create: Object.freeze({ supplier: 'Supplier' }),
+  purchase_order_confirm: Object.freeze({}),
+  purchase_order_cancel: Object.freeze({}),
+  purchase_receipt_create: Object.freeze({ purchase_order: 'Purchase Order' }),
+  purchase_receipt_confirm: Object.freeze({}),
+  delivery_note_create: Object.freeze({ sales_order: 'Sales Order' }),
+  delivery_note_confirm: Object.freeze({}),
 });
 
 // 逐 tool 可写字段白名单（D03）。item_price_set 的「可写字段」散列在业务字段，由 tool 校验无需白名单枚举其子集；
@@ -191,6 +211,16 @@ const WRITABLE_FIELDS = Object.freeze({
   item_price_set: Object.freeze(['item_code', 'price_list', 'price_list_rate', 'valid_from', 'valid_upto', 'selling', 'buying', 'currency']),
   stock_transfer_create: Object.freeze(['stock_entry_type', 'from_warehouse', 'to_warehouse', 'posting_date', 'items']),
   stock_transfer_confirm: Object.freeze(['stock_entry_id', 'modified']),
+  sales_order_create: Object.freeze(['customer', 'items', 'transaction_date', 'delivery_date']),
+  sales_order_confirm: Object.freeze(['sales_order_id', 'modified']),
+  sales_order_cancel: Object.freeze(['sales_order_id', 'modified']),
+  purchase_order_create: Object.freeze(['supplier', 'schedule_date', 'items']),
+  purchase_order_confirm: Object.freeze(['purchase_order_id', 'modified']),
+  purchase_order_cancel: Object.freeze(['purchase_order_id', 'modified']),
+  purchase_receipt_create: Object.freeze(['purchase_order_id', 'items', 'posting_date']),
+  purchase_receipt_confirm: Object.freeze(['purchase_receipt_id', 'modified']),
+  delivery_note_create: Object.freeze(['sales_order_id', 'items', 'posting_date']),
+  delivery_note_confirm: Object.freeze(['delivery_note_id', 'modified']),
 });
 
 // 不可改字段统一（不接受其作为任何写 tool 的可写字段；update 亦阻断 docstatus，B01 F5）。

@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 'use strict';
 /*
- * ERPNext MCP server（F01 通用查询能力 6 读 tool + F04 库存与主数据维护 10 写/只出 plan tool，共 16 tool）
+ * ERPNext MCP server（F01 通用查询能力 6 读 tool + F04 库存与主数据维护 10 写/只出 plan tool + F02 销售与采购 10 写 tool，共 26 tool）
  * ============================================================
  * stdio / newline-delimited JSON-RPC（MCP 2025-11-25），Node 内置模块、零外部依赖。
- * 骨架：入口 + 注册表只增不改（F02 将在 F04 通过后串行追加 #13–#22）。
+ * 骨架：入口 + 注册表只增不改（F01 → F04 → F02 串行追加）。
  * 后端调用：统一经 mcp-service + MCP Business Caller（token 经环境变量注入，凭据不落代码）。
- * 只读：6 读 tool（#1–#5、#26）。写：8 人确认档 tool（#6–#12、#24）经 server 侧 elicitation 确认方可写入，
- *   #23 全自动（仅 L3）、#25 只出 plan（无写入）；客户端未声明 elicitation 时写操作全量 fail-closed。
+ * 只读：6 读 tool（#1–#5、#26）。写：人确认档 tool（#6–#12 主数据、#14/#15/#17/#18/#20/#22 销售/采购状态流转、#24 调拨生效）
+ *   经 server 侧 elicitation 确认方可写入；全自动档（#13/#16/#19/#21 销售/采购草稿创建、#23 调拨草稿）仅 L3 免确认、
+ *   #25 只出 plan（无写入）；客户端未声明 elicitation 时写操作全量 fail-closed。
  * 失败路径不静默成功；错误以统一形状返回（D01 §4）。
  */
 
@@ -116,7 +117,7 @@ function handleInitialize(id, params) {
     protocolVersion: params.protocolVersion,
     capabilities: SERVER_CAPABILITIES,
     serverInfo: SERVER_INFO,
-    instructions: 'ERPNext MCP server（F01 只读 6 tool + F04 写 10 tool = 16 tool）。写 tool 有人确认档（8）需经 server 侧 elicitation 确认方可写入；客户端未声明 elicitation 能力时写操作 fail-closed（零写入）。',
+    instructions: 'ERPNext MCP server（F01 只读 6 tool + F04 写/只出 plan 10 tool + F02 写 10 tool = 26 tool）。写 tool 有人确认档（14）需经 server 侧 elicitation 确认方可写入；客户端未声明 elicitation 能力时写操作 fail-closed（零写入）。',
   });
 }
 
@@ -134,7 +135,7 @@ async function handleToolsCall(id, params) {
   const tool = registry.getTool(name);
   if (!tool) {
     respond(id, {
-      content: [{ type: 'text', text: JSON.stringify(errors.makeError('invalid_argument', '未知 tool「' + name + '」：当前提供 16 个 tool（6 读 + 10 写/只出 plan）', { retryable: false })) }],
+      content: [{ type: 'text', text: JSON.stringify(errors.makeError('invalid_argument', '未知 tool「' + name + '」：当前提供 26 个 tool（6 读 + 20 写/只出 plan）', { retryable: false })) }],
       isError: true,
     });
     pending -= 1; maybeExit();
@@ -172,10 +173,10 @@ function handleMessage(msg) {
     case 'notifications/cancelled': log({ event: 'rx_notification', method: method }); return;
     default:
       // elicitation/create 的应答（server 发起确认后客户端回传 result.action）。
-      if (pendingElicitations.has(id) && params && params.result) {
+      if (pendingElicitations.has(id) && msg && msg.result) {
         const resolve = pendingElicitations.get(id);
         pendingElicitations.delete(id);
-        const action = params.result.action || 'cancel';
+        const action = msg.result.action || 'cancel';
         resolve({ action: action });
         return;
       }

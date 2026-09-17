@@ -1,7 +1,7 @@
 # E01 两张允许清单落地说明（allowlist）
 
 > 文档性质：E01 交付物 D03，操作允许清单（12 类）与引用允许清单（9 类）的 server 侧强制落地说明。成员忠实 PRD §2.3 / C01a `object-scope.md`；「server 侧强制拦截」的口径按 D01 §7 / PRD §2.3 落地。
-> 版本：v1.0（E01 实施产出）。实现主体：Claude（E01 独立实施上下文）；未读取 C01b 冻结任务集正文/断言。
+> 版本：v1.1（v1.0 实施产出；CHG-20260917-E01-001 补 Account/Cost Center 只读 DocPerm，21→23）。实现主体：Claude（E01 独立实施上下文）；未读取 C01b 冻结任务集正文/断言。
 
 ---
 
@@ -56,8 +56,8 @@
 
 ### 3.1 第一层：后端 DocPerm（最小权限，主防线）
 
-- 正式角色 `MCP Business Caller` 仅对 §1 两张清单 21 个 DocType 授予最小 DocPerm（见 `permission-matrix.md` §3、`roles.md`）。
-- 清单外对象在后端**无任何 DocPerm**，任何读写由后端原生 `PermissionError`(403) 拒绝。
+- 正式角色 `MCP Business Caller` 仅对 23 个 DocType 授予最小 DocPerm：§1 两张清单 21 个（操作 12 + 引用 9）+ 框架级只读依赖 2 个（Account、Cost Center）（见 `permission-matrix.md` §3、`roles.md`）。Account / Cost Center 仅授 `read` + `select`，供销售/采购交易单据行项目 `income_account`/`expense_account`/`cost_center` Link 解析（Frappe `db.get_value` 解析账号走 `select`）；不升为两张允许清单成员、不可经 MCP 增删改、不可作 tool 目标对象（CHG-20260917-E01-001）。
+- 清单外对象（除 Account/Cost Center 框架级只读依赖外）在后端**无任何 DocPerm**，任何读写由后端原生 `PermissionError`(403) 拒绝。
 - 引用对象仅授予 `read`，后端原生拒绝 create/update/delete（越权验证见 `authorization-verification.md`）。
 - 只读对象（Bin、Stock Ledger Entry）仅 `read`；Stock Reconciliation 仅 `read`（无写 tool）。
 

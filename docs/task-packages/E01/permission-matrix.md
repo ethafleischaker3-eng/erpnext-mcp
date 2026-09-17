@@ -1,7 +1,7 @@
 # E01 权限矩阵（permission-matrix）
 
 > 文档性质：E01 交付物 D02，逐 tool（PRD #1–#26）明确其目标对象（操作允许/引用允许）、所需权限（读/写/只出方案）与后端 DocType；反向逐对象（12 操作 + 9 引用）列出哪些 tool 以何种权限访问。本矩阵是 F01/F02/F04 实施与 G01 验收的权威输入。
-> 版本：v1.0（E01 实施产出）；依据：D02 `tool-contract.md` v1.0（已通过）、D01 `common-contract.md` v1.0（已通过）、C01a `object-scope.md` v1.0（已封存）、PRD §2.1/§2.3/§5.6（2026-09-12-r1）。
+> 版本：v1.1（v1.0 实施产出；CHG-20260917-E01-001 补 Account/Cost Center 只读 DocPerm，21→23）；依据：D02 `tool-contract.md` v1.0（已通过）、D01 `common-contract.md` v1.0（已通过）、C01a `object-scope.md` v1.0（已封存）、PRD §2.1/§2.3/§5.6（2026-09-12-r1）。
 > 实现主体：Claude（E01 独立实施上下文）；未读取 C01b 冻结任务集正文/断言。
 
 ---
@@ -16,6 +16,7 @@
 | 引用允许（只读，9） | Company、Warehouse、Price List、Currency、Customer Group、Supplier Group、Territory、Item Group、UOM | 只读（仅引用，不可经 MCP 增删改） |
 
 - 清单外对象（用户/角色/设置、财务、制造、CRM、HR、项目、资产、Contact、Address 等）MUST NOT 读或写。
+- 框架级只读依赖（Account、Cost Center）：**非 MCP tool 对象、非两张清单成员**，仅后端角色 `MCP Business Caller` 授 `read` + `select` 供销售/采购交易单据行项目 `income_account`/`expense_account`/`cost_center` Link 字段解析（CHG-20260917-E01-001）；不构成 MCP 可读/可写面，不可经 MCP 增删改、不可作 tool 目标对象。
 - 子表（Sales Order Item、Purchase Order Item、Purchase Receipt Item、Delivery Note Item、Stock Entry Detail 等）仅作父单据嵌套行项目读写，不列为独立操作对象。
 - DocType 名以 ERPNext 实际名为准（实测：计量单位 DocType 为 `UOM`，非「Unit of Measure」）。
 
@@ -140,8 +141,11 @@
 | Territory | ✓ | — | — | — | — | — |
 | Item Group | ✓ | — | — | — | — | — |
 | UOM | ✓ | — | — | — | — | — |
+| Account | ✓ | — | — | — | — | — |
+| Cost Center | ✓ | — | — | — | — | — |
 
-- 除上表 21 个 DocType 外，**不授予任何其他 DocType 的任何 DocPerm**（清单外 MUST NOT 读写）。
+- 除上表 23 个 DocType 外，**不授予任何其他 DocType 的任何 DocPerm**（清单外 MUST NOT 读写）。
+- Account / Cost Center 仅授 `read` + `select`（框架级只读依赖，CHG-20260917-E01-001）：交易单据落库须解析行项目 `income_account`/`expense_account`/`cost_center`（Link 到 Account/Cost Center）；不授 `write/create/submit/cancel`，不升为允许清单成员，不可经 MCP 增删改、不可作 tool 目标对象。
 - `write` 授予所有 9 个读写对象（含 SO/PO/PR/DN/SE），覆盖主数据 update 及 cancel 的 `frappe.client.save`（docstatus=2 + modified）等价版本保护路径（D02 §0 第 5 条、B02 F3/B03 F3）所需。
 - `delete`/`amend`/`report`/`import`/`export` 等一律不授予普通 MCP 调用方角色——回滚（草稿→删除、异常回滚取消 PR/DN/SE）属管理员运维主体（PRD §5.4），不落入普通调用方「声明能力」。
 
@@ -154,4 +158,4 @@
 3. **只读对象无写**：Bin、Stock Ledger Entry 仅 #3/#4/#25 读；Stock Reconciliation 仅 #1/#2 读 + #25 只出 plan，无写 tool。
 4. **document_search 排除 Supplier/Bin/SLE**：与 D02 §2.1 一致（Supplier 检索专走 #5；库存余量/流水专走 #3/#4）。
 5. **子表不独立**：Sales Order Item 等子表未列为独立对象，仅随父单据嵌套。
-6. **权限收敛最小**：§3 仅授予 21 个 DocType 的最小 DocPerm，与 PRD §5.6「专用角色权限收敛到各对象声明能力 + 引用对象读」一致。
+6. **权限收敛最小**：§3 仅授予 23 个 DocType 的最小 DocPerm（其中 Account/Cost Center 仅 `read` + `select`，为交易单据 Link 解析的框架级依赖，CHG-20260917-E01-001），与 PRD §5.6「专用角色权限收敛到各对象声明能力 + 引用对象读」一致。

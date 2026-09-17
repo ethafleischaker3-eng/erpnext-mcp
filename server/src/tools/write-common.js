@@ -1,8 +1,8 @@
 'use strict';
 /*
- * F04 写 tool 公共层（W06/W07：挂接 E02 幂等/确认/批次 + E01 确认）
+ * F04+F02 写 tool 公共层（W06/W07：挂接 E02 幂等/确认/批次 + E01 确认）
  * ============================================================
- * 供 9 个写 tool（#6–#12、#23/#24）复用，不新增通用执行面（D01 §7.6）。
+ * 供 19 个写 tool（#6–#12 主数据、#13–#22 销售/采购、#23/#24 调拨）复用，不新增通用执行面（D01 §7.6）。
  * 复用 E02 lib/：createIdempotencyStore / identity / rollbackPathFor / makeError。
  *
  * 关键挂接：
@@ -50,7 +50,7 @@ function writeGate(ctx) {
   if (wc && wc.ok === false) {
     return { ok: false, error: makeError('permission_denied', wc.reason || '写入能力未就绪：已 fail-closed', { retryable: false }) };
   }
-  // 客户端未声明 elicitation → 全量写 fail-closed（含全自动 #23）。
+  // 客户端未声明 elicitation → 全量写 fail-closed（含全自动档 #13/#16/#19/#21/#23）。
   if (ctx && ctx.clientSupportsElicitation !== true) {
     return { ok: false, error: makeError('permission_denied', '客户端未声明 elicitation 能力：写操作已 fail-closed（零写入）', { retryable: false }) };
   }

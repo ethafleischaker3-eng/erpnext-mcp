@@ -2,7 +2,7 @@
 /*
  * F04 server 侧确认层（W06：挂接 E01 confirmation-failclosed §1.2 / 规范 §9.7）
  * ============================================================
- * 人确认档写 tool（#6–#12、#24）未经有效 server 侧确认不得写入。
+ * 人确认档写 tool（#6–#12、#14/#15/#17/#18/#20/#22/#24）未经有效 server 侧确认不得写入。
  * 本模块提供确认编排钩子；elicitation 请求体的封装不依赖具体传输（由 index.js 注入 sender）。
  * 挂接次序（E01 §1.4）：schema → 前置断言 → 确认 → 后端写 → 事后回读 → 批次台账。
  *
@@ -12,7 +12,7 @@
 
 const { makeError } = require('../lib/errors');
 
-// 人确认档 8 tool 清单（E01 confirmation-failclosed §1.3；F04 范围内）。
+// 人确认档 tool 清单（E01 confirmation-failclosed §1.3；F04 8 tool + F02 6 tool）。
 const HUMAN_CONFIRM_TOOLS = Object.freeze([
   'erpnext_customer_create',
   'erpnext_customer_update',
@@ -22,10 +22,22 @@ const HUMAN_CONFIRM_TOOLS = Object.freeze([
   'erpnext_item_update',
   'erpnext_item_price_set',
   'erpnext_stock_transfer_confirm',
+  'erpnext_sales_order_confirm',
+  'erpnext_sales_order_cancel',
+  'erpnext_purchase_order_confirm',
+  'erpnext_purchase_order_cancel',
+  'erpnext_purchase_receipt_confirm',
+  'erpnext_delivery_note_confirm',
 ]);
 
-// 全自动档（F04 范围内：#23 免确认，仅限 L3；客户端不支持 elicitation 时全量 fail-closed）。
-const AUTO_TOOLS = Object.freeze(['erpnext_stock_transfer_create']);
+// 全自动档（F04 #23 + F02 #13/#16/#19/#21 免确认，仅限 L3；客户端不支持 elicitation 时全量 fail-closed）。
+const AUTO_TOOLS = Object.freeze([
+  'erpnext_stock_transfer_create',
+  'erpnext_sales_order_create',
+  'erpnext_purchase_order_create',
+  'erpnext_purchase_receipt_create',
+  'erpnext_delivery_note_create',
+]);
 
 function needsConfirmation(toolName) {
   return HUMAN_CONFIRM_TOOLS.indexOf(toolName) !== -1;

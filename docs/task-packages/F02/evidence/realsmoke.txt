@@ -1,0 +1,22 @@
+token 长度：31（值脱敏）
+引用数据：CustomerGroup=Commercial ItemGroup=Consumable Warehouse=All Warehouses - G UOM=Unit
+PASS 前置主数据 Customer/Supplier/Item 创建 :: cust=200 supp=200 item=200
+PASS server initialize 返回 elicitation 能力
+PASS 写入能力判定完成（币种/价格表 fail-closed 通过） :: true reason=null
+PASS tools/list 返回 26 tool :: count=26
+FAIL #13 sales_order_create 草稿 :: code=permission_denied message=越权：当前调用方无该对象读写权限，仅可操作允许清单内对象
+FAIL #14 sales_order_confirm 生效（docstatus=1） :: {"isError":true,"code":"invalid_argument","message":"sales_order_id 必填：请提供销售订单编号","retryable":true}
+FAIL #15 sales_order_cancel 取消终态（docstatus=2、status=Cancelled） :: status=undefined docstatus=undefined
+FAIL #16 purchase_order_create 草稿（schedule_date 必填） :: name=
+FAIL #21 delivery_note_create 发货草稿（mapper） :: name=undefined items=undefined
+FAIL #19 purchase_receipt_create 收货草稿（mapper） :: name=undefined
+
+========================================
+真实后端写冒烟结果：4 通过 / 6 失败
+  - #13 sales_order_create 草稿 :: code=permission_denied message=越权：当前调用方无该对象读写权限，仅可操作允许清单内对象
+  - #14 sales_order_confirm 生效（docstatus=1） :: {"isError":true,"code":"invalid_argument","message":"sales_order_id 必填：请提供销售订单编号","retryable":true}
+  - #15 sales_order_cancel 取消终态（docstatus=2、status=Cancelled） :: status=undefined docstatus=undefined
+  - #16 purchase_order_create 草稿（schedule_date 必填） :: name=
+  - #21 delivery_note_create 发货草稿（mapper） :: name=undefined items=undefined
+  - #19 purchase_receipt_create 收货草稿（mapper） :: name=undefined
+========================================

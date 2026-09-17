@@ -6,6 +6,9 @@
  * F04 写（增量只增不改既有读端点）：POST /api/resource/{doctype}、PUT /api/resource/{doctype}/{name}、
  *   POST /api/method/frappe.client.submit（#24 confirm 全量 doc）、
  *   GET /api/method/...get_items（#25 读现状）。
+ * F02 写（增量只增不改既有端点）：POST /api/method/frappe.client.save（#15/#18 cancel docstatus=2+modified）、
+ *   POST /api/method/...make_delivery_note（#21 发货草稿 mapper）、
+ *   POST /api/method/...make_purchase_receipt（#19 收货草稿 mapper）。
  * 认证经 token <api_key>:<api_secret>（凭据由 config 注入，不落代码）。
  * 失败路径：非 2xx 或网络错误均结构化返回（translate.js 转译），不静默成功；写操作后端不可达不自动重试。
  *
@@ -16,6 +19,9 @@
  *   create(doctype, doc) -> { ok:true, data } | { ok:false, error }
  *   update(doctype, name, doc) -> { ok:true, data } | { ok:false, error }
  *   submit(doctype, doc) -> { ok:true, data } | { ok:false, error }
+ *   save(doctype, doc) -> { ok:true, data } | { ok:false, error }
+ *   makeDeliveryNote(sourceName) -> { ok:true, data } | { ok:false, error }
+ *   makePurchaseReceipt(sourceName) -> { ok:true, data } | { ok:false, error }
  *   getItems(opts) -> { ok:true, data } | { ok:false, error }
  */
 
@@ -125,6 +131,34 @@ function createBackendClient(config) {
     return { ok: true, data: data || null };
   }
 
+  // 取消（POST /api/method/frappe.client.save；doc 携带 docstatus=2 + modified 施加版本保护，B02 F3/B03 F3）。
+  // 标准 cancel 端点（run_method:cancel / frappe.client.cancel）不接受 modified，仅此 save 等价路径可施加版本断言（D02 §0 第 5 条）。
+  async function save(doctype, doc) {
+    const r = await request('/api/method/frappe.client.save', 'POST', { doc: doc });
+    if (r.unreachable) return { ok: false, error: backendUnavailable() };
+    if (!r.ok) return { ok: false, error: translateBackendError(r.body, r.status) };
+    const data = (r.body && r.body.message !== undefined) ? r.body.message : (r.body && r.body.data);
+    return { ok: true, data: data || null };
+  }
+
+  // 按来源销售订单生成发货草稿（POST /api/method/...make_delivery_note；B02 §1/§2.2）。
+  async function makeDeliveryNote(sourceName) {
+    const r = await request('/api/method/erpnext.selling.doctype.sales_order.sales_order.make_delivery_note', 'POST', { source_name: sourceName });
+    if (r.unreachable) return { ok: false, error: backendUnavailable() };
+    if (!r.ok) return { ok: false, error: translateBackendError(r.body, r.status) };
+    const data = (r.body && r.body.message !== undefined) ? r.body.message : (r.body && r.body.data);
+    return { ok: true, data: data || null };
+  }
+
+  // 按来源采购订单生成收货草稿（POST /api/method/...make_purchase_receipt；B03 §1/§2.2）。
+  async function makePurchaseReceipt(sourceName) {
+    const r = await request('/api/method/erpnext.buying.doctype.purchase_order.purchase_order.make_purchase_receipt', 'POST', { source_name: sourceName });
+    if (r.unreachable) return { ok: false, error: backendUnavailable() };
+    if (!r.ok) return { ok: false, error: translateBackendError(r.body, r.status) };
+    const data = (r.body && r.body.message !== undefined) ? r.body.message : (r.body && r.body.data);
+    return { ok: true, data: data || null };
+  }
+
   // 盘点读现状（GET /api/method/...get_items；B04 F11，as-of-time 读 current_qty/valuation_rate）。
   // 注意：get_items(warehouse, posting_date, posting_time, company, item_code=None) 的 posting_date/posting_time 为
   //   无默认值的位置参数（仅 item_code 可选），省略会被 Python 拒绝（TypeError）。故 getItems 仅在调用方已提供
@@ -145,7 +179,7 @@ function createBackendClient(config) {
     return { ok: true, data: data || [] };
   }
 
-  return { getList, get, getCount, create, update, submit, getItems };
+  return { getList, get, getCount, create, update, submit, save, makeDeliveryNote, makePurchaseReceipt, getItems };
 }
 
 module.exports = { createBackendClient };

@@ -1,7 +1,7 @@
 # E01 正式账号/角色与权限配置（roles）
 
 > 文档性质：E01 交付物 D04，正式业务账号 + 专用角色的定义与权限配置（脱敏）。区分管理员运维主体与普通 MCP 调用方主体；权限收敛到允许清单最小权限，不沿用 B00 临时探针权限。
-> 版本：v1.0（E01 实施产出）。实现主体：Claude（E01 独立实施上下文）；未读取 C01b 冻结任务集正文/断言。
+> 版本：v1.1（v1.0 实施产出；CHG-20260917-E01-001 补 Account/Cost Center 只读 DocPerm，21→23）。实现主体：Claude（E01 独立实施上下文）；未读取 C01b 冻结任务集正文/断言。
 
 ---
 
@@ -33,7 +33,7 @@
 
 ## 3. 专用角色 DocPerm 配置（DocType 级，最小权限）
 
-角色 `MCP Business Caller` 对下表 21 个 DocType 授予 `permlevel=0` 的 DocPerm；未列出的 DocType **不授予任何权限**。
+角色 `MCP Business Caller` 对下表 23 个 DocType 授予 `permlevel=0` 的 DocPerm；未列出的 DocType **不授予任何权限**。
 
 | DocType | 类别 | read | write | create | submit | cancel |
 |---|---|---|---|---|---|---|
@@ -58,9 +58,12 @@
 | Territory | 引用-只读 | ✓ | — | — | — | — |
 | Item Group | 引用-只读 | ✓ | — | — | — | — |
 | UOM | 引用-只读 | ✓ | — | — | — | — |
+| Account | 框架级只读（Link 解析依赖） | ✓ | — | — | — | — |
+| Cost Center | 框架级只读（Link 解析依赖） | ✓ | — | — | — | — |
 
 - `delete`/`amend`/`report`/`import`/`export`/`share`/`print`/`email`/`set_user_permissions` 一律不授予。
-- 除上表 21 个 DocType 外，用户/角色/设置（User、Role、System Settings 等）、财务（Sales Invoice、Payment Entry、Journal Entry、GL Entry 等）、制造（BOM、Work Order 等）、CRM、HR、项目、资产、Contact、Address 等**不授予任何 DocPerm**。
+- Account / Cost Center 仅授 `read` + `select`（框架级只读依赖）：销售/采购交易单据落库须解析行项目 `income_account`/`expense_account`/`cost_center`（Link 到 Account/Cost Center），故需 `select/read` 权限（Frappe `db.get_value` 解析账号走 `select`）；不开放其 `write/create/submit/cancel`，不升为两张允许清单成员，不可经 MCP 增删改、不可作 tool 目标对象（CHG-20260917-E01-001）。
+- 除上表 23 个 DocType 外，用户/角色/设置（User、Role、System Settings 等）、财务（Sales Invoice、Payment Entry、Journal Entry、GL Entry 等）、制造（BOM、Work Order 等）、CRM、HR、项目、资产、Contact、Address 等**不授予任何 DocPerm**。
 
 ---
 
@@ -68,7 +71,7 @@
 
 在本地验收环境 `erpnext.local`（非生产、可销毁）经管理员执行，每次变更记录命令与终态：
 
-1. 创建专用角色（含 21 个 DocType 的 DocPerm）。
+1. 创建专用角色（含 23 个 DocType 的 DocPerm，其中 Account/Cost Center 仅 `read`）。
 2. 创建专用系统账号 `mcp-service@erpnext.local`，仅挂 `MCP Business Caller` 角色。
 3. 生成专用 API Token 并脱敏登记。
 4. 实测越权（见 `authorization-verification.md`）后回填终态。
@@ -79,8 +82,8 @@
 
 ## 5. 与 PRD §5.6 / B00 结论一致性核对（S04）
 
-1. 专用系统账号 + 专用角色，权限收敛到「各操作允许对象按其声明能力读写 + 引用允许对象读」—— 满足（§3 表）。
-2. 不授予用户/角色/设置与两张清单外对象任何权限 —— 满足（仅 21 个 DocType）。
+1. 专用系统账号 + 专用角色，权限收敛到「各操作允许对象按其声明能力读写 + 引用允许对象读 + Account/Cost Center 框架级只读（交易单据 Link 解析依赖）」—— 满足（§3 表）。
+2. 不授予用户/角色/设置与两张清单外对象任何**读写/提交/取消**权限 —— 满足（仅 23 个 DocType；其中 Account/Cost Center 仅 `read` + `select`、无写面，见 CHG-20260917-E01-001）。
 3. 只读对象（Bin、Stock Ledger Entry）仅读；只出方案对象（Stock Reconciliation）仅读、无写 —— 满足。
 4. 管理员运维主体与普通调用方主体分离 —— 满足（§1 表）。
 5. 不沿用 B00 临时探针权限 —— 满足（全新账号/角色，B00 探针已清理，见 `authorization-verification.md` §5）。

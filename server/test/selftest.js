@@ -1,12 +1,15 @@
 'use strict';
 /*
- * F01 开发自检（S01—S10）
+ * F01+F04+F02 开发自检（S01—S24）
  * ============================================================
- * 覆盖 §12 自检方法 S01—S10（客观自检，非正式验收；档位 2 独立验收由 Acceptor gjg 完成）。
+ * 覆盖 §12 自检方法 S01—S13 与 F04/F02 写 tool 自检 S11—S24（客观自检，非正式验收；
+ * 档位 2/3 独立验收由 Acceptor gjg 完成）。
  * 运行：node server/test/selftest.js
  * 退出码：0 = 全部通过；非 0 = 有失败。
  * 依赖：Node 内置模块 + 迁移自 E02 的 lib/（零外部依赖）；后端交互以内存 mock 验证（真实后端
  * 只读调用以 mcp-service token 于运行时注入，本自检不依赖后端可达）。
+ * 注：S01 隔离自证需在受限账户 b00-impl 下运行方得 ACCESS_DENIED；非受限环境 S01 恒 FAIL，
+ *     以 verify-impl.ps1 的 `ISOLATED: all checks passed` 为隔离自证依据。
  */
 
 const path = require('path');
@@ -100,13 +103,17 @@ function s02() {
   console.log('\n== S02 tool 与 D02 §2/§3/§6 核对（W03/W04）==');
   const tools = registry.listTools();
   const names = tools.map(function (t) { return t.name; });
-  assertEq('S02.1 tool 名称与 D02 一致（16 个：6 读 + 10 写/只出 plan，无增无减）', names, [
+  assertEq('S02.1 tool 名称与 D02 一致（26 个：6 读 + 20 写/只出 plan，无增无减）', names, [
     'erpnext_document_search', 'erpnext_document_get', 'erpnext_stock_level_query',
     'erpnext_stock_ledger_query', 'erpnext_supplier_search', 'erpnext_batch_status_get',
     'erpnext_customer_create', 'erpnext_customer_update', 'erpnext_supplier_create',
     'erpnext_supplier_update', 'erpnext_item_create', 'erpnext_item_update',
     'erpnext_item_price_set', 'erpnext_stock_transfer_create', 'erpnext_stock_transfer_confirm',
     'erpnext_stock_reconciliation_plan',
+    'erpnext_sales_order_create', 'erpnext_sales_order_confirm', 'erpnext_sales_order_cancel',
+    'erpnext_purchase_order_create', 'erpnext_purchase_order_confirm', 'erpnext_purchase_order_cancel',
+    'erpnext_purchase_receipt_create', 'erpnext_purchase_receipt_confirm',
+    'erpnext_delivery_note_create', 'erpnext_delivery_note_confirm',
   ]);
   // 读 tool：readOnly=true / destructive=false / idempotent=true / openWorld=false。
   const readTools = ['erpnext_document_search', 'erpnext_document_get', 'erpnext_stock_level_query', 'erpnext_stock_ledger_query', 'erpnext_supplier_search', 'erpnext_batch_status_get'];
@@ -116,15 +123,19 @@ function s02() {
       a.readOnlyHint === true && a.destructiveHint === false && a.idempotentHint === true && a.openWorldHint === false);
   }
   // 写 tool（主数据 + confirm）：readOnly=false / destructive=true / idempotent=true。
-  const destructiveWrite = ['erpnext_customer_create', 'erpnext_customer_update', 'erpnext_supplier_create', 'erpnext_supplier_update', 'erpnext_item_create', 'erpnext_item_update', 'erpnext_item_price_set', 'erpnext_stock_transfer_confirm'];
+  const destructiveWrite = ['erpnext_customer_create', 'erpnext_customer_update', 'erpnext_supplier_create', 'erpnext_supplier_update', 'erpnext_item_create', 'erpnext_item_update', 'erpnext_item_price_set', 'erpnext_stock_transfer_confirm', 'erpnext_sales_order_confirm', 'erpnext_sales_order_cancel', 'erpnext_purchase_order_confirm', 'erpnext_purchase_order_cancel', 'erpnext_purchase_receipt_confirm', 'erpnext_delivery_note_confirm'];
   for (const name of destructiveWrite) {
     const a = registry.getTool(name).definition.annotations;
     check('S02.2w ' + name + ' 写 tool annotation（readOnly=false/destructive=true/idempotent=true）',
       a.readOnlyHint === false && a.destructiveHint === true && a.idempotentHint === true && a.openWorldHint === false);
   }
-  // #23 草稿 create（可逆）：destructive=false；#25 只出 plan：readOnly=true。
+  // #23/#13/#16/#19/#21 草稿 create（可逆）：destructive=false；#25 只出 plan：readOnly=true。
   check('S02.2s #23 stock_transfer_create（可逆草稿，destructive=false）',
     registry.getTool('erpnext_stock_transfer_create').definition.annotations.destructiveHint === false);
+  check('S02.2f #13/#16/#19/#21 草稿 create（可逆，destructive=false）',
+    ['erpnext_sales_order_create', 'erpnext_purchase_order_create', 'erpnext_purchase_receipt_create', 'erpnext_delivery_note_create'].every(function (n) {
+      return registry.getTool(n).definition.annotations.destructiveHint === false;
+    }));
   check('S02.2p #25 stock_reconciliation_plan（只出 plan，readOnly=true）',
     registry.getTool('erpnext_stock_reconciliation_plan').definition.annotations.readOnlyHint === true);
 
@@ -311,7 +322,7 @@ function s08() {
   check('S08.2 #26 仅挂接 queryBatchStatus（只读，无 rollback 入口）', bsSrc.indexOf('queryBatchStatus') !== -1 && bsSrc.indexOf('rollbackPathFor') === -1 && bsSrc.indexOf('markRollbackPending') === -1);
   // annotation 声明与实现分离：readOnly 与 idempotent 分别显式声明（D01 §3.4）；写 tool readOnly=false。
   const tools = registry.listTools();
-  check('S08.3 16 tool readOnly 与 idempotent 分别显式声明（写 tool readOnly=false）', tools.every(function (t) {
+  check('S08.3 26 tool readOnly 与 idempotent 分别显式声明（写 tool readOnly=false）', tools.every(function (t) {
     const a = t.annotations;
     return (a.idempotentHint === true) && (a.readOnlyHint !== undefined && a.readOnlyHint !== null) && (a.destructiveHint !== undefined);
   }));
@@ -327,8 +338,14 @@ function s09() {
   // 写端点口径：backend.js 应仅含 POST/PUT 写端点与 frappe.client.submit（#24 confirm）；绝不出现 DELETE/run_method 资源端点。
   const serverRoot = path.join(__dirname, '..');
   const backendSrc = fs.readFileSync(path.join(serverRoot, 'src', 'backend.js'), 'utf8');
-  check('S09.2 backend 写端点仅 POST/PUT + frappe.client.submit（无 DELETE/run_method/cancel 资源端点）',
-    backendSrc.indexOf('frappe.client.submit') !== -1 && /\.delete\(|run_method|frappe\.client\.cancel/.test(backendSrc) === false);
+  // F01/F04/F02 写端点：POST/PUT + frappe.client.submit（confirm）+ frappe.client.save（cancel）+ make_delivery_note/make_purchase_receipt（mapper）；
+  // 无 DELETE 资源端点（回滚归管理员运维）。
+  check('S09.2 backend 写端点含 submit/save/mapper、无 DELETE 资源端点',
+    backendSrc.indexOf('frappe.client.submit') !== -1 &&
+    backendSrc.indexOf('frappe.client.save') !== -1 &&
+    backendSrc.indexOf('make_delivery_note') !== -1 &&
+    backendSrc.indexOf('make_purchase_receipt') !== -1 &&
+    /\.delete\(/.test(backendSrc) === false);
 }
 
 // ---------------------------------------------------------------------------
@@ -359,15 +376,21 @@ function has(list, fields) { return fields.every(function (x) { return list.inde
 // ===========================================================================
 // 内存 mock 后端（含写端点 create/update/submit/getItems + Bin/SLE/主数据查询语义）。
 let _steSeqGlobal = 0; // 跨 mock 实例共享，确保 Stock Entry name 唯一（避免与进程级幂等 store 指纹交叉污染）。
+let _soSeqGlobal = 0; // Sales Order series
+let _poSeqGlobal = 0; // Purchase Order series
+let _prSeqGlobal = 0; // Purchase Receipt series
+let _dnSeqGlobal = 0; // Delivery Note series
+function pad5(n) { return String(n).padStart(5, '0'); }
 function makeWriteMockBackend() {
   const store = {
     Customer: [], Supplier: [], Item: [], 'Item Price': [], 'Stock Entry': [], Bin: [], 'Stock Ledger Entry': [],
+    'Sales Order': [], 'Purchase Order': [], 'Purchase Receipt': [], 'Delivery Note': [],
     'Customer Group': [{ name: 'Commercial', is_group: 0 }, { name: 'All Customer Groups', is_group: 1 }],
     'Supplier Group': [{ name: 'Raw Material', is_group: 0 }],
     'Item Group': [{ name: 'Products', is_group: 0 }],
     'UOM': [{ name: 'Nos' }],
     'Territory': [{ name: 'China' }],
-    'Price List': [{ name: 'Standard Selling' }],
+    'Price List': [{ name: 'Standard Selling' }, { name: 'Standard Buying' }],
     Warehouse: [{ name: 'Stores - G' }, { name: 'Store B' }],
   };
 
@@ -402,16 +425,28 @@ function makeWriteMockBackend() {
       return { ok: true, data: row };
     },
     async create(doctype, doc) {
-      // Item/Supplier/Customer name 取自语义标识；Item Price name 为哈希；Stock Entry name 为 series。
+      // Item/Supplier/Customer name 取自语义标识；Item Price name 为哈希；Stock Entry/单据 name 为 series。
       let name;
       if (doctype === 'Item Price') name = doc.item_code + '-' + doc.price_list + '-' + (doc.valid_from || 'any');
-      else if (doctype === 'Stock Entry') { _steSeqGlobal += 1; name = 'MAT-STE-2026-' + String(_steSeqGlobal).padStart(5, '0'); }
+      else if (doctype === 'Stock Entry') { _steSeqGlobal += 1; name = 'MAT-STE-2026-' + pad5(_steSeqGlobal); }
+      else if (doctype === 'Sales Order') { _soSeqGlobal += 1; name = 'SAL-ORD-2026-' + pad5(_soSeqGlobal); }
+      else if (doctype === 'Purchase Order') { _poSeqGlobal += 1; name = 'PUR-ORD-2026-' + pad5(_poSeqGlobal); }
+      else if (doctype === 'Purchase Receipt') { _prSeqGlobal += 1; name = 'MAT-PRE-2026-' + pad5(_prSeqGlobal); }
+      else if (doctype === 'Delivery Note') { _dnSeqGlobal += 1; name = 'MAT-DN-2026-' + pad5(_dnSeqGlobal); }
       else name = doc.name || doc.item_code || doc.customer_name || doc.supplier_name;
-      // 重名检查（Supplier/Item 拒绝；Customer 自动改名，此处简化）。Item Price/Stock Entry 无同名唯一性。
+      // 重名检查（Supplier/Item 拒绝；Customer 自动改名，此处简化）。Item Price/单据 无同名唯一性。
       if ((doctype === 'Supplier' || doctype === 'Item') && (store[doctype] || []).some(function (r) { return r.name === name; })) {
         return { ok: false, error: translate.translateBackendError({ exc_type: 'DuplicateEntryError', exception: 'DuplicateEntryError' }, 409) };
       }
-      const row = Object.assign({}, doc, { name: name, docstatus: 0, modified: 'm-' + name + '-' + Date.now() });
+      // 单据行项目补子表行标识与累计字段（供 mapper / confirm 超发超收前置断言）。
+      const items = Array.isArray(doc.items) ? doc.items.map(function (it, idx) {
+        return Object.assign({}, it, {
+          name: name + '-item-' + idx,
+          delivered_qty: 0,
+          received_qty: 0,
+        });
+      }) : doc.items;
+      const row = Object.assign({}, doc, { name: name, items: items, docstatus: 0, modified: 'm-' + name + '-' + Date.now() });
       store[doctype].push(row);
       return { ok: true, data: row };
     },
@@ -438,6 +473,38 @@ function makeWriteMockBackend() {
       store[doctype][i].docstatus = 1;
       store[doctype][i].modified = 'm-' + name + '-submitted';
       return { ok: true, data: store[doctype][i] };
+    },
+    async save(doctype, doc) {
+      // frappe.client.save（docstatus=2 + modified）等价路径：模拟取消 + 版本断言（B02 F3/B03 F3）。
+      const name = doc.name;
+      const i = (store[doctype] || []).findIndex(function (r) { return r.name === name; });
+      if (i === -1) return { ok: false, error: translate.translateBackendError({ exc_type: 'DoesNotExistError', exception: 'DoesNotExistError' }, 404) };
+      if (doc.modified && store[doctype][i].modified !== doc.modified) {
+        return { ok: false, error: translate.translateBackendError({ exc_type: 'TimestampMismatchError', exception: 'TimestampMismatchError' }, 417) };
+      }
+      store[doctype][i].docstatus = doc.docstatus === 2 ? 2 : store[doctype][i].docstatus;
+      store[doctype][i].modified = 'm-' + name + '-cancelled';
+      return { ok: true, data: store[doctype][i] };
+    },
+    async makeDeliveryNote(sourceName) {
+      // make_delivery_note mapper：来源 SO 须 docstatus=1；返回草稿 dict（items 含 against_sales_order/so_detail/qty=未完成量）。
+      const so = (store['Sales Order'] || []).find(function (r) { return r.name === sourceName; });
+      if (!so) return { ok: false, error: translate.translateBackendError({ exc_type: 'DoesNotExistError', exception: 'DoesNotExistError' }, 404) };
+      if (so.docstatus !== 1) return { ok: false, error: translate.translateBackendError({ exc_type: 'ValidationError', exception: 'ValidationError' }, 417) };
+      return { ok: true, data: {
+        doctype: 'Delivery Note', customer: so.customer,
+        items: (so.items || []).map(function (r) { return { item_code: r.item_code, qty: r.qty, warehouse: r.warehouse, against_sales_order: sourceName, so_detail: r.name }; }),
+      } };
+    },
+    async makePurchaseReceipt(sourceName) {
+      // make_purchase_receipt mapper：来源 PO 须 docstatus=1；返回草稿 dict。
+      const po = (store['Purchase Order'] || []).find(function (r) { return r.name === sourceName; });
+      if (!po) return { ok: false, error: translate.translateBackendError({ exc_type: 'DoesNotExistError', exception: 'DoesNotExistError' }, 404) };
+      if (po.docstatus !== 1) return { ok: false, error: translate.translateBackendError({ exc_type: 'ValidationError', exception: 'ValidationError' }, 417) };
+      return { ok: true, data: {
+        doctype: 'Purchase Receipt', supplier: po.supplier,
+        items: (po.items || []).map(function (r) { return { item_code: r.item_code, qty: r.qty, warehouse: r.warehouse, purchase_order: sourceName, purchase_order_item: r.name }; }),
+      } };
     },
     async getItems(opts) {
       const rows = (store.Bin || []).filter(function (b) { return b.warehouse === opts.warehouse; });
@@ -652,18 +719,173 @@ async function s17() {
   check('S17.2 不可改字段 docstatus 传入 → invalid_argument', badField.ok === false && badField.error.code === 'invalid_argument');
 
   // 写 tool 只接受允许对象（无对象类型字符串输入面）。
-  const writableSet = new Set(['customer_create','customer_update','supplier_create','supplier_update','item_create','item_update','item_price_set','stock_transfer_create','stock_transfer_confirm']);
-  check('S17.3 写 tool 无 object_type/DocType 字符串输入面（硬编码目标对象）', writableSet.size === 9 && allowlist.WRITE_DOCTYPES.customer_update === 'Customer');
+  const writableSet = new Set(['customer_create','customer_update','supplier_create','supplier_update','item_create','item_update','item_price_set','stock_transfer_create','stock_transfer_confirm','sales_order_create','sales_order_confirm','sales_order_cancel','purchase_order_create','purchase_order_confirm','purchase_order_cancel','purchase_receipt_create','purchase_receipt_confirm','delivery_note_create','delivery_note_confirm']);
+  check('S17.3 写 tool 无 object_type/DocType 字符串输入面（硬编码目标对象）', writableSet.size === 19 && allowlist.WRITE_DOCTYPES.customer_update === 'Customer' && allowlist.WRITE_DOCTYPES.sales_order_create === 'Sales Order');
+}
+
+// ===========================================================================
+// F02 销售/采购写 tool 自检（S18—S24；客观自检，非正式验收）
+// ===========================================================================
+
+// S18 F02 写 tool 契约核对（name/schema/annotation 忠实 D02 §4/§5）。
+function s18() {
+  console.log('\n== S18 F02 写 tool 契约核对（W03/W04）==');
+  const creates = ['erpnext_sales_order_create', 'erpnext_purchase_order_create', 'erpnext_purchase_receipt_create', 'erpnext_delivery_note_create'];
+  const transitions = ['erpnext_sales_order_confirm', 'erpnext_sales_order_cancel', 'erpnext_purchase_order_confirm', 'erpnext_purchase_order_cancel', 'erpnext_purchase_receipt_confirm', 'erpnext_delivery_note_confirm'];
+  check('S18.1 create 组不带 modified（schema 无 modified）', creates.every(function (n) {
+    const s = registry.getTool(n).definition.inputSchema;
+    return s.properties.modified === undefined;
+  }));
+  check('S18.2 confirm/cancel 组必带 modified（required 含 modified）', transitions.every(function (n) {
+    const s = registry.getTool(n).definition.inputSchema;
+    return (s.required || []).indexOf('modified') !== -1;
+  }));
+  check('S18.3 create description 含消歧（create 只产草稿、生效走 confirm）', creates.every(function (n) {
+    const d = registry.getTool(n).definition.description;
+    return /草稿|只产|不生效/.test(d);
+  }));
+  check('S18.4 #13/#16 schema 无 rate 字段（不接受显式 rate，消除 B02/B03 F7 副作用）',
+    registry.getTool('erpnext_sales_order_create').definition.inputSchema.properties.rate === undefined &&
+    registry.getTool('erpnext_purchase_order_create').definition.inputSchema.properties.rate === undefined);
+  check('S18.5 #16 必填 schedule_date（B03 F8）',
+    (registry.getTool('erpnext_purchase_order_create').definition.inputSchema.required || []).indexOf('schedule_date') !== -1);
+  check('S18.6 #15/#18 cancel destructive=true（作废已生效单据）',
+    registry.getTool('erpnext_sales_order_cancel').definition.annotations.destructiveHint === true &&
+    registry.getTool('erpnext_purchase_order_cancel').definition.annotations.destructiveHint === true);
+}
+
+// S19 F02 可写字段白名单核对（D03）。
+function s19() {
+  console.log('\n== S19 F02 可写字段白名单核对（W05）==');
+  const W = allowlist.WRITABLE_FIELDS;
+  check('S19.1 F02 写对象 DocType 映射正确',
+    allowlist.WRITE_DOCTYPES.sales_order_create === 'Sales Order' &&
+    allowlist.WRITE_DOCTYPES.purchase_order_create === 'Purchase Order' &&
+    allowlist.WRITE_DOCTYPES.purchase_receipt_confirm === 'Purchase Receipt' &&
+    allowlist.WRITE_DOCTYPES.delivery_note_confirm === 'Delivery Note');
+  const f02keys = ['sales_order_create','sales_order_confirm','sales_order_cancel','purchase_order_create','purchase_order_confirm','purchase_order_cancel','purchase_receipt_create','purchase_receipt_confirm','delivery_note_create','delivery_note_confirm'];
+  check('S19.2 F02 白名单不含不可改字段 name/creation/owner/docstatus', f02keys.every(function (k) {
+    return W[k].every(function (f) { return allowlist.IMMUTABLE_FIELDS.indexOf(f) === -1; });
+  }));
+  check('S19.3 #13 白名单含 customer/items/transaction_date/delivery_date', has(W.sales_order_create, ['customer','items','transaction_date','delivery_date']));
+  check('S19.4 #16 白名单含 supplier/schedule_date/items', has(W.purchase_order_create, ['supplier','schedule_date','items']));
+  check('S19.5 #19/#21 白名单含来源订单/items/posting_date',
+    has(W.purchase_receipt_create, ['purchase_order_id','items','posting_date']) &&
+    has(W.delivery_note_create, ['sales_order_id','items','posting_date']));
+  check('S19.6 Link 字段目标硬编码枚举（customer→Customer、supplier→Supplier、来源订单）',
+    allowlist.WRITE_LINK_TARGETS.sales_order_create.customer === 'Customer' &&
+    allowlist.WRITE_LINK_TARGETS.purchase_order_create.supplier === 'Supplier' &&
+    allowlist.WRITE_LINK_TARGETS.purchase_receipt_create.purchase_order === 'Purchase Order' &&
+    allowlist.WRITE_LINK_TARGETS.delivery_note_create.sales_order === 'Sales Order');
+}
+
+// S20 F02 create 行为（#13 sales_order_create）。
+async function s20() {
+  console.log('\n== S20 F02 create 行为（#13）==');
+  const backend = makeWriteMockBackend();
+  backend.store.Customer.push({ name: 'CUST-SO', customer_name: 'CUST-SO', customer_group: 'Commercial', disabled: 0, docstatus: 0, modified: 'm-cust-so' });
+  backend.store.Item.push({ name: 'IT-SO', item_code: 'IT-SO', item_name: 'IT-SO', item_group: 'Products', stock_uom: 'Nos', disabled: 0, docstatus: 0, modified: 'm-it-so' });
+  const ctx = makeWriteCtx(backend, { supportsElicitation: true, confirmAction: 'accept' });
+
+  const r1 = await registry.getTool('erpnext_sales_order_create').handler(ctx, { customer: 'CUST-SO', items: [{ item_code: 'IT-SO', qty: 3 }] });
+  check('S20.1 #13 创建销售订单草稿成功（Draft）', r1.ok === true && r1.result.status === 'Draft', JSON.stringify(r1));
+  const r2 = await registry.getTool('erpnext_sales_order_create').handler(ctx, { customer: 'CUST-SO', items: [{ item_code: 'IT-SO', qty: 3 }] });
+  check('S20.2 #13 同参数二次命中 → idempotent_replay', r2.ok === true && r2.result.idempotent_replay === true, JSON.stringify(r2));
+  const r3 = await registry.getTool('erpnext_sales_order_create').handler(ctx, { customer: 'CUST-SO', items: [] });
+  check('S20.3 #13 items 空 → invalid_argument（B02 F6）', r3.ok === false && r3.error.code === 'invalid_argument', JSON.stringify(r3));
+  const r4 = await registry.getTool('erpnext_sales_order_create').handler(ctx, { customer: 'CUST-SO', items: [{ item_code: 'IT-SO', qty: 1, rate: 100 }] });
+  check('S20.4 #13 显式 rate → invalid_argument（不接受 rate）', r4.ok === false && r4.error.code === 'invalid_argument', JSON.stringify(r4));
+  const r5 = await registry.getTool('erpnext_sales_order_create').handler(ctx, { customer: 'NO-CUST', items: [{ item_code: 'IT-SO', qty: 1 }] });
+  check('S20.5 #13 客户不存在 → precondition_failed', r5.ok === false && r5.error.code === 'precondition_failed', JSON.stringify(r5));
+}
+
+// S21 F02 confirm 状态断言（#14 sales_order_confirm）。
+async function s21() {
+  console.log('\n== S21 F02 confirm 状态断言（#14）==');
+  const backend = makeWriteMockBackend();
+  backend.store.Customer.push({ name: 'CUST-CF', customer_name: 'CUST-CF', customer_group: 'Commercial', disabled: 0, docstatus: 0, modified: 'm-cust-cf' });
+  backend.store.Item.push({ name: 'IT-CF', item_code: 'IT-CF', item_name: 'IT-CF', item_group: 'Products', stock_uom: 'Nos', disabled: 0, docstatus: 0, modified: 'm-it-cf' });
+  const ctx = makeWriteCtx(backend, { supportsElicitation: true, confirmAction: 'accept' });
+  const cre = await registry.getTool('erpnext_sales_order_create').handler(ctx, { customer: 'CUST-CF', items: [{ item_code: 'IT-CF', qty: 2 }] });
+  check('S21.1 #13 创建草稿成功', cre.ok === true, JSON.stringify(cre));
+  const sid = cre.result.name;
+  const soDoc = await backend.get('Sales Order', sid);
+  const cf1 = await registry.getTool('erpnext_sales_order_confirm').handler(ctx, { sales_order_id: sid, modified: soDoc.data.modified });
+  check('S21.2 #14 生效成功（Submitted）', cf1.ok === true && cf1.result.status === 'Submitted', JSON.stringify(cf1));
+  const cf2 = await registry.getTool('erpnext_sales_order_confirm').handler(ctx, { sales_order_id: sid, modified: soDoc.data.modified });
+  check('S21.3 #14 二次 confirm 命中状态断言 → already_in_target_state', cf2.ok === true && cf2.result.already_in_target_state === true, JSON.stringify(cf2));
+  const cre2 = await registry.getTool('erpnext_sales_order_create').handler(ctx, { customer: 'CUST-CF', items: [{ item_code: 'IT-CF', qty: 5 }] });
+  const cf3 = await registry.getTool('erpnext_sales_order_confirm').handler(ctx, { sales_order_id: cre2.result.name, modified: 'stale-modified' });
+  check('S21.4 #14 modified 陈旧 → concurrency_conflict', cf3.ok === false && cf3.error.code === 'concurrency_conflict', JSON.stringify(cf3));
+}
+
+// S22 F02 cancel（#15 sales_order_cancel）。
+async function s22() {
+  console.log('\n== S22 F02 cancel（#15）==');
+  const backend = makeWriteMockBackend();
+  backend.store.Customer.push({ name: 'CUST-CX', customer_name: 'CUST-CX', customer_group: 'Commercial', disabled: 0, docstatus: 0, modified: 'm-cust-cx' });
+  backend.store.Item.push({ name: 'IT-CX', item_code: 'IT-CX', item_name: 'IT-CX', item_group: 'Products', stock_uom: 'Nos', disabled: 0, docstatus: 0, modified: 'm-it-cx' });
+  const ctx = makeWriteCtx(backend, { supportsElicitation: true, confirmAction: 'accept' });
+  const cre = await registry.getTool('erpnext_sales_order_create').handler(ctx, { customer: 'CUST-CX', items: [{ item_code: 'IT-CX', qty: 2 }] });
+  const sid = cre.result.name;
+  const soDoc = await backend.get('Sales Order', sid);
+  const cf = await registry.getTool('erpnext_sales_order_confirm').handler(ctx, { sales_order_id: sid, modified: soDoc.data.modified });
+  check('S22.1 前置：生效成功', cf.ok === true, JSON.stringify(cf));
+  const soSubmitted = await backend.get('Sales Order', sid);
+  const cx1 = await registry.getTool('erpnext_sales_order_cancel').handler(ctx, { sales_order_id: sid, modified: soSubmitted.data.modified });
+  check('S22.2 #15 取消成功（Cancelled）', cx1.ok === true && cx1.result.status === 'Cancelled', JSON.stringify(cx1));
+  const cx2 = await registry.getTool('erpnext_sales_order_cancel').handler(ctx, { sales_order_id: sid, modified: soSubmitted.data.modified });
+  check('S22.3 #15 二次 cancel 命中状态断言 → already_in_target_state', cx2.ok === true && cx2.result.already_in_target_state === true, JSON.stringify(cx2));
+  const cre2 = await registry.getTool('erpnext_sales_order_create').handler(ctx, { customer: 'CUST-CX', items: [{ item_code: 'IT-CX', qty: 9 }] });
+  const draftDoc = await backend.get('Sales Order', cre2.result.name);
+  const cx3 = await registry.getTool('erpnext_sales_order_cancel').handler(ctx, { sales_order_id: cre2.result.name, modified: draftDoc.data.modified });
+  check('S22.4 #15 cancel 草稿 → precondition_failed', cx3.ok === false && cx3.error.code === 'precondition_failed', JSON.stringify(cx3));
+}
+
+// S23 F02 mapper create（#19/#21）。
+async function s23() {
+  console.log('\n== S23 F02 mapper create（#19/#21）==');
+  const backend = makeWriteMockBackend();
+  backend.store.Customer.push({ name: 'CUST-MAP', customer_name: 'CUST-MAP', customer_group: 'Commercial', disabled: 0, docstatus: 0, modified: 'm-cust-map' });
+  backend.store.Item.push({ name: 'IT-MAP', item_code: 'IT-MAP', item_name: 'IT-MAP', item_group: 'Products', stock_uom: 'Nos', disabled: 0, docstatus: 0, modified: 'm-it-map' });
+  const ctx = makeWriteCtx(backend, { supportsElicitation: true, confirmAction: 'accept' });
+  const creDraft = await registry.getTool('erpnext_sales_order_create').handler(ctx, { customer: 'CUST-MAP', items: [{ item_code: 'IT-MAP', qty: 5 }] });
+  const draftSid = creDraft.result.name;
+  const dnFail = await registry.getTool('erpnext_delivery_note_create').handler(ctx, { sales_order_id: draftSid });
+  check('S23.1 #21 来源 SO 未生效 → precondition_failed', dnFail.ok === false && dnFail.error.code === 'precondition_failed', JSON.stringify(dnFail));
+  const soDoc = await backend.get('Sales Order', draftSid);
+  await registry.getTool('erpnext_sales_order_confirm').handler(ctx, { sales_order_id: draftSid, modified: soDoc.data.modified });
+  const dn = await registry.getTool('erpnext_delivery_note_create').handler(ctx, { sales_order_id: draftSid });
+  check('S23.2 #21 mapper 创建发货草稿成功（Draft，缺省取未完成量）', dn.ok === true && dn.result.status === 'Draft' && dn.result.items.length === 1 && dn.result.items[0].qty === 5, JSON.stringify(dn));
+  const dnOver = await registry.getTool('erpnext_delivery_note_create').handler(ctx, { sales_order_id: draftSid, items: [{ item_code: 'IT-MAP', qty: 999 }] });
+  check('S23.3 #21 显式 items 超发 → precondition_failed', dnOver.ok === false && dnOver.error.code === 'precondition_failed', JSON.stringify(dnOver));
+}
+
+// S24 F02 确认边界（#14 confirm decline 零副作用）。
+async function s24() {
+  console.log('\n== S24 F02 确认边界（#14 人确认）==');
+  const backend = makeWriteMockBackend();
+  backend.store.Customer.push({ name: 'CUST-EL', customer_name: 'CUST-EL', customer_group: 'Commercial', disabled: 0, docstatus: 0, modified: 'm-cust-el' });
+  backend.store.Item.push({ name: 'IT-EL', item_code: 'IT-EL', item_name: 'IT-EL', item_group: 'Products', stock_uom: 'Nos', disabled: 0, docstatus: 0, modified: 'm-it-el' });
+  const ctxDecline = makeWriteCtx(backend, { supportsElicitation: true, confirmAction: 'decline' });
+  const cre = await registry.getTool('erpnext_sales_order_create').handler(ctxDecline, { customer: 'CUST-EL', items: [{ item_code: 'IT-EL', qty: 1 }] });
+  const soDoc = await ctxDecline.backend.get('Sales Order', cre.result.name);
+  const cfDecline = await registry.getTool('erpnext_sales_order_confirm').handler(ctxDecline, { sales_order_id: cre.result.name, modified: soDoc.data.modified });
+  check('S24.1 #14 confirm decline → permission_denied 零副作用', cfDecline.ok === false && cfDecline.error.code === 'permission_denied', JSON.stringify(cfDecline));
+  const soAfter = await ctxDecline.backend.get('Sales Order', cre.result.name);
+  check('S24.2 decline 后仍为草稿（docstatus=0，零写入）', soAfter.data.docstatus === 0, JSON.stringify(soAfter.data.docstatus));
 }
 
 // ---------------------------------------------------------------------------
 async function main() {
-  console.log('F01+F04 开发自检 S01—S17');
+  console.log('F01+F04+F02 开发自检 S01—S24');
   console.log('时间（UTC）: ' + new Date().toISOString());
   s01(); s02(); s03(); s05(); s07(); s08(); s09(); s10();
   await s04(); await s06();
   s11(); s12();
   await s13(); await s14(); await s15(); await s16(); await s17();
+  s18(); s19();
+  await s20(); await s21(); await s22(); await s23(); await s24();
   console.log('\n========================================');
   console.log('结果：' + passed + ' 通过 / ' + failed + ' 失败');
   if (failures.length) { console.log('失败项：'); failures.forEach(function (x) { console.log('  - ' + x); }); }
