@@ -1,0 +1,15 @@
+{
+  "name": "erpnext-mcp-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ERPNext Agent 化改造 MCP server —— F01 通用查询能力（6 只读 tool）+ F04 库存与主数据维护（10 写/只出 plan tool，共 16 tool）",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "selftest": "node test/selftest.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
+}

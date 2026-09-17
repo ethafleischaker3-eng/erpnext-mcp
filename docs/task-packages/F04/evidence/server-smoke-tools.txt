@@ -1,0 +1,18 @@
+responses: 2
+tools: 16
+erpnext_document_search
+erpnext_document_get
+erpnext_stock_level_query
+erpnext_stock_ledger_query
+erpnext_supplier_search
+erpnext_batch_status_get
+erpnext_customer_create
+erpnext_customer_update
+erpnext_supplier_create
+erpnext_supplier_update
+erpnext_item_create
+erpnext_item_update
+erpnext_item_price_set
+erpnext_stock_transfer_create
+erpnext_stock_transfer_confirm
+erpnext_stock_reconciliation_plan
