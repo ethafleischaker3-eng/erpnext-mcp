@@ -144,7 +144,7 @@ async function handler(ctx, args) {
 
   // 后端写（POST Stock Entry；stock_entry_type 必填，purpose 由后端派生）。
   const doc = {
-    stock_entry_type: 'material_transfer',
+    stock_entry_type: 'Material Transfer',
     from_warehouse: fromWarehouse,
     to_warehouse: toWarehouse,
     items: items.map(function (it) { return { item_code: it.item_code, qty: it.qty, s_warehouse: fromWarehouse, t_warehouse: toWarehouse }; }),
