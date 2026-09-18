@@ -240,6 +240,7 @@ E01 不定义可调用业务 tool 契约（不适用）。本节规定 E01 输�
 | 2026-09-16 | 实施中 | 待验收 | Claude（E01 独立实施上下文） | 全部交付物与证据已提交；W01 隔离自证已由 Owner 以 `b00-impl` 补跑 `verify-isolation.ps1` 得 ACCESS_DENIED，前置条件第 9 条「已验证」；W09（C01b T11–T15 口径对齐）归 Acceptor。待 gjg 独立验收（档位 3） |
 | 2026-09-16 | 待验收 | 已封存 | gjg（Acceptor，独立验收） | 独立验收通过（档位 3）。Acceptor 读 C01b T11–T15 完成 W09/S08 对齐核对（T14 建仓库越权 ↔ 写 Warehouse 403、T15 作废发货单 ↔ DN 无 cancel DocPerm，均一致；T11/T12/T13 属 D02/E02 机制层，E01 底座无冲突）；独立重跑越权/正向用例全通过；验收期修正 `mcp-service` user_type Website→System User（与 roles.md §2 对齐）并复测无回归。详见 §18。读题后受题污染，不再参与 F01/F02/F04 实现/评审/调参 |
 | 2026-09-17 | 已封存（v1.0） | 已封存（v1.1，待后端授权+复测） | gjg（Owner） | CHG-20260917-E01-001 批准：`MCP Business Caller` 补 Account/Cost Center 只读 DocPerm（21→23），解除 F02 #13–#22 真实后端写 403 阻断（建销售/采购单据须解析行项目 income_account/expense_account/cost_center，Link 到 Account/Cost Center）。`permission-matrix.md`/`roles.md`/`allowlist.md` 升版 v1.1（Account/Cost Center 仅 `read`，不授写、不升允许清单成员、不作 tool 目标对象）。后端运行时授权 + F02 realsmoke 复测 + 越权复测（Account/Cost Center 仅读不可写）待执行，通过后回填封存 |
+| 2026-09-17 | 已封存（v1.1，待后端授权+复测） | 已封存（v1.1） | gjg（Owner） | 后端运行时授权落地（`MCP Business Caller` 21→23 DocPerm，Account/Cost Center 仅 `read`+`select`）；越权复测与 F02 realsmoke 复测通过（F02 档位 3 独立验收：`acceptance-record.md` §4.3 写 Account/Cost Center 均 403、`tabDocPerm` 23 项核实、realsmoke 13/13），CHG-20260917-E01-001 收尾闭环；E01 v1.1 重新冻结完成（依据 `freeze-manifests/E01-v1.1.md`） |
 
 ## 18. 封存记录与下游影响
 
@@ -291,3 +292,10 @@ Acceptor（gjg）不采信实施侧自证，独立完成：
 2. F 包须落实 MCP tool 层白名单（第二层拦截）——26 个 tool 的 `object_type`/Link 字段目标硬编码枚举，切断 Contact/Address/User 框架残余的 agent 触达路径；这是 E01 残余风险兜底的前置条件。
 3. 人确认档写 tool（#6–#12、#14/#15/#17/#18/#20/#22/#24）未经有效 server 侧确认不得写入；客户端不支持 `elicitation` 时全部写 tool（含全自动草稿创建）fail-closed——由 F 包实现时挂接（E01 已冻结机制规范）。
 4. 已知限制不变：`mcp-service` token 仅存后端容器 `/tmp/mcp_token.txt`（供验收验证），F 包接线前须以正式凭证管理方式重发/托管 token；框架级残余（Contact/Address/User）接受为残余风险，若需后端原生拒绝须走框架级变更控制（总则 §12）。
+
+### 18.7 v1.1 重新冻结（CHG-20260917-E01-001）
+
+- **触发**：F02 档位 3 真实后端写冒烟（`server/test/realsmoke.js`）发现 `MCP Business Caller` 缺 Account/Cost Center 读权限，致 #13–#22 建销售/采购单据全链 403（`PermissionError: select/read this account`）。
+- **变更**：`permission-matrix.md`/`roles.md`/`allowlist.md` 升 v1.1；`MCP Business Caller` DocPerm 21→23（追加 Account `read`+`select`、Cost Center `read`+`select`；`write/create/submit/cancel/delete` 全 0；不升允许清单成员、不作 tool 目标对象）。
+- **落地与复测**：后端运行时 23 DocPerm 落地；F02 档位 3 独立验收复测通过（越权 12/12 全 403 含 Account/Cost Center 写、realsmoke 13/13、`tabDocPerm` 23 项核实）。依据 `docs/task-records/changes/CHG-20260917-E01-001.md`、`docs/task-records/freeze-manifests/E01-v1.1.md`、`docs/task-packages/F02/acceptance-record.md` §4.3。
+- **下游影响**：§18.5/§18.6 中「21 DocPerm」自 v1.1 起应为「23 DocPerm（21 操作/引用 + Account/Cost Center 框架级只读）」；下游引用 E01 权限矩阵以 v1.1 为准。

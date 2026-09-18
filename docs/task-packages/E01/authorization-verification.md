@@ -99,4 +99,5 @@
 
 - 探测对象（`E01-PROBE-CONTACT`、`E01-PROBE-CUST`）验证后经 `Administrator` 删除，`tabContact`/`tabCustomer` 中 `E01%` 前缀计数为 0，零残留。
 - 正式账号 `mcp-service` + 角色 `MCP Business Caller`（23 DocType DocPerm：21 操作/引用 + Account/Cost Center 框架级只读 `read`+`select`，CHG-20260917-E01-001）为 E01 交付终态，保留供 F 包接线（不删除）。
+- Account/Cost Center 仅读不可写的越权复测（CHG-20260917-E01-001 评审结论 ④）由 **F02 档位 3 独立验收**覆盖并记录于 `docs/task-packages/F02/acceptance-record.md` §4.3：写 Account 403、写 Cost Center 403、`tabDocPerm` 核实 Account/Cost Center `read=1 select=1 write=0`。本文件 §3 反向控制为 E01 实施期 v1.0 用例（21 DocPerm），v1.1 复测以 F02 验收记录为准。
 - 原始证据（命令、HTTP 状态码、脱敏前原始输出）落 `D:\second-acceptance\evidence\`，脱敏引用登记入 `evidence-manifest.md`。
