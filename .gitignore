@@ -24,6 +24,9 @@
 **/*.bak
 **/*.backup
 
+# 换机备份产物（backup.sh 输出，含数据，不入库）
+backups/
+
 # 数据库转储 / SQLite
 **/*.dump
 **/*.sql

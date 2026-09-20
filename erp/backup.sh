@@ -8,6 +8,9 @@
 # ⚠️ 请把生成的 .tar.gz 拷到本机之外（移动硬盘 / 网盘 / 第二台电脑）保存，否则换机无法恢复。
 set -euo pipefail
 
+# 关闭 MSYS 路径自动转换，避免把容器内 /data 等路径转成 Windows 路径（Git Bash + Docker 常见坑）
+export MSYS_NO_PATHCONV=1
+
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 COMPOSE_DIR="$REPO_ROOT/frappe_docker"
 DB_PASSWORD="${DB_PASSWORD:-erpnext-dev-123}"
@@ -36,13 +39,14 @@ fi
 echo "[4/5] 复制 .env 与打包 Docker 卷（含全部数据 + 站点加密钥）..."
 [ -f "$COMPOSE_DIR/.env" ] && cp "$COMPOSE_DIR/.env" "$OUT_DIR/env.backup" || echo "  (警告) 未找到 frappe_docker/.env"
 
+# 卷内容经 stdout 重定向落盘（避免 Windows bind-mount 路径问题）
 if [ -n "$SITES_VOL" ]; then
-  docker run --rm -v "$SITES_VOL:/data" -v "$OUT_DIR:/backup" alpine \
-    sh -c "tar czf /backup/sites.tar.gz -C /data ." >/dev/null && echo "  已备份卷 sites"
+  docker run --rm -v "$SITES_VOL:/data" alpine tar czf - -C /data . > "$OUT_DIR/sites.tar.gz" \
+    && echo "  已备份卷 sites" || echo "  ✗ sites 卷备份失败"
 fi
 if [ -n "$DB_VOL" ]; then
-  docker run --rm -v "$DB_VOL:/data" -v "$OUT_DIR:/backup" alpine \
-    sh -c "tar czf /backup/db-data.tar.gz -C /data ." >/dev/null && echo "  已备份卷 db-data"
+  docker run --rm -v "$DB_VOL:/data" alpine tar czf - -C /data . > "$OUT_DIR/db-data.tar.gz" \
+    && echo "  已备份卷 db-data" || echo "  ✗ db-data 卷备份失败"
 fi
 
 {
