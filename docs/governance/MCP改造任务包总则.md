@@ -6,7 +6,7 @@
 > 上游基线：《开源后端 Agent 化接入规范》**2026-09-07 定稿版**；《ERPNext-MCP 改造 PRD》**2026-09-12-r1**  
 > 当前状态：**已冻结并投入使用（v1.1 升版）**  
 > Reviewer：gjg；决策人：gjg；评审日期：2026-09-12（v1.0）；升版日期：2026-09-15（v1.1）  
-> 评审记录：`docs/变更记录-2026-09-12-任务包治理修订.md`；v1.1 变更依据：`docs/task-records/changes/CHG-20260915-002.md`；冻结哈希在发布时写入独立 Freeze Manifest，不写入本文自身  
+> 评审记录：`docs/governance/changes/变更记录-2026-09-12-任务包治理修订.md`；v1.1 变更依据：`docs/task-records/changes/CHG-20260915-002.md`；冻结哈希在发布时写入独立 Freeze Manifest，不写入本文自身  
 > 本文不定义业务范围、tool 语义或验收阈值；发生冲突时以上游文件为准。
 
 ---
@@ -507,7 +507,7 @@
 - 任务包变更记录：`docs/task-records/changes/<变更编号>.md`；
 - 任务包退回记录：`docs/task-records/returns/<退回编号>.md`；
 - 冻结清单及文档哈希：`docs/task-records/freeze-manifests/<文档名>-<版本>.md`；
-- P00 项目总控状态与登记表：`docs/task-packages/P00/` 与 `docs/任务包登记表.md`。
+- P00 项目总控状态与登记表：`docs/task-packages/P00/` 与 `docs/governance/任务包登记表.md`。
 
 原始证据、凭据、包含敏感信息的日志以及正式验收隐藏材料不得因上述路径约定进入公开实施区；其实际受控位置必须在 Evidence Manifest 中登记脱敏引用。验收材料的位置和访问控制以《实施区与验收区边界》为准。
 
