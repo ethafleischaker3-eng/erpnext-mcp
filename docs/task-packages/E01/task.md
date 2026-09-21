@@ -71,9 +71,9 @@
 
 | 优先级 | 名称 | 路径/位置 | 版本或提交标识 |
 |---|---|---|---|
-| 1 | 开源后端 Agent 化接入规范 | `docs/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
-| 2 | ERPNext-MCP 改造 PRD | `docs/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
-| 3 | MCP 改造任务包总则 | `docs/MCP改造任务包总则.md` | v1.1（升版 2026-09-15） |
+| 1 | 开源后端 Agent 化接入规范 | `docs/governance/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
+| 2 | ERPNext-MCP 改造 PRD | `docs/governance/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
+| 3 | MCP 改造任务包总则 | `docs/governance/MCP改造任务包总则.md` | v1.1（升版 2026-09-15） |
 | 4 | D02 业务 tool 契约（26 tool 逐 tool 冻结口径） | `docs/task-packages/D02/tool-contract.md` | v1.0 已通过 |
 | 5 | D01 公共契约与错误模型（统一基座） | `docs/task-packages/D01/common-contract.md` | v1.0 已通过 |
 | 6 | B00 可信调用方身份 + 权限模型可行性结论 | `docs/task-packages/B00/task.md` §18.3、`D:\second-acceptance\evidence\` | v1.0 已封存 |
@@ -98,7 +98,7 @@
 |---|---|---|---|---|
 | `docs/task-packages/E01/` | 新增和维护 E01 任务包、权限矩阵、允许清单落地、确认/fail-closed 机制规范、越权验证记录（脱敏）、Evidence Manifest | gjg | 否 | 状态变化追加记录，不覆盖历史 |
 | 后端验收环境用户/角色/权限 | 创建正式业务系统账号、专用角色与 DocPerm 权限配置（复用/替换 B00 临时探针，先建后验） | gjg | 否 | 仅本地验收环境；每次变更记录命令与终态 |
-| `docs/任务包登记表.md` 的 E01 行 | 更新 E01 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 E01 行 |
+| `docs/governance/任务包登记表.md` 的 E01 行 | 更新 E01 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 E01 行 |
 | `docs/task-records/freeze-manifests/E01-v1.0.md` | 冻结时登记 E01 冻结清单与哈希 | gjg | 否 | 哈希针对冻结文件计算，不写回被哈希文件 |
 | `docs/task-records/changes/`、`returns/` | 保存 E01 变更或退回记录（如发生） | gjg | 是 | 稳定编号、独立文件 |
 
@@ -175,7 +175,7 @@ E01 不定义可调用业务 tool 契约（不适用）。本节规定 E01 输�
 | D05 | 人工确认与 fail-closed 机制规范 | `docs/task-packages/E01/confirmation-failclosed.md` | 对齐 A01 L3 结论与 PRD 决议 1/2 |
 | D06 | 越权验证记录 | `docs/task-packages/E01/authorization-verification.md`（脱敏）+ 原始证据 `D:\second-acceptance\evidence\` | 越权拒绝实测可复核 |
 | D07 | Evidence Manifest | `docs/task-packages/E01/evidence-manifest.md` | 逐项可追溯 |
-| D08 | 更新后的登记表 | `docs/任务包登记表.md` | E01 行与本文件一致 |
+| D08 | 更新后的登记表 | `docs/governance/任务包登记表.md` | E01 行与本文件一致 |
 
 ## 12. 开发自检
 

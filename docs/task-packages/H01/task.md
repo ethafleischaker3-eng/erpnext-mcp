@@ -60,16 +60,16 @@
 
 | 优先级 | 名称 | 路径/位置 | 版本或提交标识 |
 |---|---|---|---|
-| 1 | 《开源后端 Agent 化接入规范》（符合性声明 §3.5、符合性判据 §14、覆盖下限 §12.3、指标 §13） | `docs/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
-| 2 | 《ERPNext-MCP 改造 PRD》（§0 符合性声明草稿、§1.3 分级验收口径、§6 指标阈值） | `docs/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
-| 3 | 《MCP 改造任务包总则》（§4.6 交付任务包、§16.4 项目完成门槛） | `docs/MCP改造任务包总则.md` | v1.1 |
-| 4 | 《MCP 改造封闭任务包模板》 | `docs/任务包模板.md` | v1.0 |
+| 1 | 《开源后端 Agent 化接入规范》（符合性声明 §3.5、符合性判据 §14、覆盖下限 §12.3、指标 §13） | `docs/governance/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
+| 2 | 《ERPNext-MCP 改造 PRD》（§0 符合性声明草稿、§1.3 分级验收口径、§6 指标阈值） | `docs/governance/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
+| 3 | 《MCP 改造任务包总则》（§4.6 交付任务包、§16.4 项目完成门槛） | `docs/governance/MCP改造任务包总则.md` | v1.1 |
+| 4 | 《MCP 改造封闭任务包模板》 | `docs/templates/任务包模板.md` | v1.0 |
 | 5 | G01 完整集成验收报告 + Evidence Manifest + Freeze Manifest | `docs/task-packages/G01/` | v1.0 已封存 |
 | 6 | D02 业务 tool 契约（26 tool 档位归属） | `docs/task-packages/D02/tool-contract.md` | v1.0 已通过 |
 | 7 | E01 权限矩阵/允许清单/角色（符合性「权限矩阵」交付物） | `docs/task-packages/E01/` | v1.1 已封存 |
 | 8 | D01 公共契约、E02 机制契约、B01–B05 接口事实/幂等边界、C01a object-scope、A01 L3 结论 | `docs/task-packages/{D01,E02,B0*,C01a,A01}/` | 均已封存/通过 |
 | 9 | 项目总控 P00（项目级完成定义、登记表基线） | `docs/task-packages/P00/` | v1.1 已封存 |
-| 10 | 任务包登记表 | `docs/任务包登记表.md` | v1.0 字段结构基线 |
+| 10 | 任务包登记表 | `docs/governance/任务包登记表.md` | v1.0 字段结构基线 |
 
 ## 6. 授权范围与所有权
 
@@ -85,7 +85,7 @@
 |---|---|---|---|---|
 | `docs/task-packages/H01/` | 新增和维护 H01 任务包、符合性声明、交付物汇总、Evidence Manifest | gjg | 否 | 状态变化追加记录，不覆盖历史 |
 | `docs/task-records/freeze-manifests/H01-v1.0.md` | 冻结时登记 H01 冻结清单与哈希（任何档位冻结仍需，总则 §7.1） | gjg | 否 | 哈希针对冻结文件计算，不写回被哈希文件 |
-| `docs/任务包登记表.md` 的 H01 行 | 更新 H01 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 H01 行 |
+| `docs/governance/任务包登记表.md` 的 H01 行 | 更新 H01 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 H01 行 |
 | `docs/task-packages/P00/task.md` §19「项目完成标记」 | 仅当 §16.4 四项核对通过后，追加项目完成状态章节（不改 frozen 快照） | gjg | 是 | 由 Owner 拍板，H01 只提供核对结论 |
 
 > 治理文档落实施区 `docs/task-packages/H01/`；H01 不写入验收区（`D:\second-acceptance\` 下任何目录均不写）。

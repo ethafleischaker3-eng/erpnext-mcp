@@ -73,11 +73,11 @@
 
 | 优先级 | 名称 | 路径/位置 | 版本或提交标识 |
 |---|---|---|---|
-| 1 | 开源后端 Agent 化接入规范 | `docs/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
-| 2 | ERPNext-MCP 改造 PRD | `docs/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
+| 1 | 开源后端 Agent 化接入规范 | `docs/governance/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
+| 2 | ERPNext-MCP 改造 PRD | `docs/governance/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
 | 3 | D02 业务 tool 契约（**F01 直接依据**，§2 六项读 tool 逐 tool 冻结口径） | `docs/task-packages/D02/tool-contract.md` | v1.0 已通过 |
 | 4 | D01 公共契约与错误模型（统一基座） | `docs/task-packages/D01/common-contract.md` | v1.0 已通过 |
-| 5 | MCP 改造任务包总则 | `docs/MCP改造任务包总则.md` | v1.1（升版 2026-09-15） |
+| 5 | MCP 改造任务包总则 | `docs/governance/MCP改造任务包总则.md` | v1.1（升版 2026-09-15） |
 | 6 | E01 权限矩阵 / 两张允许清单 / 正式账号与角色 / 确认与 fail-closed / 越权验证 | `docs/task-packages/E01/permission-matrix.md`、`allowlist.md`、`roles.md`、`confirmation-failclosed.md`、`authorization-verification.md` | v1.0 已封存 |
 | 7 | E02 实现契约（幂等/前置/事后/批次台账接口 + #26 查询语义） | `docs/task-packages/E02/implementation-contract.md`（+ `lib/`） | v1.0 已封存 |
 | 8 | C01a 对象范围边界名单（12 操作 + 9 引用） | `docs/task-packages/C01a/object-scope.md` | v1.0 已封存 |
@@ -101,7 +101,7 @@
 |---|---|---|---|---|
 | `docs/task-packages/F01/` | 新增和维护 F01 task.md、evidence-manifest.md、开发自检与对齐核对记录（脱敏） | gjg | 否 | 状态变化追加记录，不覆盖历史 |
 | MCP server 实现代码（`server/` 骨架 + 迁入 E02 `lib/` 8 模块 + 6 个读 tool 模块 + 白名单/错误转译挂接） | 新增/维护（代码落点已裁定：仓库根 `server/`，入口/注册表只增不改） | gjg | 是（与 F04/F02 串行共享） | 串行：F01 建 `server/` 骨架 + 迁入 E02 `lib/` 8 模块 + 6 读 tool 并拥有其所有权；E02 原 `lib/` 保留为机制参考不动；F04/F02 仅在 F01 通过后按串行顺序追加写 tool，只增不改入口/注册表 |
-| `docs/任务包登记表.md` 的 F01 行 | 更新 F01 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 F01 行；其他任务行实质变化另走相应任务或变更流程 |
+| `docs/governance/任务包登记表.md` 的 F01 行 | 更新 F01 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 F01 行；其他任务行实质变化另走相应任务或变更流程 |
 | `docs/task-records/freeze-manifests/F01-v1.0.md` | 冻结时登记 F01 冻结清单与哈希 | gjg | 否 | 哈希针对冻结文件计算，不写回被哈希文件 |
 | `docs/task-records/changes/`、`returns/` | 保存 F01 变更或退回记录（如发生） | gjg | 是 | 稳定编号、独立文件 |
 
@@ -202,7 +202,7 @@ F01 不定义新契约，6 个读 tool 的契约以 D02 `tool-contract.md` §2.1
 | D04 | 对齐核对记录 | `docs/task-packages/F01/`（脱敏） | 逐 tool 逐项可复核，无清单外对象 |
 | D05 | 开发自检记录 | `docs/task-packages/F01/`（脱敏） | S01–S10 可复核 |
 | D06 | Evidence Manifest | `docs/task-packages/F01/evidence-manifest.md` | 逐项可追溯 |
-| D07 | 更新后的登记表 | `docs/任务包登记表.md` | F01 行与本文件一致 |
+| D07 | 更新后的登记表 | `docs/governance/任务包登记表.md` | F01 行与本文件一致 |
 | D08 | 独立验收记录 | `docs/task-packages/F01/`（脱敏，随 §18） | Acceptor gjg 独立验收通过（档位 2） |
 
 ## 12. 开发自检

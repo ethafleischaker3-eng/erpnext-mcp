@@ -12,7 +12,7 @@
 2. 核对 §4 前置条件已满足（尤其 `object-scope.md` 已下发、隔离 ACL 已建立）。
 3. 做 W01 负向自证：你以 `c01a-blind` 身份尝试读取下列路径，必须**全部得到 ACCESS_DENIED（读不到）**：
    - `docs/task-packages/B01/`、`B02/`、`B03/`、`B04/`、`B05/` 下任意文件
-   - `docs/ERPNext-MCP改造PRD.md`
+   - `docs/governance/ERPNext-MCP改造PRD.md`
    - `docs/task-records/` 下任意文件（B 系列 Freeze Manifest / 变更记录）
    - `D:\second-acceptance\task-sets/`、`assertions/`、`runs/`、`snapshots/` 下任意文件
    - 若任一读到了内容，盲隔离已破，立即停止并上报，不得继续。
@@ -23,13 +23,13 @@
 - `docs/task-packages/C01a/object-scope.md`（对象范围边界名单，你的范围上限）
 - `erp/README.md`（ERPNext 数据模型）
 - `frappe_docker/`（submodule 源码；版本基线 ERPNext 15.121.2 / Frappe 15.120.1，固定提交见 task.md §4）
-- `docs/开源后端Agent化接入规范.md` 第 8 章（tool 设计规范）
+- `docs/governance/开源后端Agent化接入规范.md` 第 8 章（tool 设计规范）
 - `docs/` 治理文档（总则 / 任务包模板 / 登记表 / 实施区与验收区边界），仅用于本任务包自身起草与自检，**不进入场景生成输入**
 
 ## 严禁读（任何情况下）
 
 - `docs/task-packages/B01–B05/` 任何文件（含 interface-facts、task.md、implementer-brief、frozen 快照）
-- `docs/ERPNext-MCP改造PRD.md` 全文
+- `docs/governance/ERPNext-MCP改造PRD.md` 全文
 - `docs/task-records/`（B 系列 Freeze Manifest / 变更记录）
 - 任何 MCP 契约、server 实现代码
 - `D:\second-acceptance\` 下 `task-sets/`、`assertions/`、`runs/`、`snapshots/`

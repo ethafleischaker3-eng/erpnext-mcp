@@ -69,14 +69,14 @@
 
 | 优先级 | 名称 | 路径/位置 | 版本或提交标识 |
 |---|---|---|---|
-| 1 | 开源后端 Agent 化接入规范 | `docs/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
-| 2 | ERPNext-MCP 改造 PRD | `docs/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
-| 3 | MCP 改造任务包总则 | `docs/MCP改造任务包总则.md` | v1.0；以对应 Freeze Manifest 为准 |
-| 4 | MCP 改造封闭任务包模板 | `docs/任务包模板.md` | v1.0；以对应 Freeze Manifest 为准 |
-| 5 | MCP 改造任务包登记表 | `docs/任务包登记表.md` | v1.0 字段结构基线；任务行受控更新 |
-| 6 | 实施区与验收区边界 | `docs/实施区与验收区边界.md` | v1.0 边界规则 |
+| 1 | 开源后端 Agent 化接入规范 | `docs/governance/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
+| 2 | ERPNext-MCP 改造 PRD | `docs/governance/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
+| 3 | MCP 改造任务包总则 | `docs/governance/MCP改造任务包总则.md` | v1.0；以对应 Freeze Manifest 为准 |
+| 4 | MCP 改造封闭任务包模板 | `docs/templates/任务包模板.md` | v1.0；以对应 Freeze Manifest 为准 |
+| 5 | MCP 改造任务包登记表 | `docs/governance/任务包登记表.md` | v1.0 字段结构基线；任务行受控更新 |
+| 6 | 实施区与验收区边界 | `docs/governance/实施区与验收区边界.md` | v1.0 边界规则 |
 | 7 | B00 封存记录与下游影响 | `docs/task-packages/B00/task.md` §18 | B00 v1.0（已封存，2026-09-14） |
-| 8 | 治理修订评审记录 | `docs/变更记录-2026-09-12-任务包治理修订.md` | CHG-20260912-001（2026-09-12） |
+| 8 | 治理修订评审记录 | `docs/governance/changes/变更记录-2026-09-12-任务包治理修订.md` | CHG-20260912-001（2026-09-12） |
 
 > **非冻结权威输入的参考来源**：实施中还需读取两份外部资料以产出结论，其精确版本由 W01/W02 钉定并写入验证记录（§9.2），冻结时无精确值，故不列入上表（总则 §6.5 要求权威输入具备精确版本）：① MCP 协议官方文档（确认机制 / elicitation 语义，W02）；② Claude Agent SDK 官方规范（客户端承载候选评估，W01）。二者钉定后的版本作为验证记录产出，成为下游 B01～B05、E05 的权威输入。
 
@@ -95,7 +95,7 @@
 | 路径/对象 | 允许动作 | Owner | 是否共享 | 协调规则 |
 |---|---|---|---|---|
 | `docs/task-packages/A01/` | 新增和维护 A01 任务包、探针、公开证据、验证记录与 Evidence Manifest | gjg | 否 | 状态变化必须追加记录，不覆盖历史 |
-| `docs/任务包登记表.md` 的 A01 行 | 更新 A01 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 A01 行；其他任务行实质变化另走相应任务或变更流程 |
+| `docs/governance/任务包登记表.md` 的 A01 行 | 更新 A01 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 A01 行；其他任务行实质变化另走相应任务或变更流程 |
 | `docs/task-records/changes/`、`returns/` | 保存 A01 变更或退回记录（如发生） | gjg | 是 | 使用稳定编号和独立文件 |
 | `docs/task-records/freeze-manifests/A01-v1.0.md` | 冻结时登记 A01 冻结清单与哈希 | gjg | 否 | 哈希针对冻结文件计算，不写回被哈希文件 |
 | 探针本地副作用标记文件 | 探针在 `docs/task-packages/A01/probe/state/`（或等价本地路径）写入/清除合成标记 | gjg | 否 | 仅本地合成标记，不涉及 ERPNext 数据；每次运行前后记录并清理，纳入 Evidence Manifest |
@@ -198,7 +198,7 @@ A01 不提供正式业务 tool，不定义业务 tool 语义或 schema。本节�
 |---|---|---|---|
 | D01 | A01 任务包 | `docs/task-packages/A01/task.md` | 按冻结模板检查必备结构 |
 | D02 | A01 Evidence Manifest | `docs/task-packages/A01/evidence-manifest.md` | 逐项追溯工作项与完成定义 |
-| D03 | 更新后的任务包登记表 | `docs/任务包登记表.md` | A01 行与本文件一致，表格结构未改变 |
+| D03 | 更新后的任务包登记表 | `docs/governance/任务包登记表.md` | A01 行与本文件一致，表格结构未改变 |
 | D04 | 隔离确认能力探针（server 代码 + 运行说明 + 清理说明） | `docs/task-packages/A01/probe/` | 探针可启动、可连接、可清理；明显标记为非正式业务 tool；不含凭据 |
 | D05 | 客户端能力验证记录（正文，含结论与接入方确认） | `docs/task-packages/A01/verification-record.md` | 覆盖 §9.2 全部 10 项，结论可复核并由接入方确认有效 |
 | D06 | 各场景原始证据（日志、确认请求内容捕获、客户端会话记录，脱敏） | `docs/task-packages/A01/evidence/` | 逐场景可复核：支持性、完整参数、拒绝 fail-closed、不支持 fail-closed、form/URL 模式、发起时机 |

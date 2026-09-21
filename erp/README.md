@@ -4,8 +4,9 @@
 > 后续的「MCP 改造」以本文档为后端事实依据。
 >
 > 关联文档（同仓库）：
-> - [开源后端 Agent 化接入规范](../docs/开源后端Agent化接入规范.md)——通用规范，回答「怎么算接对」
-> - [ERPNext-MCP 改造 PRD](../docs/ERPNext-MCP改造PRD.md)——本次落地，回答「这次做什么」
+> - [开源后端 Agent 化接入规范](../docs/governance/开源后端Agent化接入规范.md)——通用规范，回答「怎么算接对」
+> - [ERPNext-MCP 改造 PRD](../docs/governance/ERPNext-MCP改造PRD.md)——本次落地，回答「这次做什么」
+> - [换机复现手册](换机复现手册.md)——整机迁移/备份还原/重建环境，本文同目录
 
 ---
 

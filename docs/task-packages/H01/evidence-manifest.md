@@ -31,7 +31,7 @@
 
 ## 3. 登记与归档（W06 落实）
 
-- **登记表 H01 行**：`docs/任务包登记表.md` H01 行状态「已冻结」→「待验收」，备注追加「档位 1 以 Implementation Reviewer 评审记录替代独立验收；CD-1/2/3/5 交付物与实施记录回填」（档位 1 实施完成后即交由 Implementation Reviewer 记录「已通过」）。
+- **登记表 H01 行**：`docs/governance/任务包登记表.md` H01 行状态「已冻结」→「待验收」，备注追加「档位 1 以 Implementation Reviewer 评审记录替代独立验收；CD-1/2/3/5 交付物与实施记录回填」（档位 1 实施完成后即交由 Implementation Reviewer 记录「已通过」）。
 - **P00 项目完成标记**：`docs/task-packages/P00/task.md` 追加 §19「项目完成标记」（不改 `frozen/v1.1/` 快照）。
 - **Freeze Manifest**：`docs/task-records/freeze-manifests/H01-v1.0.md`（冻结时产物，记录输入版本与完成定义，非封存环节）。
 - **H01 task.md 完成记录**：`docs/task-packages/H01/task.md` §17/§18 追加实施与完成记录。

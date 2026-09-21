@@ -79,12 +79,12 @@
 
 | 优先级 | 名称 | 路径/位置 | 版本或提交标识 |
 |---|---|---|---|
-| 1 | 开源后端 Agent 化接入规范 | `docs/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
-| 2 | ERPNext-MCP 改造 PRD | `docs/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
-| 3 | MCP 改造任务包总则 | `docs/MCP改造任务包总则.md` | v1.0；以对应 Freeze Manifest 为准 |
-| 4 | MCP 改造封闭任务包模板 | `docs/任务包模板.md` | v1.0；以对应 Freeze Manifest 为准 |
-| 5 | MCP 改造任务包登记表 | `docs/任务包登记表.md` | v1.0 字段结构基线；任务行受控更新 |
-| 6 | 实施区与验收区边界 | `docs/实施区与验收区边界.md` | v1.1（升版 2026-09-15，依据 CHG-20260915-001） |
+| 1 | 开源后端 Agent 化接入规范 | `docs/governance/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
+| 2 | ERPNext-MCP 改造 PRD | `docs/governance/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
+| 3 | MCP 改造任务包总则 | `docs/governance/MCP改造任务包总则.md` | v1.0；以对应 Freeze Manifest 为准 |
+| 4 | MCP 改造封闭任务包模板 | `docs/templates/任务包模板.md` | v1.0；以对应 Freeze Manifest 为准 |
+| 5 | MCP 改造任务包登记表 | `docs/governance/任务包登记表.md` | v1.0 字段结构基线；任务行受控更新 |
+| 6 | 实施区与验收区边界 | `docs/governance/实施区与验收区边界.md` | v1.1（升版 2026-09-15，依据 CHG-20260915-001） |
 | 7 | ERPNext 进销存系统·部署与接口文档 | `erp/README.md` | 当前工作树版本 |
 | 8 | frappe_docker 依赖 | `frappe_docker`（submodule） | 固定提交 `a0c52135d4d41c4b8acf7adfdfc5bbcba46dd4d0` |
 | 9 | B00 封存记录与下游影响 | `docs/task-packages/B00/task.md` §18 | B00 v1.0（已封存，2026-09-14） |
@@ -92,8 +92,8 @@
 | 11 | B01 封存记录与下游影响 | `docs/task-packages/B01/task.md` §18 | B01 v1.0（已封存，2026-09-14） |
 | 12 | B02 封存记录与下游影响 | `docs/task-packages/B02/task.md` §18 | B02 v1.0（已封存，2026-09-15） |
 | 13 | B03 封存记录与下游影响 | `docs/task-packages/B03/task.md` §18 | B03 v1.0（已封存，2026-09-15） |
-| 14 | 治理修订评审记录 | `docs/变更记录-2026-09-12-任务包治理修订.md` | CHG-20260912-001（2026-09-12） |
-| 15 | 实施区与验收区边界路径冻结评审记录 | `docs/变更记录-2026-09-15-实施区与验收区边界路径冻结.md` | CHG-20260915-001（2026-09-15） |
+| 14 | 治理修订评审记录 | `docs/governance/changes/变更记录-2026-09-12-任务包治理修订.md` | CHG-20260912-001（2026-09-12） |
+| 15 | 实施区与验收区边界路径冻结评审记录 | `docs/governance/changes/变更记录-2026-09-15-实施区与验收区边界路径冻结.md` | CHG-20260915-001（2026-09-15） |
 
 ## 6. 授权范围与所有权
 
@@ -111,7 +111,7 @@
 | 路径/对象 | 允许动作 | Owner | 是否共享 | 协调规则 |
 |---|---|---|---|---|
 | `docs/task-packages/B04/` | 新增和维护 B04 任务包、公开证据、接口事实记录与 Evidence Manifest | gjg | 否 | 状态变化必须追加记录，不覆盖历史 |
-| `docs/任务包登记表.md` 的 B04 行 | 更新 B04 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 B04 行；其他任务行实质变化另走相应任务或变更流程 |
+| `docs/governance/任务包登记表.md` 的 B04 行 | 更新 B04 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 B04 行；其他任务行实质变化另走相应任务或变更流程 |
 | `docs/task-records/changes/`、`returns/` | 保存 B04 变更或退回记录（如发生） | gjg | 是 | 使用稳定编号和独立文件 |
 | `docs/task-records/freeze-manifests/B04-v1.0.md` | 冻结时登记 B04 冻结清单与哈希 | gjg | 否 | 哈希针对冻结文件计算，不写回被哈希文件 |
 | 验收区 `D:\second-acceptance\evidence\` | 保存 B04 敏感原始输出（数据库查询结果、含凭据痕迹的 REST 响应） | gjg | 是 | 脱敏；仅本地验收环境；保留至项目交付 |
@@ -195,7 +195,7 @@ B04 不提供正式业务 tool，不定义 tool 语义或 schema。本节规定�
 |---|---|---|---|
 | D01 | B04 任务包 | `docs/task-packages/B04/task.md` | 按冻结模板检查必备结构 |
 | D02 | B04 Evidence Manifest | `docs/task-packages/B04/evidence-manifest.md` | 逐项追溯工作项与完成定义 |
-| D03 | 更新后的任务包登记表 | `docs/任务包登记表.md` | B04 行与本文件一致，表格结构未改变 |
+| D03 | 更新后的任务包登记表 | `docs/governance/任务包登记表.md` | B04 行与本文件一致，表格结构未改变 |
 | D04 | 库存/事务/回滚接口事实记录 | `docs/task-packages/B04/interface-facts.md` | 覆盖第 9 节全部 9 项，逐对象可复核 |
 | D05 | 合成数据与清理记录 | `docs/task-packages/B04/evidence/`（脱敏）+ `D:\second-acceptance\evidence\`（敏感） | 合成对象唯一前缀、清理终态可复核 |
 | D06 | 各场景原始证据（REST 响应、数据库查询、报错，脱敏） | `docs/task-packages/B04/evidence/` | 逐场景可复核 |

@@ -6,7 +6,7 @@
 
 ## 开工前五步（总则 §9）
 
-1. 依序读并核对：`docs/task-packages/F04/task.md`（冻结正文，以 `frozen/v1.0/task.md` 快照为准）、`docs/task-packages/D02/tool-contract.md`（§3 主数据 #6–#12、§6 库存 #23–#25 逐 tool 冻结口径，F04 直接依据）、`docs/task-packages/D01/common-contract.md`、`docs/task-packages/E01/`（permission-matrix.md / allowlist.md / roles.md / confirmation-failclosed.md / authorization-verification.md）、`docs/task-packages/E02/implementation-contract.md`（含 `lib/` 8 模块）、`docs/task-packages/F01/task.md` 与仓库根 `server/`（直接上游，复用骨架与白名单层）、`docs/task-packages/C01a/object-scope.md`、`docs/task-packages/B01/interface-facts.md` 与 `docs/task-packages/B04/interface-facts.md`、`docs/开源后端Agent化接入规范.md`、`docs/ERPNext-MCP改造PRD.md`、`docs/MCP改造任务包总则.md`、`docs/实施区与验收区边界.md`。
+1. 依序读并核对：`docs/task-packages/F04/task.md`（冻结正文，以 `frozen/v1.0/task.md` 快照为准）、`docs/task-packages/D02/tool-contract.md`（§3 主数据 #6–#12、§6 库存 #23–#25 逐 tool 冻结口径，F04 直接依据）、`docs/task-packages/D01/common-contract.md`、`docs/task-packages/E01/`（permission-matrix.md / allowlist.md / roles.md / confirmation-failclosed.md / authorization-verification.md）、`docs/task-packages/E02/implementation-contract.md`（含 `lib/` 8 模块）、`docs/task-packages/F01/task.md` 与仓库根 `server/`（直接上游，复用骨架与白名单层）、`docs/task-packages/C01a/object-scope.md`、`docs/task-packages/B01/interface-facts.md` 与 `docs/task-packages/B04/interface-facts.md`、`docs/governance/开源后端Agent化接入规范.md`、`docs/governance/ERPNext-MCP改造PRD.md`、`docs/governance/MCP改造任务包总则.md`、`docs/governance/实施区与验收区边界.md`。
 2. 核对 F04 v1.0 及 §4 前置条件（F01/D02/D01/E01/E02/C01b/C01a/B01/B04 均已通过或封存）是否成立；第 11、12 条（隔离、本地环境可写/快照重置）为实施前验证项，不成立即停。
 3. 检查工作区无未授权变更（`git status`，确认未改动 D02/D01/E01/E02/F01 的冻结产物）。
 4. 声明任务边界（只做 F04：10 个写/只出 plan tool #6–#12 + #23–#25；不实现 #13–#22、不改 F01 的 6 读 tool 与 E02 `lib/` 8 模块、不读 C01b）。

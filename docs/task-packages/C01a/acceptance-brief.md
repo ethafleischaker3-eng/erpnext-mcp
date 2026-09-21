@@ -12,7 +12,7 @@
 2. `docs/task-packages/C01a/evidence-manifest.md`（W01 盲隔离自证 + 各工作项证据）
 3. `docs/task-packages/C01a/object-scope.md`（对象范围边界名单：12 操作 + 9 引用）
 4. 候选正文 4 份：`D:\second-acceptance\candidates\C01a\` 下 `S01-sales-fulfillment.md`、`S02-sales-void.md`、`P01-purchase-receipt.md`、`P02-purchase-void.md`
-5. 交叉核对用的实施侧结论：`docs/task-packages/B01–B05/` 各 `interface-facts.md`、`docs/ERPNext-MCP改造PRD.md`
+5. 交叉核对用的实施侧结论：`docs/task-packages/B01–B05/` 各 `interface-facts.md`、`docs/governance/ERPNext-MCP改造PRD.md`
 
 ## 验收项（逐条判定）
 

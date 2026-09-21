@@ -68,12 +68,12 @@
 
 | 优先级 | 名称 | 路径/位置 | 版本或提交标识 |
 |---|---|---|---|
-| 1 | 开源后端 Agent 化接入规范 | `docs/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
-| 2 | ERPNext-MCP 改造 PRD | `docs/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
-| 3 | MCP 改造任务包总则 | `docs/MCP改造任务包总则.md` | v1.1（以对应 Freeze Manifest 为准） |
-| 4 | MCP 改造封闭任务包模板 | `docs/任务包模板.md` | v1.0（以对应 Freeze Manifest 为准） |
-| 5 | MCP 改造任务包登记表 | `docs/任务包登记表.md` | v1.0 字段结构基线；任务行受控更新 |
-| 6 | 实施区与验收区边界 | `docs/实施区与验收区边界.md` | v1.1（升版 2026-09-15，依据 CHG-20260915-001） |
+| 1 | 开源后端 Agent 化接入规范 | `docs/governance/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
+| 2 | ERPNext-MCP 改造 PRD | `docs/governance/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
+| 3 | MCP 改造任务包总则 | `docs/governance/MCP改造任务包总则.md` | v1.1（以对应 Freeze Manifest 为准） |
+| 4 | MCP 改造封闭任务包模板 | `docs/templates/任务包模板.md` | v1.0（以对应 Freeze Manifest 为准） |
+| 5 | MCP 改造任务包登记表 | `docs/governance/任务包登记表.md` | v1.0 字段结构基线；任务行受控更新 |
+| 6 | 实施区与验收区边界 | `docs/governance/实施区与验收区边界.md` | v1.1（升版 2026-09-15，依据 CHG-20260915-001） |
 | 7 | B05 幂等可实现性调研结论 | `docs/task-packages/B05/idempotency-research.md` | v1.0 已封存（2026-09-15，§10 接入方确认有效） |
 | 8 | B05 封存记录与下游影响（§18.3 权威结论） | `docs/task-packages/B05/task.md` §18.3 | v1.0 已封存（2026-09-15） |
 | 9 | B00 封存记录与下游影响（可信调用方身份事实） | `docs/task-packages/B00/task.md` §18.3 第 1 条 | v1.0 已封存（2026-09-14） |
@@ -102,7 +102,7 @@
 | 路径/对象 | 允许动作 | Owner | 是否共享 | 协调规则 |
 |---|---|---|---|---|
 | `docs/task-packages/E02/` | 新增和维护 E02 任务包、机制实现代码、实现契约正文、Evidence Manifest、隔离探针 | gjg | 否 | 状态变化必须追加记录，不覆盖历史 |
-| `docs/任务包登记表.md` 的 E02 行 | 更新 E02 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 E02 行；其他任务行实质变化另走相应任务或变更流程 |
+| `docs/governance/任务包登记表.md` 的 E02 行 | 更新 E02 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 E02 行；其他任务行实质变化另走相应任务或变更流程 |
 | `docs/task-records/freeze-manifests/E02-v1.0.md` | 冻结时登记 E02 冻结清单与哈希 | gjg | 否 | 哈希针对冻结文件计算，不写回被哈希文件 |
 | `docs/task-records/changes/`、`returns/` | 保存 E02 变更或退回记录（如发生） | gjg | 是 | 使用稳定编号和独立文件 |
 
@@ -198,7 +198,7 @@ E02 为档位 2（标准），需独立验收（客观验证）。验收不依�
 |---|---|---|---|
 | CD-1 | E02 任务包 | `docs/task-packages/E02/task.md` | 按冻结模板检查必备结构 |
 | CD-2 | E02 Evidence Manifest | `docs/task-packages/E02/evidence-manifest.md` | 逐项追溯工作项与完成定义 |
-| CD-3 | 更新后的任务包登记表 | `docs/任务包登记表.md` | E02 行与本文件一致，表格结构未改变 |
+| CD-3 | 更新后的任务包登记表 | `docs/governance/任务包登记表.md` | E02 行与本文件一致，表格结构未改变 |
 | CD-4 | 机制实现（server 侧模块/函数 + 隔离探针） | `docs/task-packages/E02/`（实现目录与探针目录） | 可运行、可注入合成状态/故障、可清理；不含凭据；不接入 ERPNext |
 | CD-5 | 实现契约正文 | `docs/task-packages/E02/implementation-contract.md` | 覆盖 §9.1 全部 7 项，逐项可复核，不含具体业务 tool 语义 |
 | CD-6 | 独立验收记录 | `docs/task-packages/E02/`（验收记录 + 证据） | Acceptor（gjg）独立验收通过，断言可复算 |

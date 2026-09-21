@@ -72,12 +72,12 @@
 
 | 优先级 | 名称 | 路径/位置 | 版本或提交标识 |
 |---|---|---|---|
-| 1 | 开源后端 Agent 化接入规范 | `docs/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
-| 2 | ERPNext-MCP 改造 PRD | `docs/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
-| 3 | MCP 改造任务包总则 | `docs/MCP改造任务包总则.md` | v1.1（以对应 Freeze Manifest 为准） |
-| 4 | MCP 改造封闭任务包模板 | `docs/任务包模板.md` | v1.0（以对应 Freeze Manifest 为准） |
-| 5 | MCP 改造任务包登记表 | `docs/任务包登记表.md` | v1.0 字段结构基线；任务行受控更新 |
-| 6 | 实施区与验收区边界 | `docs/实施区与验收区边界.md` | v1.1（升版 2026-09-15，依据 CHG-20260915-001） |
+| 1 | 开源后端 Agent 化接入规范 | `docs/governance/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
+| 2 | ERPNext-MCP 改造 PRD | `docs/governance/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
+| 3 | MCP 改造任务包总则 | `docs/governance/MCP改造任务包总则.md` | v1.1（以对应 Freeze Manifest 为准） |
+| 4 | MCP 改造封闭任务包模板 | `docs/templates/任务包模板.md` | v1.0（以对应 Freeze Manifest 为准） |
+| 5 | MCP 改造任务包登记表 | `docs/governance/任务包登记表.md` | v1.0 字段结构基线；任务行受控更新 |
+| 6 | 实施区与验收区边界 | `docs/governance/实施区与验收区边界.md` | v1.1（升版 2026-09-15，依据 CHG-20260915-001） |
 | 7 | B01 主数据接口事实记录 | `docs/task-packages/B01/interface-facts.md` | v1.0 已封存（2026-09-14） |
 | 8 | B02 销售链路接口事实记录 | `docs/task-packages/B02/interface-facts.md` | v1.0 已封存（2026-09-14，含 F7 原位重冻） |
 | 9 | B03 采购链路接口事实记录 | `docs/task-packages/B03/interface-facts.md` | v1.0 已封存（2026-09-15） |
@@ -106,7 +106,7 @@
 | 路径/对象 | 允许动作 | Owner | 是否共享 | 协调规则 |
 |---|---|---|---|---|
 | `docs/task-packages/D01/` | 新增和维护 D01 任务包、公共契约正文（`common-contract.md`）与 Evidence Manifest | gjg | 否 | 状态变化必须追加记录，不覆盖历史 |
-| `docs/任务包登记表.md` 的 D01 行 | 更新 D01 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 D01 行；其他任务行实质变化另走相应任务或变更流程 |
+| `docs/governance/任务包登记表.md` 的 D01 行 | 更新 D01 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 D01 行；其他任务行实质变化另走相应任务或变更流程 |
 | `docs/task-records/freeze-manifests/D01-v1.0.md` | 冻结时登记 D01 冻结清单与哈希 | gjg | 否 | 哈希针对冻结文件计算，不写回被哈希文件 |
 | `docs/task-records/changes/`、`returns/` | 保存 D01 变更或退回记录（如发生） | gjg | 是 | 使用稳定编号和独立文件 |
 
@@ -193,7 +193,7 @@ D01 为档位 1（轻量），其正确性由下游 D02 首次使用时验证（
 | CD-1 | D01 任务包 | `docs/task-packages/D01/task.md` | 按冻结模板检查必备结构 |
 | CD-2 | 公共契约与错误模型正文 | `docs/task-packages/D01/common-contract.md` | 覆盖 §9.1 全部 7 项，逐项可复核，不含具体 tool 业务语义 |
 | CD-3 | D01 Evidence Manifest | `docs/task-packages/D01/evidence-manifest.md` | 逐项追溯工作项与完成定义 |
-| CD-4 | 更新后的任务包登记表 | `docs/任务包登记表.md` | D01 行与本文件一致，表格结构未改变 |
+| CD-4 | 更新后的任务包登记表 | `docs/governance/任务包登记表.md` | D01 行与本文件一致，表格结构未改变 |
 
 ## 12. 开发自检
 

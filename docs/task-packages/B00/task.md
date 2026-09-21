@@ -68,15 +68,15 @@
 
 | 优先级 | 名称 | 路径/位置 | 版本或提交标识 |
 |---|---|---|---|
-| 1 | 开源后端 Agent 化接入规范 | `docs/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
-| 2 | ERPNext-MCP 改造 PRD | `docs/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
-| 3 | MCP 改造任务包总则 | `docs/MCP改造任务包总则.md` | v1.0；以对应 Freeze Manifest 为准 |
-| 4 | MCP 改造封闭任务包模板 | `docs/任务包模板.md` | v1.0；以对应 Freeze Manifest 为准 |
-| 5 | MCP 改造任务包登记表 | `docs/任务包登记表.md` | v1.0 字段结构基线；任务行受控更新 |
-| 6 | 实施区与验收区边界 | `docs/实施区与验收区边界.md` | v1.0 边界规则 |
+| 1 | 开源后端 Agent 化接入规范 | `docs/governance/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
+| 2 | ERPNext-MCP 改造 PRD | `docs/governance/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
+| 3 | MCP 改造任务包总则 | `docs/governance/MCP改造任务包总则.md` | v1.0；以对应 Freeze Manifest 为准 |
+| 4 | MCP 改造封闭任务包模板 | `docs/templates/任务包模板.md` | v1.0；以对应 Freeze Manifest 为准 |
+| 5 | MCP 改造任务包登记表 | `docs/governance/任务包登记表.md` | v1.0 字段结构基线；任务行受控更新 |
+| 6 | 实施区与验收区边界 | `docs/governance/实施区与验收区边界.md` | v1.0 边界规则 |
 | 7 | ERPNext 进销存系统·部署与接口文档 | `erp/README.md` | 当前工作树版本 |
 | 8 | frappe_docker 依赖 | `frappe_docker`（submodule） | 固定提交 `a0c52135d4d41c4b8acf7adfdfc5bbcba46dd4d0` |
-| 9 | 治理修订评审记录 | `docs/变更记录-2026-09-12-任务包治理修订.md` | CHG-20260912-001（2026-09-12） |
+| 9 | 治理修订评审记录 | `docs/governance/changes/变更记录-2026-09-12-任务包治理修订.md` | CHG-20260912-001（2026-09-12） |
 | 10 | P00 封存记录与下游影响 | `docs/task-packages/P00/task.md` §18 | P00 v1.1（已封存） |
 
 ## 6. 授权范围与所有权
@@ -95,7 +95,7 @@
 | 路径/对象 | 允许动作 | Owner | 是否共享 | 协调规则 |
 |---|---|---|---|---|
 | `docs/task-packages/B00/` | 新增和维护 B00 任务包、隔离脚本、公开证据与 Evidence Manifest | gjg | 否 | 状态变化必须追加记录，不覆盖历史 |
-| `docs/任务包登记表.md` 的 B00 行 | 更新 B00 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 B00 行；其他任务行实质变化另走相应任务或变更流程 |
+| `docs/governance/任务包登记表.md` 的 B00 行 | 更新 B00 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 B00 行；其他任务行实质变化另走相应任务或变更流程 |
 | `docs/task-records/changes/`、`returns/` | 保存 B00 变更或退回记录（如发生） | gjg | 是 | 使用稳定编号和独立文件 |
 | `docs/task-records/freeze-manifests/B00-v1.0.md` | 冻结时登记 B00 冻结清单与哈希 | gjg | 否 | 哈希针对冻结文件计算，不写回被哈希文件 |
 | 验收区 `D:\second-acceptance\` 目录结构 | 建立 `snapshots/`、`reset/` 子目录与目录说明；实施区=`D:\second`、验收区=`D:\second-acceptance`（独立 Git 仓库，Owner=gjg） | gjg | 是 | `task-sets/`、`assertions/`、`runs/` 为 C01/G01 产物，B00 不得创建；隔离验证完成前不得启动 C01a/C01b/G01 |
@@ -196,7 +196,7 @@ B00 的输出为「冻结事实记录」与「临时探针权限」，其作为�
 |---|---|---|---|
 | D01 | B00 任务包 | `docs/task-packages/B00/task.md` | 按冻结模板检查必备结构 |
 | D02 | B00 Evidence Manifest | `docs/task-packages/B00/evidence-manifest.md` | 逐项追溯工作项与完成定义 |
-| D03 | 更新后的任务包登记表 | `docs/任务包登记表.md` | B00 行与本文件一致，表格结构未改变 |
+| D03 | 更新后的任务包登记表 | `docs/governance/任务包登记表.md` | B00 行与本文件一致，表格结构未改变 |
 | D04 | 对象裁剪与 API 可用性核查记录 | `docs/task-packages/B00/evidence/`（脱敏） | 逐对象 DocType 与端点结论可复核 |
 | D05 | 权限模型可行性与临时探针权限记录 | `D:\second-acceptance\evidence\`（Owner=gjg；访问主体=验收侧；保留至项目交付） | 角色/用户/权限机制与越权验证可复核 |
 | D06 | 事务与回滚基础确认记录 | `D:\second-acceptance\evidence\`（Owner=gjg；访问主体=验收侧；保留至项目交付） | 事务/回滚能力与失败不静默成功结论可复核 |

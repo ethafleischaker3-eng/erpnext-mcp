@@ -26,7 +26,7 @@
 ### 3.1 冻结完整性
 
 - 冻结快照哈希与 Freeze Manifest 一致（`ca16b976…` / `1ca2932c…`），当前 `task.md` 仅在冻结语义之上追加状态记录与风险条目，未覆盖冻结内容（快照 `frozen/v1.0/` 未动）。
-- 工作区改动面核对：仅新增 `docs/task-packages/E02/`（实现 + 探针 + 测试 + 证据）与 `docs/task-records/freeze-manifests/E02-v1.0.md`、修改 `docs/任务包登记表.md` 的 E02 行。未改动规范、PRD、总则、模板、边界规则、B00/B05/D01 冻结材料、`frozen/` 快照。
+- 工作区改动面核对：仅新增 `docs/task-packages/E02/`（实现 + 探针 + 测试 + 证据）与 `docs/task-records/freeze-manifests/E02-v1.0.md`、修改 `docs/governance/任务包登记表.md` 的 E02 行。未改动规范、PRD、总则、模板、边界规则、B00/B05/D01 冻结材料、`frozen/` 快照。
 
 ### 3.2 开发自检（独立重跑，非采信实施侧自证）
 

@@ -27,7 +27,7 @@
 ### 3.1 冻结完整性
 
 - `diff` 冻结快照 `frozen/v1.0/task.md` 与当前 `task.md`：仅 3 处差异 —— ① 页头状态「已冻结 → 待验收」（状态流转）；② §4 前置第 9/10 条「待实施前验证 → 已验证」（实施期回填）；③ §17 追加两条状态记录（已冻结→实施中→待验收）。**冻结的目标/范围/权威输入/完成定义/不变量/禁止事项均未改动**，`frozen/v1.0/` 快照未动。
-- 工作区改动面核对：新增 `server/`（骨架 + lib 8 模块 + 6 读 tool + 白名单/错误转译）、新增 `docs/task-packages/F01/` 五份交付物文档与 `evidence/`；修改 `docs/task-packages/F01/task.md`（状态记录）与 `docs/任务包登记表.md` F01 行。未改动上游规范、PRD、总则、D01/D02 契约、E01/E02 结论、C01b 冻结任务集、`frozen/` 快照。
+- 工作区改动面核对：新增 `server/`（骨架 + lib 8 模块 + 6 读 tool + 白名单/错误转译）、新增 `docs/task-packages/F01/` 五份交付物文档与 `evidence/`；修改 `docs/task-packages/F01/task.md`（状态记录）与 `docs/governance/任务包登记表.md` F01 行。未改动上游规范、PRD、总则、D01/D02 契约、E01/E02 结论、C01b 冻结任务集、`frozen/` 快照。
 
 ### 3.2 逐 tool 与 D02 §2 核对（name / schema / annotation / 错误转译 / 批次行为）
 

@@ -37,5 +37,5 @@
 | D04 对齐核对记录 | `docs/task-packages/F01/alignment-check.md` | 已产出 |
 | D05 开发自检记录 | `docs/task-packages/F01/dev-selftest.md` | 已产出 |
 | D06 Evidence Manifest | `docs/task-packages/F01/evidence-manifest.md` | 本文件 |
-| D07 登记表 F01 行 | `docs/任务包登记表.md` | 随状态追加 |
+| D07 登记表 F01 行 | `docs/governance/任务包登记表.md` | 随状态追加 |
 | D08 独立验收记录 | （归 Acceptor gjg，Implementer 不产出） | 不适用 |

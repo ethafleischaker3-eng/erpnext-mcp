@@ -79,11 +79,11 @@
 
 | 优先级 | 名称 | 路径/位置 | 版本或提交标识 |
 |---|---|---|---|
-| 1 | 开源后端 Agent 化接入规范 | `docs/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
-| 2 | ERPNext-MCP 改造 PRD | `docs/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
+| 1 | 开源后端 Agent 化接入规范 | `docs/governance/开源后端Agent化接入规范.md` | 2026-09-07 定稿版 |
+| 2 | ERPNext-MCP 改造 PRD | `docs/governance/ERPNext-MCP改造PRD.md` | 2026-09-12-r1 |
 | 3 | D02 业务 tool 契约（**F04 直接依据**，§3 主数据 #6–#12、§6 库存 #23–#25 逐 tool 冻结口径） | `docs/task-packages/D02/tool-contract.md` | v1.0 已通过 |
 | 4 | D01 公共契约与错误模型（统一基座） | `docs/task-packages/D01/common-contract.md` | v1.0 已通过 |
-| 5 | MCP 改造任务包总则 | `docs/MCP改造任务包总则.md` | v1.1（升版 2026-09-15） |
+| 5 | MCP 改造任务包总则 | `docs/governance/MCP改造任务包总则.md` | v1.1（升版 2026-09-15） |
 | 6 | E01 权限矩阵 / 两张允许清单 / 正式账号与角色 / 确认与 fail-closed / 越权验证 | `docs/task-packages/E01/permission-matrix.md`、`allowlist.md`、`roles.md`、`confirmation-failclosed.md`、`authorization-verification.md` | v1.0 已封存 |
 | 7 | E02 实现契约（幂等/前置/事后/批次台账接口 + #26 查询语义） | `docs/task-packages/E02/implementation-contract.md`（+ `lib/` 8 模块） | v1.0 已封存 |
 | 8 | F01 任务包与 `server/` 骨架（直接上游，复用骨架/白名单层/机制迁入） | `docs/task-packages/F01/task.md`、`server/`（仓库根） | v1.0 已通过 |
@@ -108,7 +108,7 @@
 |---|---|---|---|---|
 | `docs/task-packages/F04/` | 新增和维护 F04 task.md、evidence-manifest.md、可写字段白名单、对齐核对记录、开发自检与独立验收记录（脱敏） | gjg | 否 | 状态变化追加记录，不覆盖历史 |
 | MCP server 实现代码（`server/` 追加 10 个写/只出 plan tool 模块 + 注册表尾部新增 + 后端写端点/确认/fail-closed 增量扩展） | 新增/维护（复用 F01 `server/` 骨架；入口/注册表只增不改；既有 6 读 tool 与迁入 E02 `lib/` 8 模块不改） | gjg | 是（与 F01/F02 串行共享） | 串行：F01 已建 `server/` 骨架并拥有 6 读 tool 所有权；F04 在 `src/tools/` 尾部新增 10 个写 tool 模块、`registry.js` `TOOL_MODULES` 尾部新增条目，扩展 `backend.js`（写端点 POST/PUT + `frappe.client.submit`（confirm #24））、`index.js`（elicitation 确认处理）、`config.js`（币种/价格表 fail-closed 集中配置）、`allowlist.js`（写对象枚举与可写字段）——均为增量，不改既有条目/处理器；F02 仅在 F04 通过后按串行顺序追加 #13–#22 |
-| `docs/任务包登记表.md` 的 F04 行 | 更新 F04 版本、状态、角色、路径与证据位置，并**补列 F01 为上游依赖** | gjg | 是 | 仅更新 F04 行；其他任务行实质变化另走相应任务或变更流程 |
+| `docs/governance/任务包登记表.md` 的 F04 行 | 更新 F04 版本、状态、角色、路径与证据位置，并**补列 F01 为上游依赖** | gjg | 是 | 仅更新 F04 行；其他任务行实质变化另走相应任务或变更流程 |
 | `docs/task-records/freeze-manifests/F04-v1.0.md` | 冻结时登记 F04 冻结清单与哈希（档位 3 强制） | gjg | 否 | 哈希针对冻结文件计算，不写回被哈希文件 |
 | `docs/task-records/changes/`、`returns/` | 保存 F04 变更或退回记录（如发生） | gjg | 是 | 稳定编号、独立文件 |
 
@@ -232,7 +232,7 @@ F04 不定义新契约，10 个 tool 的契约以 D02 `tool-contract.md` §3.1�
 | D04 | 对齐核对记录 | `docs/task-packages/F04/`（脱敏） | 逐 tool 逐项可复核，无清单外对象、无机制绕过 |
 | D05 | 开发自检记录 | `docs/task-packages/F04/`（脱敏） | S01–S12 可复核 |
 | D06 | Evidence Manifest | `docs/task-packages/F04/evidence-manifest.md` | 逐项可追溯 |
-| D07 | 更新后的登记表 | `docs/任务包登记表.md` | F04 行与本文件一致（含上游依赖补 F01） |
+| D07 | 更新后的登记表 | `docs/governance/任务包登记表.md` | F04 行与本文件一致（含上游依赖补 F01） |
 | D08 | 独立验收记录 + 封存记录 | `docs/task-packages/F04/`（脱敏，随 §18）+ `docs/task-records/freeze-manifests/F04-v1.0.md` | Acceptor gjg 独立验收通过（档位 3），封存与下游影响记录完整 |
 
 ## 12. 开发自检

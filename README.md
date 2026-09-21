@@ -136,10 +136,13 @@ docker exec -i frappe_docker-db-1 mariadb -uroot -perpnext-dev-123 \
 |---|---|
 | 后端部署与原生 API | `erp/README.md` |
 | MCP server 运行与目录 | `server/README.md` |
-| 通用接入规范 | `docs/开源后端Agent化接入规范.md` |
-| 项目 PRD | `docs/ERPNext-MCP改造PRD.md` |
-| 任务包总则 | `docs/MCP改造任务包总则.md` |
+| 换机复现（部署迁移） | `erp/换机复现手册.md` |
+| 项目推进侧总入口（治理/模板/规划/产出/记录） | `docs/README.md` |
+| 通用接入规范 | `docs/governance/开源后端Agent化接入规范.md` |
+| 项目 PRD | `docs/governance/ERPNext-MCP改造PRD.md` |
+| 任务包总则 | `docs/governance/MCP改造任务包总则.md` |
 | 26 tool 契约 | `docs/task-packages/D02/tool-contract.md` |
 | 权限矩阵/允许清单 | `docs/task-packages/E01/` |
 | 集成验收报告 | `docs/task-packages/G01/acceptance-report.md` |
 | 符合性声明与交付物汇总 | `docs/task-packages/H01/` |
+| 二期规划与评估 | `docs/plans/` |

@@ -6,7 +6,7 @@
 
 ## 开工前五步（总则 §9）
 
-1. 依序读并核对：docs/task-packages/A01/task.md（冻结正文，以 frozen/v1.0/task.md 快照为准）、docs/task-packages/A01/evidence-manifest.md、docs/MCP改造任务包总则.md、docs/任务包模板.md、docs/ERPNext-MCP改造PRD.md、docs/开源后端Agent化接入规范.md、docs/task-packages/B00/task.md（§18）、docs/任务包登记表.md、docs/实施区与验收区边界.md。
+1. 依序读并核对：docs/task-packages/A01/task.md（冻结正文，以 frozen/v1.0/task.md 快照为准）、docs/task-packages/A01/evidence-manifest.md、docs/governance/MCP改造任务包总则.md、docs/templates/任务包模板.md、docs/governance/ERPNext-MCP改造PRD.md、docs/governance/开源后端Agent化接入规范.md、docs/task-packages/B00/task.md（§18）、docs/governance/任务包登记表.md、docs/governance/实施区与验收区边界.md。
 2. 核对 A01 v1.0 及 §4 前置条件（B00 已封存、PRD 已冻结等）是否成立，不成立即停。
 3. 检查工作区无未授权变更。
 4. 声明任务边界（只做 A01，§3 非目标以外的事不做）。

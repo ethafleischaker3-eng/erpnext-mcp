@@ -78,8 +78,8 @@
 | 4 | D01 公共契约与错误模型（统一基座） | `docs/task-packages/D01/common-contract.md` | v1.0 已通过 |
 | 5 | B01–B04 接口事实（字段名/状态机/错误码/回滚） | `docs/task-packages/B0[1-4]/interface-facts.md` | v1.0 已封存 |
 | 6 | B05 幂等边界（窗口期/指纹/状态断言） | `docs/task-packages/B05/idempotency-research.md`、`task.md` §18.3 | v1.0 已封存 |
-| 7 | PRD 分级验收口径、指标与可复算口径 | `docs/ERPNext-MCP改造PRD.md` §1.3/§6 | 2026-09-12-r1 |
-| 8 | 规范验收覆盖下限、指标与验收环境 | `docs/开源后端Agent化接入规范.md` §12.3/§12.4/§13 | 2026-09-07 定稿版 |
+| 7 | PRD 分级验收口径、指标与可复算口径 | `docs/governance/ERPNext-MCP改造PRD.md` §1.3/§6 | 2026-09-12-r1 |
+| 8 | 规范验收覆盖下限、指标与验收环境 | `docs/governance/开源后端Agent化接入规范.md` §12.3/§12.4/§13 | 2026-09-07 定稿版 |
 | 9 | ERPNext 数据模型（复核字段名） | `erp/README.md` | 2026-09-11 |
 | 10 | 治理约束（总则/模板/登记表/边界） | `docs/` | v1.1 / v1.0 已冻结 |
 
@@ -102,7 +102,7 @@
 | `D:\second-acceptance\assertions\` | 写入精确终态断言与评分规则 | gjg | 否 | 对实施主体 Deny |
 | `D:\second-acceptance\snapshots\` | 写入初始数据与快照 | gjg | 否 | 对实施主体 Deny |
 | `D:\second-acceptance\reset\` | 写入重置脚本（恢复脚本） | gjg | 否 | 受控（实施主体 Modify），G01 执行 |
-| `docs/任务包登记表.md` 的 C01b 行 | 更新 C01b 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 C01b 行 |
+| `docs/governance/任务包登记表.md` 的 C01b 行 | 更新 C01b 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 C01b 行 |
 | `docs/task-records/freeze-manifests/C01b-v1.0.md` | 冻结时登记 C01b 冻结清单与哈希 | gjg | 否 | 哈希针对冻结文件计算，不写回被哈希文件 |
 
 > 治理文档落实施区 `docs/task-packages/C01b/`；题目全文→`task-sets/`、精确断言与评分规则→`assertions/`、初始快照→`snapshots/`、重置脚本→`reset/`，均按边界 v1.1 §3.1 冻结目录清单落位（边界 §3）。覆盖映射明细（题目→tool）含题目结构信息，属隐藏材料，随 task-sets/ 冻结；实施区仅保留脱敏的覆盖汇总（tool 维度计数，不含题目正文）。

@@ -52,7 +52,7 @@
 | 实施区/验收区实际路径已填写并经 Owner 确认（D:\second / D:\second-acceptance） | 核对边界生效条件 + B00 EV-B00-008/012 | 已满足 |
 | 源码版本基线冻结：ERPNext 15.121.2 / Frappe 15.120.1；frappe_docker submodule 提交 a0c52135d4d41c4b8acf7adfdfc5bbcba46dd4d0 | 核对 .env ERPNEXT_VERSION + B00 EV-B00-001 | 已满足 |
 | 数据模型交接文档 erp/README.md 可用 | 文件存在 | 已满足 |
-| Owner 已建立对盲出题主体的只读拒绝 ACL：`docs/task-packages/B0[1-5]/`、`docs/task-records/`、PRD 全文 `docs/ERPNext-MCP改造PRD.md` 与验收区隐藏目录 task-sets/assertions/runs/snapshots | Owner 以管理员运行隔离脚本 + `icacls` 校验（出题会话无权建 ACL） | 已满足（setup/verify-c01a-isolation.ps1：B01–B04 + PRD + task-records + 4 隐藏哨兵均 READ_DENIED） |
+| Owner 已建立对盲出题主体的只读拒绝 ACL：`docs/task-packages/B0[1-5]/`、`docs/task-records/`、PRD 全文 `docs/governance/ERPNext-MCP改造PRD.md` 与验收区隐藏目录 task-sets/assertions/runs/snapshots | Owner 以管理员运行隔离脚本 + `icacls` 校验（出题会话无权建 ACL） | 已满足（setup/verify-c01a-isolation.ps1：B01–B04 + PRD + task-records + 4 隐藏哨兵均 READ_DENIED） |
 | Owner 已建立对实施主体的只读拒绝 ACL：验收区隐藏目录 task-sets/assertions/runs/snapshots 与新增 candidates/ | Owner 以管理员运行隔离脚本 + `icacls` 校验 | 已满足（candidates/ 对 b00-impl Deny 已建立） |
 | Owner 已授予盲出题主体对 `D:\second-acceptance\candidates\C01a\` 的写权限（自身产物） | Owner 以管理员建立 ACL | 已满足（verify 写探针 WRITE_OK） |
 | Owner 已下发对象范围边界名单（Owner 前置交付，非本包写入集；三列：对象名 / 类别[操作允许·引用允许] / 读写性质[读写·只读]；忠实抽取自 PRD §2；路径 `docs/task-packages/C01a/object-scope.md`） | 名单文件存在 | 已满足（object-scope.md 已产出，12 操作 + 9 引用） |
@@ -64,7 +64,7 @@
 
 | 优先级 | 名称 | 路径/位置 | 版本或提交标识 |
 |---|---|---|---|
-| 1 | 开源后端 Agent 化接入规范 第 8 章（tool 设计规范） | docs/开源后端Agent化接入规范.md | 2026-09-07 定稿版 |
+| 1 | 开源后端 Agent 化接入规范 第 8 章（tool 设计规范） | docs/governance/开源后端Agent化接入规范.md | 2026-09-07 定稿版 |
 | 2 | ERPNext 数据模型（DocType、状态机、单据流转、对象↔API 映射） | erp/README.md | 2026-09-11 |
 | 3 | frappe_docker 源码（部署形态与版本基线） | frappe_docker/（submodule） | 提交 a0c52135d4d41c4b8acf7adfdfc5bbcba46dd4d0；ERPNEXT_VERSION=v15.121.2 |
 | 4 | 冻结源码版本基线 | 同上 .env + B00 EV-B00-001/008 | ERPNext 15.121.2 / Frappe 15.120.1 / MariaDB 11.8.9 |
@@ -82,8 +82,8 @@
 
 ### 6.1 可读取范围
 
-- 可读：实施区 `frappe_docker/`（submodule 源码与 .env 版本基线）、`erp/README.md`（数据模型）、`docs/开源后端Agent化接入规范.md` 第 8 章、`docs/` 治理文档（总则/任务包模板/登记表/实施区与验收区边界）、Owner 下发的对象范围边界名单（`docs/task-packages/C01a/object-scope.md`）；`docs/task-packages/B00/` 仅核对封存状态（v1.0）作启动门槛，不读取其事实作场景生成输入。
-- 严禁读：`docs/task-packages/B0[1-5]/` 任何文件（尤其各 interface-facts.md、task.md、implementer-brief.md）；**PRD 全文**（`docs/ERPNext-MCP改造PRD.md`）；`docs/task-records/` 任何文件（尤其各 B 系列 Freeze Manifest 与变更记录）；任何 MCP 契约或 server 实现；验收区隐藏目录 `task-sets/`、`assertions/`、`runs/`、`snapshots/` 的任何文件。
+- 可读：实施区 `frappe_docker/`（submodule 源码与 .env 版本基线）、`erp/README.md`（数据模型）、`docs/governance/开源后端Agent化接入规范.md` 第 8 章、`docs/` 治理文档（总则/任务包模板/登记表/实施区与验收区边界）、Owner 下发的对象范围边界名单（`docs/task-packages/C01a/object-scope.md`）；`docs/task-packages/B00/` 仅核对封存状态（v1.0）作启动门槛，不读取其事实作场景生成输入。
+- 严禁读：`docs/task-packages/B0[1-5]/` 任何文件（尤其各 interface-facts.md、task.md、implementer-brief.md）；**PRD 全文**（`docs/governance/ERPNext-MCP改造PRD.md`）；`docs/task-records/` 任何文件（尤其各 B 系列 Freeze Manifest 与变更记录）；任何 MCP 契约或 server 实现；验收区隐藏目录 `task-sets/`、`assertions/`、`runs/`、`snapshots/` 的任何文件。
 - 本包产物 `candidates/`（验收区）为出题会话自身的写入/回读空间，不属于上述严禁读；其对「实施主体」的只读拒绝由 Owner 建立（见 §4）。
 - 一旦读到上述严禁内容，本上下文立即作废，停止并上报。
 

@@ -77,8 +77,8 @@
 | 5 | E01 权限矩阵/允许清单/正式账号/确认与 fail-closed | `docs/task-packages/E01/` | v1.1 已封存（权限矩阵） |
 | 6 | E02 幂等/前置/事后/批次机制契约 | `docs/task-packages/E02/implementation-contract.md` | v1.0 已封存 |
 | 7 | C01a object-scope 名单（12 操作 + 9 引用） | `docs/task-packages/C01a/object-scope.md` | v1.0 已封存 |
-| 8 | PRD 分级验收口径、指标与可复算口径 | `docs/ERPNext-MCP改造PRD.md` §1.3/§6 | 2026-09-12-r1 |
-| 9 | 规范验收覆盖下限、指标与验收环境 | `docs/开源后端Agent化接入规范.md` §12.3/§12.4/§13 | 2026-09-07 定稿版 |
+| 8 | PRD 分级验收口径、指标与可复算口径 | `docs/governance/ERPNext-MCP改造PRD.md` §1.3/§6 | 2026-09-12-r1 |
+| 9 | 规范验收覆盖下限、指标与验收环境 | `docs/governance/开源后端Agent化接入规范.md` §12.3/§12.4/§13 | 2026-09-07 定稿版 |
 | 10 | 干净基线快照 | `D:\second-acceptance\snapshots\clean-post-E01.sql` | 已就绪 |
 | 11 | 被测 MCP server 实现与自检 | `server/index.js`（26 tool）、`server/test/selftest.js`、`server/test/realsmoke.js` | 当前仓库提交（W02 固化） |
 | 12 | 治理约束（总则/模板/登记表/边界） | `docs/` | v1.1 / v1.0 已冻结 |
@@ -100,7 +100,7 @@
 | `docs/task-packages/G01/` | 新增和维护 G01 任务包、集成验收报告（脱敏）、Evidence Manifest | gjg | 否 | 状态变化追加记录，不覆盖历史 |
 | `D:\second-acceptance\runs\` | 写入每题验收运行记录（调用序列、终态核对、次数统计） | gjg | 否 | 对实施主体 Deny |
 | `docs/task-records/returns/`、`docs/task-records/changes/` | 写入归责/退回/变更记录（按 §8.3 归责） | gjg | 否 | 按总则 §14/§12 模板 |
-| `docs/任务包登记表.md` 的 G01 行 | 更新 G01 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 G01 行 |
+| `docs/governance/任务包登记表.md` 的 G01 行 | 更新 G01 版本、状态、角色、路径与证据位置 | gjg | 是 | 仅更新 G01 行 |
 | `docs/task-records/freeze-manifests/G01-v1.0.md` | 封存时登记 G01 冻结清单与哈希 | gjg | 否 | 哈希针对冻结文件计算，不写回被哈希文件 |
 | 后端数据库 | 通过快照恢复改变状态（验收合法动作）；仅此途径，不手工改库 | gjg | 否 | 恢复后以终态断言核对 |
 
